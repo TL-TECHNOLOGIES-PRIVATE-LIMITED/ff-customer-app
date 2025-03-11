@@ -180,28 +180,26 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
               maxLength: 191,
             ),
             getSizedBox(height: Constant.size15),
-            editPhoneBoxBoxWidget(
-              context,
-              edtMobile,
-              phoneNumberValidation,
-              getTranslatedValue(
-                context,
-                "mobile_number",
-              ),
-              countryCode: countryCode,
-              onCountryCodeChanged: (newCode) {
-                // Update state when changed
-                setState(() {
-                  countryCode = newCode;
-                });
-              },
-              onNumberChanged: (newNumber) {
-                // Update state when changed
-                setState(() {
-                  numberMobile = newNumber;
-                });
-              },
-            ),
+           editPhoneBoxBoxWidget(
+  context,
+  edtMobile,
+  phoneNumberValidation,
+  getTranslatedValue(context, "mobile_number"),
+  countryCode: countryCode,
+  onCountryCodeChanged: (newCode) {
+    setState(() {
+      countryCode = newCode;
+    });
+    formKey.currentState?.validate(); // Validate after country code change
+  },
+  onNumberChanged: (newNumber) {
+    setState(() {
+      numberMobile = newNumber;
+    });
+    formKey.currentState?.validate(); // Validate after mobile number change
+  },
+),
+
             getSizedBox(height: Constant.size15),
             editPhoneBoxBoxWidget(
               context,
@@ -623,132 +621,100 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                       context,
                       "add_new_address",
                     ),
-              callback: () async {
-                print('country code is ${countryCode}');
-                print('alternate country code is ${alternateCountryCode}');
-                print('number mobile is ${numberMobile}');
-                print('number alternate mobile is ${numberAlternateMobile}');
-                formKey.currentState!.save();
-                if (formKey.currentState!.validate()) {
-                  if (longitude.isEmpty && latitude.isEmpty) {
-                    setState(() {
-                      isLoading = false;
-                    });
-                    showMessage(
-                      context,
-                      getTranslatedValue(
-                        context,
-                        "please_select_address_from_map",
-                      ),
-                      MessageType.warning,
-                    );
-                  } else if (edtMobile.text.isEmpty) {
-                    setState(() {
-                      isLoading = false;
-                    });
-                    showMessage(
-                      context,
-                      getTranslatedValue(
-                        context,
-                        "mobile_number_cannot_be_empty",
-                      ),
-                      MessageType.warning,
-                    );
-                  } else if (numberMobile == numberAlternateMobile) {
-                    setState(() {
-                      isLoading = false;
-                    });
-                    showMessage(
-                      context,
-                      getTranslatedValue(
-                        context,
-                        "mobile_number_and_alternate_mobile_number_cannot_be_same",
-                      ),
-                      MessageType.warning,
-                    );
-                  } else {
-                    print('country code is ${countryCode}');
-                    print('alternate country code is ${alternateCountryCode}');
-                    Map<String, String> params = {};
+              callback: ()  async {
 
-                    String id = widget.address?.id.toString() ?? "";
-                    if (id.isNotEmpty) {
-                      params[ApiAndParams.id] = id;
-                    }
-                    params[ApiAndParams.countryCode] = countryCode ?? "IN";
-                    params[ApiAndParams.altCountryCode] =
-                        alternateCountryCode ?? "IN";
-                    params[ApiAndParams.name] = edtName.text.trim().toString();
-                    params[ApiAndParams.mobile] =
-                        edtMobile.text.trim().toString();
-                    if (selectedAddressType == AddressType.home) {
-                      params[ApiAndParams.type] = "home";
-                    } else if (selectedAddressType == AddressType.office) {
-                      params[ApiAndParams.type] = "office";
-                    } else if (selectedAddressType == AddressType.other) {
-                      params[ApiAndParams.type] = "other";
-                    } else {
-                      params[ApiAndParams.type] = "home";
-                    }
-                    params[ApiAndParams.address] =
-                        edtAddress.text.trim().toString();
-                    params[ApiAndParams.landmark] =
-                        edtLandmark.text.trim().toString();
-                    params[ApiAndParams.area] = edtArea.text.trim().toString();
-                    params[ApiAndParams.pinCode] =
-                        edtZipcode.text.trim().toString();
-                    params[ApiAndParams.city] = edtCity.text.trim().toString();
-                    params[ApiAndParams.state] =
-                        edtState.text.trim().toString();
-                    params[ApiAndParams.country] =
-                        edtCountry.text.trim().toString();
-                    params[ApiAndParams.alternateMobile] =
-                        edtAltMobile.text.trim().toString();
-                    params[ApiAndParams.latitude] = latitude;
-                    params[ApiAndParams.longitude] = longitude;
-                    params[ApiAndParams.isDefault] =
-                        isDefaultAddress == true ? "1" : "0";
+  
+  formKey.currentState!.save();
 
-                    widget.addressProviderContext
-                        .read<AddressProvider>()
-                        .addOrUpdateAddress(
-                            context: context,
-                            address: widget.address ?? "",
-                            params: params,
-                            function: () {
-                              final addresses = widget.addressProviderContext
-                                  .read<AddressProvider>();
+  if (formKey.currentState!.validate()) {
+    String mainMobile = edtMobile.text.trim();
+    String alternateMobile = edtAltMobile.text.trim();
 
-                              if ((widget.address?.id.toString() ?? "")
-                                      .isEmpty &&
-                                  addresses.addresses.isNotEmpty) {
-                                print('New Address');
-                                if (widget.from == "checkout") {
-                                  addresses.setSelectedAddress(int.parse(
-                                      addresses.addresses.last.id.toString()));
+    if (longitude.isEmpty || latitude.isEmpty) {
+      showMessage(
+        context,
+        getTranslatedValue(context, "please_select_address_from_map"),
+        MessageType.warning,
+      );
+    } else if (mainMobile.isEmpty) {
+      showMessage(
+        context,
+        getTranslatedValue(context, "mobile_number_cannot_be_empty"),
+        MessageType.warning,
+      );
+    } else if (!RegExp(r'^[0-9]{10,15}$').hasMatch(mainMobile)) {
+      // Validate the main phone number format
+      showMessage(
+        context,
+        getTranslatedValue(context, "please_enter_valid_mobile_number"),
+        MessageType.warning,
+      );
+    } else if (alternateMobile.isNotEmpty && mainMobile == alternateMobile) {
+      showMessage(
+        context,
+        getTranslatedValue(context, "mobile_number_and_alternate_mobile_number_cannot_be_same"),
+        MessageType.warning,
+      );
+    } else if (alternateMobile.isNotEmpty && !RegExp(r'^[0-9]{10,15}$').hasMatch(alternateMobile)) {
+      // Validate the alternate phone number format if provided
+      showMessage(
+        context,
+        getTranslatedValue(context, "please_enter_valid_alternate_mobile_number"),
+        MessageType.warning,
+      );
+    } else {
+      // Passed all validations, proceed with address addition
+      setState(() {
+        isLoading = true;
+      });
 
-                                  print('kkkkkk here');
-                                  Navigator.pop(
-                                      context, addresses.addresses.last);
-                                } else {
-                                  print('jjjjjj here');
-                                  Navigator.pop(context);
-                                }
-                              } else {
-                                print('hai its here');
-                                Navigator.pop(context);
-                              }
-                            });
+      Map<String, String> params = {
+        ApiAndParams.countryCode: countryCode ?? "IN",
+        ApiAndParams.altCountryCode: alternateCountryCode ?? "IN",
+        ApiAndParams.name: edtName.text.trim(),
+        ApiAndParams.mobile: mainMobile,
+        ApiAndParams.alternateMobile: alternateMobile,
+        ApiAndParams.address: edtAddress.text.trim(),
+        ApiAndParams.landmark: edtLandmark.text.trim(),
+        ApiAndParams.area: edtArea.text.trim(),
+        ApiAndParams.pinCode: edtZipcode.text.trim(),
+        ApiAndParams.city: edtCity.text.trim(),
+        ApiAndParams.state: edtState.text.trim(),
+        ApiAndParams.country: edtCountry.text.trim(),
+        ApiAndParams.latitude: latitude,
+        ApiAndParams.longitude: longitude,
+        ApiAndParams.isDefault: isDefaultAddress ? "1" : "0",
+        ApiAndParams.type: selectedAddressType == AddressType.home
+            ? "home"
+            : selectedAddressType == AddressType.office
+                ? "office"
+                : "other",
+      };
 
-                    setState(() {
-                      isLoading = true;
-                    });
-                  }
-                } else {
-                  showMessage(context, "Please fill in all required fields!",
-                      MessageType.error);
-                }
-              },
+      widget.addressProviderContext.read<AddressProvider>().addOrUpdateAddress(
+          context: context,
+          address: widget.address ?? "",
+          params: params,
+          function: () {
+            final addresses = widget.addressProviderContext.read<AddressProvider>();
+
+            if ((widget.address?.id.toString() ?? "").isEmpty && addresses.addresses.isNotEmpty) {
+              if (widget.from == "checkout") {
+                addresses.setSelectedAddress(int.parse(addresses.addresses.last.id.toString()));
+                Navigator.pop(context, addresses.addresses.last);
+              } else {
+                Navigator.pop(context);
+              }
+            } else {
+              Navigator.pop(context);
+            }
+          });
+    }
+  } else {
+    showMessage(context, "Please fill in all required fields!", MessageType.error);
+  }
+}
+
             ),
             getSizedBox(height: Constant.size10),
           ],

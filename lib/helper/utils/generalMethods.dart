@@ -367,23 +367,26 @@ String? validateArea(String value) {
 }
 
 String? optionalPhoneValidation(PhoneNumber? value) {
-  if (value == null || value.number.isEmpty) {
+  if (value == null || value.number.trim().isEmpty) {
     return null; // No validation needed if the field is empty
   }
 
-  String pattern = r'^\d+$'; // Ensures only digits are present
-  RegExp regExp = RegExp(pattern);
+  final String phoneNumber = value.number.trim();
+  final RegExp regExp = RegExp(r'^\d+$'); // Ensures only digits are present
 
-  if (!regExp.hasMatch(value.number)) {
+  if (!regExp.hasMatch(phoneNumber)) {
     return "Phone number can only contain digits.";
-  } else if (value.number.length > 15) {
+  } 
+  if (phoneNumber.length > 15) {
     return "Phone number is too long.";
-  } else if (value.number.length < Constant.minimumRequiredMobileNumberLength) {
+  } 
+  if (phoneNumber.length < Constant.minimumRequiredMobileNumberLength) {
     return "Phone number is too short.";
   }
 
-  return null; // Valid input or empty (optional field)
+  return null; // Valid input
 }
+
 
 getUserLocation() async {
   LocationPermission permission;

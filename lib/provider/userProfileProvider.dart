@@ -7,9 +7,12 @@ class UserProfileProvider extends ChangeNotifier {
   ProfileState profileState = ProfileState.initial;
 
   Future updateUserProfile(
+
+   
       {required BuildContext context,
       required String selectedImagePath,
       required Map<String, String> params}) async {
+         print('-------------------updateUserProfile-------------------------');
     var returnValue;
     try {
       profileState = ProfileState.loading;
@@ -17,9 +20,16 @@ class UserProfileProvider extends ChangeNotifier {
 
       List<String> fileParamsNames = [];
       List<String> fileParamsFilesPath = [];
+      print('--------------------${fileParamsFilesPath}-----------------------');
       if (selectedImagePath.isNotEmpty) {
         fileParamsNames.add(ApiAndParams.profile);
         fileParamsFilesPath.add(selectedImagePath);
+
+
+        print('--------------------$fileParamsNames--------------------------');
+            print('--------------------${fileParamsFilesPath}-----------------------');
+
+            print('--------------$params------------------');
       }
 
       await getUpdateProfileApi(

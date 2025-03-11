@@ -245,6 +245,7 @@ class _EditProfileState extends State<EditProfile> {
                         params[ApiAndParams.mobile] = edtMobile.text.trim();
                         params[ApiAndParams.countryCode] =
                             selectedCountryCode!.countryCode.toString();
+                            
                         userProfileProvider
                             .updateUserProfile(
                                 context: context,
