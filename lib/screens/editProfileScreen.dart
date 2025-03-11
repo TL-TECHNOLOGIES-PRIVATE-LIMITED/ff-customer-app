@@ -133,6 +133,7 @@ class _EditProfileState extends State<EditProfile> {
                       if (widget.from == "register" ||
                           widget.from == "register_header" ||
                           widget.from == "add_to_cart_register") {
+                        print('haiii histhi is');
                         userProfileProvider
                             .registerAccountApi(
                                 context: context,
@@ -184,6 +185,7 @@ class _EditProfileState extends State<EditProfile> {
                           },
                         );
                       } else if (widget.from == "add_to_cart") {
+                        print('haiii histhi is cart');
                         Map<String, String> params = {};
                         params[ApiAndParams.name] = edtUsername.text.trim();
                         params[ApiAndParams.email] = edtEmail.text.trim();
@@ -236,6 +238,7 @@ class _EditProfileState extends State<EditProfile> {
                           }
                         }
                       } else {
+                        print('haiii histhi is else');
                         Map<String, String> params = {};
                         params[ApiAndParams.name] = edtUsername.text.trim();
                         params[ApiAndParams.email] = edtEmail.text.trim();
@@ -285,7 +288,9 @@ class _EditProfileState extends State<EditProfile> {
                                         (Route<dynamic> route) => false,
                                       ),
                                     );
+                                    print("i am right here-----------3");
                                   } else {
+                                    print("i am right here-----------1");
                                     showMessage(
                                       context,
                                       getTranslatedValue(context,
@@ -309,6 +314,7 @@ class _EditProfileState extends State<EditProfile> {
                                     },
                                   );
                                 } else {
+                                  print("i am right here-----------2");
                                   showMessage(
                                     context,
                                     getTranslatedValue(context,
@@ -515,7 +521,6 @@ class _EditProfileState extends State<EditProfile> {
       child: IntlPhoneField(
         enabled: (!isEditable || edtMobile.text.isEmpty),
         controller: edtMobile,
-
         onChanged: (number) {
           print('number is ${number.completeNumber}');
           tempMobile = number.number;
@@ -588,6 +593,7 @@ class _EditProfileState extends State<EditProfile> {
                           Constant.session.getData(SessionManager.keyUserImage),
                     )
                   : Image.file(
+                      filterQuality: FilterQuality.high,
                       File(selectedImagePath),
                       width: 100,
                       height: 100,

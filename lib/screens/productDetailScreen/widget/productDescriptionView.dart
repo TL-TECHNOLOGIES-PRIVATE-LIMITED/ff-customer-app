@@ -35,6 +35,11 @@ class ProductDescriptionView extends StatelessWidget {
     //   controller: QuillEditorController(),
     // );
     return Html(
+      style: {
+        "*": Style(
+          color: ColorsRes.mainTextColor,
+        ),
+      },
       data: product.description,
     );
   }
