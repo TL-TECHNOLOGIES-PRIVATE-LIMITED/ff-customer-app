@@ -256,6 +256,11 @@ class _WebViewScreenState extends State<WebViewScreen> {
     //   controller: QuillEditorController(),
     // );
     return Html(
+      style: {
+        "*": Style(
+          color: ColorsRes.mainTextColor,
+        ),
+      },
       data: modifyHtmlForExternalLinks(htmlContent),
       onLinkTap: (url, _, __) async {
         final Uri urllink = Uri.parse(url!);

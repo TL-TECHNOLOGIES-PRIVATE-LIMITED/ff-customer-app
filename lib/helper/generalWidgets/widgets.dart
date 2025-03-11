@@ -106,9 +106,11 @@ Widget setNetworkImg({
             image: DecorationImage(
               image: CachedNetworkImageProvider(image),
               fit: boxFit,
+              filterQuality: FilterQuality.high,
             ),
           ),
           child: CachedNetworkImage(
+            filterQuality: FilterQuality.high,
             imageUrl: image,
             height: height,
             width: width,
@@ -135,7 +137,10 @@ Widget defaultImg({
     child: (image.contains("png") ||
             image.contains("jpeg") ||
             image.contains("jpg"))
-        ? Image.asset(Constant.getAssetsPath(0, image))
+        ? Image.asset(
+            Constant.getAssetsPath(0, image),
+            filterQuality: FilterQuality.high,
+          )
         : SvgPicture.asset(
             Constant.getAssetsPath(1, image),
             width: width,

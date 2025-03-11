@@ -97,9 +97,8 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
           ),
           decoration:
               DesignConfig.boxDecoration(Theme.of(context).cardColor, 5),
-          child: Consumer2<SelectedVariantItemProvider, RatingListProvider>(
-            builder:
-                (context, selectedVariantItemProvider, ratingListProvider, _) {
+          child: Consumer<SelectedVariantItemProvider>(
+            builder: (context, selectedVariantItemProvider, _) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -247,33 +246,22 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                             ),
                           ],
                         ),
-                        ratingListProvider.ratingState == RatingState.loaded
-                            ? ProductListRatingBuilderWidget(
-                                averageRating: context
-                                    .read<RatingListProvider>()
-                                    .productRatingData
-                                    .averageRating
-                                    .toString()
-                                    .toDouble,
-                                totalRatings: context
-                                    .read<RatingListProvider>()
-                                    .totalData
-                                    .toString()
-                                    .toInt,
-                                size: 15,
-                                spacing: 2,
-                                fontSize: 16,
-                              )
-                            : CustomShimmer(
-                                width: context.width / 3,
-                                height: 30,
-                                margin: EdgeInsetsDirectional.only(
-                                  top: 10,
-                                  end: 10,
-                                  start: 10,
-                                ),
-                                borderRadius: 2,
-                              )
+                        ProductListRatingBuilderWidget(
+                          averageRating: context
+                              .read<RatingListProvider>()
+                              .productRatingData
+                              .averageRating
+                              .toString()
+                              .toDouble,
+                          totalRatings: context
+                              .read<RatingListProvider>()
+                              .totalData
+                              .toString()
+                              .toInt,
+                          size: 15,
+                          spacing: 2,
+                          fontSize: 16,
+                        )
                       ],
                     ),
                   ),
@@ -431,7 +419,14 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                   //   },
                   //   controller: _controller,
                   // ),
-                  child: Html(data: widget.product.description),
+                  child: Html(
+                    style: {
+                      "*": Style(
+                        color: ColorsRes.mainTextColor,
+                      ),
+                    },
+                    data: widget.product.description,
+                  ),
                 ),
               ),
             ],

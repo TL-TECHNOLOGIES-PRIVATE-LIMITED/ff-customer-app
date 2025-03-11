@@ -514,7 +514,6 @@ class _EditProfileState extends State<EditProfile> {
       child: IntlPhoneField(
         enabled: (!isEditable || edtMobile.text.isEmpty),
         controller: edtMobile,
-
         onChanged: (number) {
           print('number is ${number.completeNumber}');
           tempMobile = number.number;
