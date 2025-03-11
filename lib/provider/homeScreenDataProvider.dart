@@ -20,6 +20,8 @@ class HomeScreenProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+
+      
       Map<String, dynamic> data =
           await getHomeScreenDataApi(context: context, params: params);
       if (data[ApiAndParams.status].toString() == "1") {

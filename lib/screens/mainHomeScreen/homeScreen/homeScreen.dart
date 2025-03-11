@@ -16,15 +16,33 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Map<String, List<OfferImages>> map = {};
-
+ bool isLoad = true;
   @override
   void initState() {
     super.initState();
-    bool isLoad = true;
+    
+     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      Map<String, String> params = await Constant.getProductsDefaultParams();
+      context.read<HomeScreenProvider>().getHomeScreenApiProvider(
+            context: context,
+            params: params,
+          );
+    });
+
+    
     print(
         'hello home screen ---------------> delivery available -------->  ${context.read<CityByLatLongProvider>().isDeliverable}');
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (Constant.session.getBoolData(SessionManager.isLocation) == false) {
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+
+      
+    
+    // });
+
+ 
+
+
+
+  if (Constant.session.getBoolData(SessionManager.isLocation) == false) {
         showModalBottomSheet(
           isDismissible: false,
           backgroundColor: Theme.of(context).cardColor,
@@ -474,8 +492,6 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         );
       }
-    });
-
     //fetch productList from api
   }
 

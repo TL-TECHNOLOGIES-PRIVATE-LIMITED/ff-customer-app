@@ -182,7 +182,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         ),
                       ),
 
-                      /// Download invoice button
+                      // /// Download invoice button
                       Consumer<OrderInvoiceProvider>(
                         builder: (context, orderInvoiceProvider, child) {
                           return Container(
