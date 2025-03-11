@@ -224,7 +224,7 @@ String? validateUsername(String value) {
 }
 
 String? validatePincode(String value) {
-  RegExp regex = RegExp(r'^\d{4,10}$'); // Accepts 4 to 10 digits
+  RegExp regex = RegExp(r'^\d{6}$'); // Accepts 6 digits
 
   if (value.trim().isEmpty) {
     return "Pincode cannot be empty";

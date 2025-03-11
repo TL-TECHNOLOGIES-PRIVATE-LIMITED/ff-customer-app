@@ -352,13 +352,13 @@ class _CartListScreenState extends State<CartListScreen> {
                               children: [
                                 Image.asset(
                                   'assets/images/save_money.png',
-                                  height: 40,
+                                  height: 35,
                                 ),
                                 Text(
                                   ' You made savings of ${cartProvider.savedAmount.toString().currency}',
                                   style: TextStyle(
                                       fontWeight: FontWeight.w800,
-                                      fontSize: 20,
+                                      fontSize: 18,
                                       color: ColorsRes.appColorGreen),
                                 ),
                               ],

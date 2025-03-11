@@ -419,7 +419,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                 "enter_pin_code",
               ),
               TextInputType.number,
-              maxLength: 191,
+              maxLength: 6,
             ),
             getSizedBox(height: Constant.size15),
             editBoxWidget(

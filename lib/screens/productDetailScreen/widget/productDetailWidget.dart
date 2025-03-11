@@ -1,10 +1,10 @@
+import 'package:flutter_html/flutter_html.dart';
 import 'package:project/helper/generalWidgets/ratingImagesWidget.dart';
 import 'package:project/helper/utils/generalImports.dart';
 import 'package:project/screens/productDetailScreen/widget/otherImagesViewWidget.dart';
 import 'package:project/screens/productDetailScreen/widget/productDetailImportantInformationWidget.dart';
 import 'package:project/screens/productDetailScreen/widget/productDetailSimilarProductsWidget.dart';
 import 'package:project/screens/productDetailScreen/widget/productDetailVariantsWidget.dart';
-import 'package:quill_html_editor/quill_html_editor.dart';
 
 class ProductDetailWidget extends StatefulWidget {
   final BuildContext context;
@@ -18,12 +18,12 @@ class ProductDetailWidget extends StatefulWidget {
 }
 
 class _ProductDetailWidgetState extends State<ProductDetailWidget> {
-  late final QuillEditorController _controller;
+  // late final QuillEditorController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = QuillEditorController();
+    // _controller = QuillEditorController();
   }
 
   @override
@@ -97,8 +97,9 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
           ),
           decoration:
               DesignConfig.boxDecoration(Theme.of(context).cardColor, 5),
-          child: Consumer<SelectedVariantItemProvider>(
-            builder: (context, selectedVariantItemProvider, _) {
+          child: Consumer2<SelectedVariantItemProvider, RatingListProvider>(
+            builder:
+                (context, selectedVariantItemProvider, ratingListProvider, _) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -180,60 +181,6 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                               ],
                             ),
                             getSizedBox(height: 5),
-                            // CustomTextLabel(
-                            //   text: double.parse(widget
-                            //               .product
-                            //               .variants[selectedVariantItemProvider
-                            //                   .getSelectedIndex()]
-                            //               .discountedPrice) !=
-                            //           0
-                            //       ? "${widget
-                            //           .product
-                            //           .variants[selectedVariantItemProvider
-                            //               .getSelectedIndex()]
-                            //           .discountedPrice
-                            //           .currency} excl. GST"
-                            //       : "${widget
-                            //           .product
-                            //           .variants[selectedVariantItemProvider
-                            //               .getSelectedIndex()]
-                            //           .discountedPrice
-                            //           .currency} excl. GST",
-                            //   softWrap: true,
-                            //   overflow: TextOverflow.ellipsis,
-                            //   style: TextStyle(
-                            //       fontSize: 18,
-                            //       color: Theme.of(context).primaryColor,
-                            //       fontWeight: FontWeight.w800),
-                            // ),
-                            // getSizedBox(height: 5),
-                            // CustomTextLabel(
-                            //   text: double.parse(widget
-                            //               .product
-                            //               .variants[selectedVariantItemProvider
-                            //                   .getSelectedIndex()]
-                            //               .discountedPriceGST) !=
-                            //           0
-                            //       ? "${widget
-                            //           .product
-                            //           .variants[selectedVariantItemProvider
-                            //               .getSelectedIndex()]
-                            //           .discountedPriceGST
-                            //           .currency} incl. GST"
-                            //       : "${widget
-                            //           .product
-                            //           .variants[selectedVariantItemProvider
-                            //               .getSelectedIndex()]
-                            //           .discountedPriceGST
-                            //           .currency} incl. GST",
-                            //   softWrap: true,
-                            //   overflow: TextOverflow.ellipsis,
-                            //   style: TextStyle(
-                            //       fontSize: 16,
-                            //       color: Theme.of(context).primaryColor,
-                            //       fontWeight: FontWeight.w800),
-                            // ),
-
                             Text.rich(TextSpan(
                               children: [
                                 TextSpan(
@@ -260,7 +207,6 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                                 ),
                               ],
                             )),
-
                             Text.rich(
                               TextSpan(
                                 children: [
@@ -301,22 +247,33 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                             ),
                           ],
                         ),
-                        ProductListRatingBuilderWidget(
-                          averageRating: context
-                              .read<RatingListProvider>()
-                              .productRatingData
-                              .averageRating
-                              .toString()
-                              .toDouble,
-                          totalRatings: context
-                              .read<RatingListProvider>()
-                              .totalData
-                              .toString()
-                              .toInt,
-                          size: 15,
-                          spacing: 2,
-                          fontSize: 16,
-                        )
+                        ratingListProvider.ratingState == RatingState.loaded
+                            ? ProductListRatingBuilderWidget(
+                                averageRating: context
+                                    .read<RatingListProvider>()
+                                    .productRatingData
+                                    .averageRating
+                                    .toString()
+                                    .toDouble,
+                                totalRatings: context
+                                    .read<RatingListProvider>()
+                                    .totalData
+                                    .toString()
+                                    .toInt,
+                                size: 15,
+                                spacing: 2,
+                                fontSize: 16,
+                              )
+                            : CustomShimmer(
+                                width: context.width / 3,
+                                height: 30,
+                                margin: EdgeInsetsDirectional.only(
+                                  top: 10,
+                                  end: 10,
+                                  start: 10,
+                                ),
+                                borderRadius: 2,
+                              )
                       ],
                     ),
                   ),
@@ -449,31 +406,32 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                 ),
                 child: Container(
                   // margin: EdgeInsetsDirectional.all(10),
-                  child: QuillHtmlEditor(
-                    text: widget.product.description,
-                    hintText:
-                        getTranslatedValue(context, "description_goes_here"),
-                    isEnabled: false,
-                    ensureVisible: false,
-                    minHeight: 10,
-                    autoFocus: false,
-                    textStyle: TextStyle(color: ColorsRes.mainTextColor),
-                    hintTextStyle:
-                        TextStyle(color: ColorsRes.subTitleMainTextColor),
-                    hintTextAlign: TextAlign.start,
-                    padding: const EdgeInsets.only(left: 6),
-                    hintTextPadding: const EdgeInsets.only(left: 20),
-                    backgroundColor: Theme.of(context).cardColor,
-                    inputAction: InputAction.newline,
-                    loadingBuilder: (context) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      );
-                    },
-                    controller: _controller,
-                  ),
+                  // child: QuillHtmlEditor(
+                  //   text: widget.product.description,
+                  //   hintText:
+                  //       getTranslatedValue(context, "description_goes_here"),
+                  //   isEnabled: false,
+                  //   ensureVisible: false,
+                  //   minHeight: 10,
+                  //   autoFocus: false,
+                  //   textStyle: TextStyle(color: ColorsRes.mainTextColor),
+                  //   hintTextStyle:
+                  //       TextStyle(color: ColorsRes.subTitleMainTextColor),
+                  //   hintTextAlign: TextAlign.start,
+                  //   padding: const EdgeInsets.only(left: 6),
+                  //   hintTextPadding: const EdgeInsets.only(left: 20),
+                  //   backgroundColor: Theme.of(context).cardColor,
+                  //   inputAction: InputAction.newline,
+                  //   loadingBuilder: (context) {
+                  //     return Center(
+                  //       child: CircularProgressIndicator(
+                  //         color: Theme.of(context).primaryColor,
+                  //       ),
+                  //     );
+                  //   },
+                  //   controller: _controller,
+                  // ),
+                  child: Html(data: widget.product.description),
                 ),
               ),
             ],
@@ -481,155 +439,170 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
         ),
         Consumer<RatingListProvider>(
           builder: (context, ratingListProvider, child) {
-            if (ratingListProvider.ratings.length > 0) {
-              return Container(
+            if (ratingListProvider.ratingState == RatingState.loading) {
+              return CustomShimmer(
+                width: context.width,
+                height: 180,
                 margin: EdgeInsetsDirectional.only(
-                  start: 10,
+                  top: 10,
                   end: 10,
-                  bottom: 10,
+                  start: 10,
                 ),
-                decoration: DesignConfig.boxDecoration(
-                  Theme.of(context).cardColor,
-                  10,
-                ),
-                child: ExpansionTile(
-                  collapsedShape:
-                      ShapeBorder.lerp(InputBorder.none, InputBorder.none, 0),
-                  shape:
-                      ShapeBorder.lerp(InputBorder.none, InputBorder.none, 0),
-                  initiallyExpanded: true,
-                  title: CustomTextLabel(
-                    jsonKey: "ratings_and_reviews",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: ColorsRes.mainTextColor,
-                    ),
+                borderRadius: 10,
+              );
+            } else {
+              if (ratingListProvider.ratings.length > 0) {
+                return Container(
+                  margin: EdgeInsetsDirectional.only(
+                    start: 10,
+                    end: 10,
+                    bottom: 10,
                   ),
-                  iconColor: ColorsRes.mainTextColor,
-                  collapsedIconColor: ColorsRes.mainTextColor,
-                  children: [
-                    Padding(
-                      padding: EdgeInsetsDirectional.symmetric(horizontal: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          getOverallRatingSummary(
-                              context: context,
-                              productRatingData:
-                                  ratingListProvider.productRatingData,
-                              totalRatings:
-                                  ratingListProvider.totalData.toString()),
-                          if (ratingListProvider.totalImages > 0)
+                  decoration: DesignConfig.boxDecoration(
+                    Theme.of(context).cardColor,
+                    10,
+                  ),
+                  child: ExpansionTile(
+                    collapsedShape:
+                        ShapeBorder.lerp(InputBorder.none, InputBorder.none, 0),
+                    shape:
+                        ShapeBorder.lerp(InputBorder.none, InputBorder.none, 0),
+                    initiallyExpanded: true,
+                    title: CustomTextLabel(
+                      jsonKey: "ratings_and_reviews",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: ColorsRes.mainTextColor,
+                      ),
+                    ),
+                    iconColor: ColorsRes.mainTextColor,
+                    collapsedIconColor: ColorsRes.mainTextColor,
+                    children: [
+                      Padding(
+                        padding:
+                            EdgeInsetsDirectional.symmetric(horizontal: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            getOverallRatingSummary(
+                                context: context,
+                                productRatingData:
+                                    ratingListProvider.productRatingData,
+                                totalRatings:
+                                    ratingListProvider.totalData.toString()),
+                            if (ratingListProvider.totalImages > 0)
+                              getSizedBox(height: 20),
+                            if (ratingListProvider.totalImages > 0)
+                              CustomTextLabel(
+                                text:
+                                    "${getTranslatedValue(context, "customer_photos")}(${ratingListProvider.totalImages})",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: ColorsRes.mainTextColor,
+                                ),
+                              ),
+                            if (ratingListProvider.totalImages > 0)
+                              getSizedBox(height: 20),
+                            if (ratingListProvider.totalImages > 0)
+                              RatingImagesWidget(
+                                images: ratingListProvider.images,
+                                from: "productDetails",
+                                productId: widget.product.id,
+                                totalImages: ratingListProvider.totalImages,
+                              ),
                             getSizedBox(height: 20),
-                          if (ratingListProvider.totalImages > 0)
                             CustomTextLabel(
-                              text:
-                                  "${getTranslatedValue(context, "customer_photos")}(${ratingListProvider.totalImages})",
+                              jsonKey: "customer_reviews",
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: ColorsRes.mainTextColor,
                               ),
                             ),
-                          if (ratingListProvider.totalImages > 0)
                             getSizedBox(height: 20),
-                          if (ratingListProvider.totalImages > 0)
-                            RatingImagesWidget(
-                              images: ratingListProvider.images,
-                              from: "productDetails",
-                              productId: widget.product.id,
-                              totalImages: ratingListProvider.totalImages,
-                            ),
-                          getSizedBox(height: 20),
-                          CustomTextLabel(
-                            jsonKey: "customer_reviews",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: ColorsRes.mainTextColor,
-                            ),
-                          ),
-                          getSizedBox(height: 20),
-                          ListView(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            padding: EdgeInsets.zero,
-                            children: List.generate(
-                              ratingListProvider.ratings.length,
-                              (index) {
-                                ProductRatingList rating =
-                                    ratingListProvider.ratings[index];
-                                return Column(
-                                  children: [
-                                    getRatingReviewItem(rating: rating),
-                                    getSizedBox(height: 10),
-                                    getDivider(
-                                      color: ColorsRes.grey.withOpacity(0.5),
-                                      height: 0,
-                                      endIndent: 0,
-                                      indent: 0,
-                                    ),
-                                    getSizedBox(height: 10),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                          if (ratingListProvider.totalData > 5)
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(
-                                    context, ratingAndReviewScreen,
-                                    arguments: widget.product.id.toString());
-                              },
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.only(
-                                  top: 10,
-                                  end: 10,
-                                  bottom: 10,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        border: BorderDirectional(
-                                          bottom: BorderSide(
-                                              color: ColorsRes.mainTextColor),
-                                        ),
+                            ListView(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              padding: EdgeInsets.zero,
+                              children: List.generate(
+                                ratingListProvider.ratings.length,
+                                (index) {
+                                  ProductRatingList rating =
+                                      ratingListProvider.ratings[index];
+                                  return Column(
+                                    children: [
+                                      getRatingReviewItem(rating: rating),
+                                      getSizedBox(height: 10),
+                                      getDivider(
+                                        color: ColorsRes.grey.withOpacity(0.5),
+                                        height: 0,
+                                        endIndent: 0,
+                                        indent: 0,
                                       ),
-                                      child: CustomTextLabel(
-                                        text:
-                                            "${getTranslatedValue(context, "view_all_reviews_title")} ${ratingListProvider.totalData.toString().toInt} ${getTranslatedValue(context, "reviews")}",
-                                        style: TextStyle(
-                                          color: ColorsRes.mainTextColor,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                    getSizedBox(width: 5),
-                                    Icon(
-                                      Icons.arrow_forward_ios_rounded,
-                                      color: ColorsRes.mainTextColor,
-                                      size: 13,
-                                    ),
-                                  ],
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                ),
+                                      getSizedBox(height: 10),
+                                    ],
+                                  );
+                                },
                               ),
                             ),
-                          getSizedBox(height: 10),
-                        ],
+                            if (ratingListProvider.totalData > 5)
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, ratingAndReviewScreen,
+                                      arguments: widget.product.id.toString());
+                                },
+                                child: Padding(
+                                  padding: EdgeInsetsDirectional.only(
+                                    top: 10,
+                                    end: 10,
+                                    bottom: 10,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          border: BorderDirectional(
+                                            bottom: BorderSide(
+                                                color: ColorsRes.mainTextColor),
+                                          ),
+                                        ),
+                                        child: CustomTextLabel(
+                                          text:
+                                              "${getTranslatedValue(context, "view_all_reviews_title")} ${ratingListProvider.totalData.toString().toInt} ${getTranslatedValue(context, "reviews")}",
+                                          style: TextStyle(
+                                            color: ColorsRes.mainTextColor,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      getSizedBox(width: 5),
+                                      Icon(
+                                        Icons.arrow_forward_ios_rounded,
+                                        color: ColorsRes.mainTextColor,
+                                        size: 13,
+                                      ),
+                                    ],
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                  ),
+                                ),
+                              ),
+                            getSizedBox(height: 10),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              return SizedBox.shrink();
+                    ],
+                  ),
+                );
+              } else {
+                return SizedBox.shrink();
+              }
             }
           },
         ),

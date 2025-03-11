@@ -1,5 +1,5 @@
+import 'package:flutter_html/flutter_html.dart';
 import 'package:project/helper/utils/generalImports.dart';
-import 'package:quill_html_editor/quill_html_editor.dart';
 
 class WebViewScreen extends StatefulWidget {
   final String dataFor;
@@ -226,29 +226,43 @@ class _WebViewScreenState extends State<WebViewScreen> {
     );
   }
 
+  String modifyHtmlForExternalLinks(String htmlContent) {
+    return htmlContent.replaceAll(
+        '<a ', '<a target="_blank" rel="noopener noreferrer" ');
+  }
+
   Widget _getHtmlContainer(String htmlContent) {
-    return QuillHtmlEditor(
-      text: htmlContent,
-      hintText: getTranslatedValue(context, "description_goes_here"),
-      isEnabled: false,
-      ensureVisible: false,
-      minHeight: 10,
-      autoFocus: false,
-      textStyle: TextStyle(color: ColorsRes.mainTextColor),
-      hintTextStyle: TextStyle(color: ColorsRes.subTitleMainTextColor),
-      hintTextAlign: TextAlign.start,
-      padding: const EdgeInsets.only(top: 5, left: 5, right: 5, bottom: 5),
-      hintTextPadding: const EdgeInsets.only(left: 20),
-      backgroundColor: Theme.of(context).cardColor,
-      inputAction: InputAction.newline,
-      loadingBuilder: (context) {
-        return Center(
-          child: CircularProgressIndicator(
-            color: Theme.of(context).primaryColor,
-          ),
-        );
+    // return QuillHtmlEditor(
+    //   text: modifyHtmlForExternalLinks(htmlContent),
+    //   hintText: getTranslatedValue(context, "description_goes_here"),
+    //   isEnabled: false,
+    //   ensureVisible: false,
+    //   minHeight: 10,
+    //   autoFocus: false,
+    //   textStyle: TextStyle(color: ColorsRes.mainTextColor),
+    //   hintTextStyle: TextStyle(color: ColorsRes.subTitleMainTextColor),
+    //   hintTextAlign: TextAlign.start,
+    //   padding: const EdgeInsets.only(top: 5, left: 5, right: 5, bottom: 5),
+    //   hintTextPadding: const EdgeInsets.only(left: 20),
+    //   backgroundColor: Theme.of(context).cardColor,
+    //   inputAction: InputAction.newline,
+    //   loadingBuilder: (context) {
+    //     return Center(
+    //       child: CircularProgressIndicator(
+    //         color: Theme.of(context).primaryColor,
+    //       ),
+    //     );
+    //   },
+    //   controller: QuillEditorController(),
+    // );
+    return Html(
+      data: modifyHtmlForExternalLinks(htmlContent),
+      onLinkTap: (url, _, __) async {
+        final Uri urllink = Uri.parse(url!);
+        if (await canLaunchUrl(urllink)) {
+          await launchUrl(urllink);
+        }
       },
-      controller: QuillEditorController(),
     );
   }
 }
