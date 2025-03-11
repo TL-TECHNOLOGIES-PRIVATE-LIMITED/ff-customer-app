@@ -102,6 +102,7 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
             child: Column(
               children: [
                 Image.asset(
+                  filterQuality: FilterQuality.high,
                   Constant.getAssetsPath(0, "logo.png"),
                   height: 200,
                 ),

@@ -351,6 +351,7 @@ class _CartListScreenState extends State<CartListScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Image.asset(
+                                  filterQuality: FilterQuality.high,
                                   'assets/images/save_money.png',
                                   height: 35,
                                 ),

@@ -66,6 +66,7 @@ class _LoginAccountState extends State<LoginAccount> {
             child: Column(
               children: [
                 Image.asset(
+                  filterQuality: FilterQuality.high,
                   Constant.getAssetsPath(0, "logo.png"),
                   height: 200,
                 ),
