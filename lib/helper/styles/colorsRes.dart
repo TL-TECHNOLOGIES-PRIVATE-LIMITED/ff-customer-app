@@ -79,13 +79,13 @@ class ColorsRes {
   static Color shimmerContentColor = Colors.white;
 
   //Dark theme shimmer color
-  static Color shimmerBaseColorDark = Colors.grey.withOpacity(0.05);
-  static Color shimmerHighlightColorDark = Colors.grey.withOpacity(0.005);
+  static Color shimmerBaseColorDark = Color(0xff1E252B);
+  static Color shimmerHighlightColorDark = Color(0xff2A323A);
   static Color shimmerContentColorDark = Colors.black;
 
   //Light theme shimmer color
-  static Color shimmerBaseColorLight = Colors.black.withOpacity(0.05);
-  static Color shimmerHighlightColorLight = Colors.black.withOpacity(0.005);
+  static Color shimmerBaseColorLight = Color(0xffE0E0E0);
+  static Color shimmerHighlightColorLight = Color(0xffF0F0F0);
   static Color shimmerContentColorLight = Colors.white;
 
   static Color activeRatingColor = Color(0xffF4CD32);

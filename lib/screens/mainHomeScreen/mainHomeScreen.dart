@@ -133,6 +133,7 @@ class HomeMainScreenState extends State<HomeMainScreen>
       case AppLifecycleState.paused:
         // App is in background
         print('App is in background');
+
         break;
       case AppLifecycleState.inactive:
         // App is inactive
@@ -146,6 +147,7 @@ class HomeMainScreenState extends State<HomeMainScreen>
         break;
       case AppLifecycleState.resumed:
         // App is resumed
+        Constant.session.setBoolData(SessionManager.isFetched, true, false);
         print('App is resumed');
         break;
       default:

@@ -30,48 +30,103 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   //fetch productList from api
+  //   Future.delayed(Duration.zero).then((value) async {
+  //     if (mounted) {
+  //       scrollController.addListener(scrollListener);
+  //       try {
+  //         Map<String, String> params =
+  //             await Constant.getProductsDefaultParams();
+  //         if (RegExp(r'\d').hasMatch(widget.id)) {
+  //           params[ApiAndParams.id] = widget.id;
+  //         } else {
+  //           params[ApiAndParams.slug] = widget.id;
+  //         }
+
+  //         context.read<RatingListProvider>().getRatingApiProvider(
+  //           params: {ApiAndParams.productId: widget.id.toString()},
+  //           context: context,
+  //           limit: "5",
+  //         ).then(
+  //           (value) async {
+  //             context.read<RatingListProvider>().getRatingImagesApiProvider(
+  //                 params: {ApiAndParams.productId: widget.id.toString()},
+  //                 limit: "5",
+  //                 context: context).then(
+  //               (value) async => await context
+  //                   .read<ProductDetailProvider>()
+  //                   .getProductDetailProvider(
+  //                     context: context,
+  //                     params: params,
+  //                   ),
+  //             );
+  //           },
+  //         );
+  //       } catch (_) {}
+  //     }
+  //   });
+  // }
+
+  // @override
+  // dispose() {
+  //   super.dispose();
+  // }
+
   @override
   void initState() {
     super.initState();
-    //fetch productList from api
-    Future.delayed(Duration.zero).then((value) async {
-      if (mounted) {
-        scrollController.addListener(scrollListener);
-        try {
-          Map<String, String> params =
-              await Constant.getProductsDefaultParams();
-          if (RegExp(r'\d').hasMatch(widget.id)) {
-            params[ApiAndParams.id] = widget.id;
-          } else {
-            params[ApiAndParams.slug] = widget.id;
-          }
+    scrollController = ScrollController()..addListener(scrollListener);
 
-          context.read<RatingListProvider>().getRatingApiProvider(
-            params: {ApiAndParams.productId: widget.id.toString()},
-            context: context,
-            limit: "5",
-          ).then(
-            (value) async {
-              context.read<RatingListProvider>().getRatingImagesApiProvider(
-                  params: {ApiAndParams.productId: widget.id.toString()},
-                  limit: "5",
-                  context: context).then(
-                (value) async => await context
-                    .read<ProductDetailProvider>()
-                    .getProductDetailProvider(
-                      context: context,
-                      params: params,
-                    ),
-              );
-            },
-          );
-        } catch (_) {}
+    // Fetch product details first, then ratings & images
+    fetchProductDetails();
+  }
+
+  Future<void> fetchProductDetails() async {
+    try {
+      Map<String, String> params = await Constant.getProductsDefaultParams();
+      if (RegExp(r'\d').hasMatch(widget.id)) {
+        params[ApiAndParams.id] = widget.id;
+      } else {
+        params[ApiAndParams.slug] = widget.id;
       }
-    });
+
+      // Fetch product details first
+      await context.read<ProductDetailProvider>().getProductDetailProvider(
+            context: context,
+            params: params,
+          );
+
+      // Now fetch ratings & images
+      fetchRatingsAndImages();
+    } catch (e) {
+      debugPrint("Error fetching product details: $e");
+    }
+  }
+
+  Future<void> fetchRatingsAndImages() async {
+    try {
+      await context.read<RatingListProvider>().getRatingApiProvider(
+        params: {ApiAndParams.productId: widget.id.toString()},
+        context: context,
+        limit: "5",
+      );
+
+      await context.read<RatingListProvider>().getRatingImagesApiProvider(
+        params: {ApiAndParams.productId: widget.id.toString()},
+        limit: "5",
+        context: context,
+      );
+    } catch (e) {
+      debugPrint("Error fetching ratings & images: $e");
+    }
   }
 
   @override
-  dispose() {
+  void dispose() {
+    scrollController.removeListener(scrollListener);
     super.dispose();
   }
 
@@ -141,7 +196,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         if (value) {
                           context
                               .read<ProductWishListProvider>()
-                              .addRemoveFavoriteProduct(widget.productListItem);
+                              .addRemoveFavoriteProduct(
+                                  context, widget.productListItem);
                         }
                       });
                     } else {
@@ -232,7 +288,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ProductDetailState.loading ||
                   productDetailProvider.productDetailState ==
                       ProductDetailState.initial) {
-                return getProductDetailShimmer(context: context);
+                return SingleChildScrollView(
+                    physics: NeverScrollableScrollPhysics(),
+                    child: getProductDetailShimmer(context));
               } else if (productDetailProvider.productDetailState ==
                   ProductDetailState.error) {
                 return DefaultBlankItemMessageScreen(
@@ -296,13 +354,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           //   ),
         ],
       ),
-    );
-  }
-
-  getProductDetailShimmer({required BuildContext context}) {
-    return CustomShimmer(
-      height: context.height,
-      width: context.width,
     );
   }
 }

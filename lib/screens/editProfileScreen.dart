@@ -285,11 +285,13 @@ class _EditProfileState extends State<EditProfile> {
                                       ),
                                     );
                                   } else {
-                                    Navigator.of(context)
-                                        .pushNamedAndRemoveUntil(
-                                      mainHomeScreen,
-                                      (Route<dynamic> route) => false,
+                                    showMessage(
+                                      context,
+                                      getTranslatedValue(context,
+                                          "profile_updated_successfully"),
+                                      MessageType.success,
                                     );
+                                    Navigator.of(context).pop();
                                   }
                                 } else if (widget.from == "add_to_cart") {
                                   addGuestCartBulkToCartWhileLogin(

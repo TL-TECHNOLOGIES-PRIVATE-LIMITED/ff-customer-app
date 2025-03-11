@@ -1149,3 +1149,30 @@ Widget getHomeScreenShimmer(BuildContext context) {
     ),
   );
 }
+
+Widget getProductDetailShimmer(BuildContext context) {
+  return Padding(
+    padding: EdgeInsets.symmetric(
+        vertical: Constant.size10, horizontal: Constant.size10),
+    child: Column(
+      children: [
+        CustomShimmer(
+          height: context.height * 0.44,
+          width: context.width,
+        ),
+        getSizedBox(
+          height: Constant.size12,
+        ),
+        CustomShimmer(
+          height: context.height * 0.35,
+        ),
+        getSizedBox(
+          height: Constant.size10,
+        ),
+        CustomShimmer(
+          height: context.height * 0.35,
+        ),
+      ],
+    ),
+  );
+}

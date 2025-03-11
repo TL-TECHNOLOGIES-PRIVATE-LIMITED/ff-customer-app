@@ -121,12 +121,14 @@ class ProductWishListProvider extends ChangeNotifier {
     productWishListState = state;
   }
 
-  addRemoveFavoriteProduct(ProductListItem? product) {
+  addRemoveFavoriteProduct(BuildContext context, ProductListItem? product) {
     if (product != null) {
       if (wishlistProducts.contains(product)) {
         wishlistProducts.remove(product);
+        showMessage(context, "Item removed from wishlist", MessageType.error);
       } else {
         wishlistProducts.add(product);
+        showMessage(context, "Item added to wishlist", MessageType.success);
       }
 
       if (wishlistProducts.isEmpty) {

@@ -30,7 +30,7 @@ class ProductWishListIcon extends StatelessWidget {
                 if (value) {
                   context
                       .read<ProductWishListProvider>()
-                      .addRemoveFavoriteProduct(product);
+                      .addRemoveFavoriteProduct(context, product);
                 }
               });
             } else {
