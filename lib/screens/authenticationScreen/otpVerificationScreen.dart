@@ -36,7 +36,7 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
   /// Create Controller
   final pinController = TextEditingController();
 
-  static const _duration = Duration(minutes: 1, seconds: 30);
+  static const _duration = Duration( seconds: 30);
   Timer? _timer;
   Duration _remaining = _duration;
 
@@ -55,6 +55,7 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
 
   @override
   void initState() {
+    startTimer();
     // TODO REMOVE DEMO OTP FROM HERE
     super.initState();
   }
@@ -477,6 +478,7 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
   }
 
   Future checkOtpValidation() async {
+    print('-----------------checkOtpValidation------------------------------');
     bool checkInternet = await checkInternetConnection();
     String? msg;
     if (checkInternet) {
@@ -506,51 +508,48 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
     return msg;
   }
 
-  firebaseLoginProcess() async {
-    if (widget.phoneNumber.isNotEmpty) {
-      await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber:
-            '${widget.selectedCountryCode.countryCode} - ${widget.phoneNumber}',
-        verificationCompleted: (PhoneAuthCredential credential) {
-          pinController.setText(credential.smsCode ?? "");
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          print('hai i am here');
-          showMessage(
-            context,
-            e.message!,
-            MessageType.warning,
-          );
-          pinController.clear();
-          if (mounted) {
-            print('hai i am here kkk');
-            isLoading = false;
-            setState(() {
-              pinController.clear();
-            });
-          }
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          forceResendingToken = resendToken;
-          if (mounted) {
-            isLoading = false;
-            setState(() {
-              resendOtpVerificationId = verificationId;
-            });
-          }
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          if (mounted) {
-            isLoading = false;
-            setState(() {
-              // isLoading = false;
-            });
-          }
-        },
-        forceResendingToken: forceResendingToken,
-      );
-    }
+firebaseLoginProcess() async {
+
+  print('-----------------firebaseLoginProcess------------------------------');
+  if (widget.phoneNumber.isNotEmpty) {
+    // Reset the resending token to force a new OTP generation
+    forceResendingToken = null;
+
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: '${widget.selectedCountryCode.countryCode}${widget.phoneNumber}', // Remove unnecessary dash
+      verificationCompleted: (PhoneAuthCredential credential) {
+        pinController.setText(credential.smsCode ?? "");
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        showMessage(context, e.message!, MessageType.warning);
+        pinController.clear();
+        if (mounted) {
+          isLoading = false;
+          setState(() {
+            pinController.clear();
+          });
+        }
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        forceResendingToken = resendToken;
+        if (mounted) {
+          isLoading = false;
+          setState(() {
+            resendOtpVerificationId = verificationId;
+          });
+        }
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {
+        if (mounted) {
+          isLoading = false;
+          setState(() {});
+        }
+      },
+      forceResendingToken: forceResendingToken, // This remains null to always generate a new OTP
+    );
   }
+}
+
 
   @override
   void dispose() {

@@ -497,6 +497,9 @@ class _LoginAccountState extends State<LoginAccount> {
   }
 
   loginWithPhoneNumber() async {
+
+
+    print('--------------------loginWithPhoneNumber-----------------------');
     var validation = await mobileNumberValidation();
     if (validation) {
       if (isLoading) return;
