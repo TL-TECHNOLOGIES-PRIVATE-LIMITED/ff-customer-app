@@ -98,7 +98,7 @@
 
                 <data android:scheme="https" />
                 <!-- Add here admin panel domain-->
-                <data android:host="myfrostyfoods.com"/>
+                <data android:host="admin.myfrostyfoods.com"/>
             </intent-filter>
             <!-- App Links Ends-->
 
@@ -113,7 +113,7 @@
 
                 <data android:scheme="https" />
                 <!-- Add here admin panel domain-->
-                <data android:host="myfrostyfoods.com" />
+                <data android:host="admin.myfrostyfoods.com" />
             </intent-filter>
             <!-- Deep Links Ends-->
 
