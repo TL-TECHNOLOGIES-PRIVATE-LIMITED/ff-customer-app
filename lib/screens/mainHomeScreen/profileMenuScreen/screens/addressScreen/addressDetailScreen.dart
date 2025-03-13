@@ -31,14 +31,14 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
   final TextEditingController edtZipcode = TextEditingController();
   final TextEditingController edtCountry = TextEditingController();
   final TextEditingController edtState = TextEditingController();
-  String? countryCode;
+  String? countryCode = "IN";
   String? alternateCountryCode;
   bool isLoading = false;
   bool isDefaultAddress = false;
   String longitude = "";
   String latitude = "";
   AddressType selectedAddressType = AddressType.home;
-  String? numberMobile;
+  String? numberMobile = ""; 
   String? numberAlternateMobile;
 
   //Address types
@@ -120,6 +120,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                 children: [
                   Form(
                       key: formKey,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       child: Column(
                         children: [
                           contactWidget(),
@@ -180,31 +181,31 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
               maxLength: 191,
             ),
             getSizedBox(height: Constant.size15),
-           editPhoneBoxBoxWidget(
-  context,
-  edtMobile,
-  phoneNumberValidation,
-  getTranslatedValue(context, "mobile_number"),
-  countryCode: countryCode,
-  onCountryCodeChanged: (newCode) {
-    setState(() {
-      countryCode = newCode;
-    });
-    formKey.currentState?.validate(); // Validate after country code change
-  },
-  onNumberChanged: (newNumber) {
-    setState(() {
-      numberMobile = newNumber;
-    });
-    formKey.currentState?.validate(); // Validate after mobile number change
-  },
-),
+  editPhoneBoxBoxWidget(
+    context,
+    edtMobile,
+    phoneNumberValidation,  // Advanced validation function
+    getTranslatedValue(context, "mobile_number"),
+    countryCode: countryCode,
+    
+    onCountryCodeChanged: (newCode) {
+      setState(() {
+        countryCode = newCode;
+      });
+    },
+
+    onNumberChanged: (newNumber) {
+      setState(() {
+        numberMobile = newNumber;
+      });
+    },
+  ),
 
             getSizedBox(height: Constant.size15),
             editPhoneBoxBoxWidget(
               context,
               edtAltMobile,
-              optionalPhoneValidation,
+              phoneNumberValidation,
               getTranslatedValue(
                 context,
                 "alternate_mobile_number",
@@ -627,6 +628,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
   formKey.currentState!.save();
 
   if (formKey.currentState!.validate()) {
+       formKey.currentState!.save();
     String mainMobile = edtMobile.text.trim();
     String alternateMobile = edtAltMobile.text.trim();
 

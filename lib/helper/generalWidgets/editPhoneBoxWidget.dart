@@ -1,4 +1,20 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:project/helper/utils/generalImports.dart';
+
+class Debouncer {
+  final int milliseconds;
+  VoidCallback? action;
+  Timer? _timer;
+
+  Debouncer({this.milliseconds = 500});
+
+  void run(VoidCallback action) {
+    _timer?.cancel();
+    _timer = Timer(Duration(milliseconds: milliseconds), action);
+  }
+}
 
 Widget editPhoneBoxBoxWidget(
   BuildContext context,
@@ -13,12 +29,15 @@ Widget editPhoneBoxBoxWidget(
   TextInputAction? optionalTextInputAction,
   int? minLines,
   int? maxLines,
+  
   int? maxLength,
   FloatingLabelBehavior? floatingLabelBehavior,
   void Function()? onTap,
   bool? readOnly,
 }) {
   return IntlPhoneField(
+    
+    disableLengthCheck: true, // Disable package's internal length check
     controller: edtController,
     dropdownTextStyle: TextStyle(color: ColorsRes.mainTextColor),
     style: TextStyle(color: ColorsRes.mainTextColor),
@@ -31,15 +50,18 @@ Widget editPhoneBoxBoxWidget(
     flagsButtonMargin: EdgeInsets.only(left: 10),
     initialCountryCode: countryCode ?? "IN",
     onChanged: (value) {
+      debugPrint("Updated Number: ${value.completeNumber}");
       onNumberChanged?.call(value.completeNumber);
-      onCountryCodeChanged?.call(value.countryISOCode);
     },
     onCountryChanged: (value) {
+      debugPrint("Updated Country Code: ${value.code}");
       onCountryCodeChanged?.call(value.code);
     },
     textInputAction: optionalTextInputAction ?? 
         (isLastField == true ? TextInputAction.done : TextInputAction.next),
+    autovalidateMode: AutovalidateMode.onUserInteraction,
     decoration: InputDecoration(
+      errorStyle: TextStyle(color: ColorsRes.appColorRed), // Explicit error style
       hintStyle: TextStyle(color: Theme.of(context).hintColor),
       counterText: "",
       alignLabelWithHint: true,
@@ -78,12 +100,24 @@ Widget editPhoneBoxBoxWidget(
       isDense: true,
       floatingLabelBehavior: floatingLabelBehavior ?? FloatingLabelBehavior.auto,
     ),
-    autovalidateMode: AutovalidateMode.onUserInteraction,
     validator: (value) {
       if (validationFunction != null) {
-        return validationFunction(value);
+        // Ensure validation is synchronous
+        final result = validationFunction(value);
+        if (result is Future<String?>) {
+          // Handle asynchronous result if necessary
+          result.then((message) {
+            // If using state management, update here
+          });
+          return "Validating..."; // Placeholder message
+        } else {
+          debugPrint("Validation Result: $result");
+          return result; // Synchronous result
+        }
       }
       return null;
     },
   );
 }
+
+

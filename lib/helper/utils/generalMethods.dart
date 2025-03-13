@@ -279,27 +279,26 @@ phoneValidation(String value) {
   return null;
 }
 
-FutureOr<String?> phoneNumberValidation(PhoneNumber? value) {
+//import 'dart:async';
+// Before: FutureOr<String?> phoneNumberValidation(...)
+String? phoneNumberValidation(PhoneNumber? value) {
   if (value == null || value.number.isEmpty) {
-    print('here');
     return "Please enter your phone number.";
-  } else {
-    print('here2');
   }
 
-  String pattern = r'^\d+$'; // Ensures only digits are present
-  RegExp regExp = RegExp(pattern);
-
-  if (!regExp.hasMatch(value.number)) {
-    return "Phone number can only contain digits.";
-  } else if (value.number.length >= 16) {
-    return "Phone number is too long.";
-  } else if (value.number.length < Constant.minimumRequiredMobileNumberLength) {
-    return "Phone number is too short.";
+  if (!RegExp(r'^\d+$').hasMatch(value.number)) {
+    return "Only digits allowed";
+  } else if (value.number.length > 10) {
+    return "Number too long";
+  } else if (value.number.length < 10) {
+    print(Constant.minimumRequiredMobileNumberLength);
+    return "Number too short";
   }
-
-  return null; // Valid input
+  
+  return null; // Valid
 }
+
+
 
 validateName(String value) {
   if (value.trim().isEmpty) {
