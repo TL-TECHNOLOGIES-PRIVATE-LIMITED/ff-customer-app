@@ -181,31 +181,33 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
               maxLength: 191,
             ),
             getSizedBox(height: Constant.size15),
-  editPhoneBoxBoxWidget(
-    context,
-    edtMobile,
-    phoneNumberValidation,  // Advanced validation function
-    getTranslatedValue(context, "mobile_number"),
-    countryCode: countryCode,
-    
-    onCountryCodeChanged: (newCode) {
-      setState(() {
-        countryCode = newCode;
-      });
-    },
+editPhoneBoxBoxWidget(
+  context,
+  edtMobile,
+  (value) => phoneNumberValidation(value, countryCode??'IN'),  // Pass function reference
+  getTranslatedValue(context, "mobile_number"),
+  countryCode: countryCode,
 
-    onNumberChanged: (newNumber) {
-      setState(() {
-        numberMobile = newNumber;
-      });
-    },
-  ),
+  onCountryCodeChanged: (newCode) {
+    setState(() {
+      countryCode = newCode;
+      print('---------$countryCode----countryCode--------------------');
+    });
+  },
+
+  onNumberChanged: (newNumber) {
+    setState(() {
+      numberMobile = newNumber;
+    });
+  },
+),
+
 
             getSizedBox(height: Constant.size15),
             editPhoneBoxBoxWidget(
               context,
               edtAltMobile,
-              phoneNumberValidation,
+             (value) => phoneNumberValidation(value, alternateCountryCode??'IN'),
               getTranslatedValue(
                 context,
                 "alternate_mobile_number",

@@ -100,23 +100,15 @@ Widget editPhoneBoxBoxWidget(
       isDense: true,
       floatingLabelBehavior: floatingLabelBehavior ?? FloatingLabelBehavior.auto,
     ),
-    validator: (value) {
-      if (validationFunction != null) {
-        // Ensure validation is synchronous
-        final result = validationFunction(value);
-        if (result is Future<String?>) {
-          // Handle asynchronous result if necessary
-          result.then((message) {
-            // If using state management, update here
-          });
-          return "Validating..."; // Placeholder message
-        } else {
-          debugPrint("Validation Result: $result");
-          return result; // Synchronous result
-        }
-      }
-      return null;
-    },
+validator: (value) async {
+  if (validationFunction != null) {
+    final result = await validationFunction(value); // Await the async function
+    debugPrint("Validation Result: $result");
+    return result; // Return the result after completion
+  }
+  return null;
+},
+
   );
 }
 
