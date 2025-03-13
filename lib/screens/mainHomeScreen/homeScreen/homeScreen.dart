@@ -16,12 +16,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Map<String, List<OfferImages>> map = {};
- bool isLoad = true;
+  bool isLoad = true;
   @override
   void initState() {
     super.initState();
-    
-     WidgetsBinding.instance.addPostFrameCallback((_) async {
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       Map<String, String> params = await Constant.getProductsDefaultParams();
       context.read<HomeScreenProvider>().getHomeScreenApiProvider(
             context: context,
@@ -29,14 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
           );
     });
 
-    
-
-
-     WidgetsBinding.instance.addPostFrameCallback((_) async {
-
-
-
-  if (Constant.session.getBoolData(SessionManager.isLocation) == false) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (Constant.session.getBoolData(SessionManager.isLocation) == false) {
         showModalBottomSheet(
           isDismissible: false,
           backgroundColor: Theme.of(context).cardColor,
@@ -377,6 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       (Route<dynamic> route) => false,
                     );
                   } else {
+                    setState(() {});
                     showDialog(
                         barrierDismissible: false,
                         context: context,
@@ -486,15 +481,12 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         );
       }
-
-       });
+    });
     //fetch productList from api
   }
 
-
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       floatingActionButton:
           (context.watch<CartListProvider>().cartList.length > 0)
@@ -638,6 +630,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-
 }
