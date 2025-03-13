@@ -73,10 +73,52 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton:
           context.watch<CartListProvider>().cartList.isNotEmpty
               ? CartFloating()
               : null,
+      bottomNavigationBar: Consumer<ProductDetailProvider>(
+          builder: (context, productDetailProvider, child) {
+        if (productDetailProvider.expanded) {
+          return AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            width: context.width,
+            height: 70,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadiusDirectional.only(
+                  topStart: Radius.circular(10),
+                  topEnd: Radius.circular(10),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: ColorsRes.subTitleMainTextColor,
+                    offset: Offset(1, 1),
+                    blurRadius: 5,
+                    spreadRadius: 0.1,
+                  )
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadiusDirectional.only(
+                  topStart: Radius.circular(10),
+                  topEnd: Radius.circular(10),
+                ),
+                child: ProductDetailAddToCartButtonWidget(
+                  context: context,
+                  product: productDetailProvider.productData,
+                  bgColor: Theme.of(context).cardColor,
+                  padding: 10,
+                ),
+              ),
+            ),
+          );
+        } else {
+          return SizedBox.shrink();
+        }
+      }),
       appBar: getAppBar(
         context: context,
         title: SizedBox.shrink(),
@@ -182,41 +224,41 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ),
                         ),
-                        if (productDetailProvider.expanded)
-                          AnimatedContainer(
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            width: context.width,
-                            height: 70,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadiusDirectional.only(
-                                  topStart: Radius.circular(10),
-                                  topEnd: Radius.circular(10),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: ColorsRes.subTitleMainTextColor,
-                                    offset: Offset(1, 1),
-                                    blurRadius: 5,
-                                    spreadRadius: 0.1,
-                                  )
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadiusDirectional.only(
-                                  topStart: Radius.circular(10),
-                                  topEnd: Radius.circular(10),
-                                ),
-                                child: ProductDetailAddToCartButtonWidget(
-                                  context: context,
-                                  product: productDetailProvider.productData,
-                                  bgColor: Theme.of(context).cardColor,
-                                  padding: 10,
-                                ),
-                              ),
-                            ),
-                          ),
+                        // if (productDetailProvider.expanded)
+                        //   AnimatedContainer(
+                        //     duration: Duration(milliseconds: 300),
+                        //     curve: Curves.easeInOut,
+                        //     width: context.width,
+                        //     height: 70,
+                        //     child: Container(
+                        //       decoration: BoxDecoration(
+                        //         borderRadius: BorderRadiusDirectional.only(
+                        //           topStart: Radius.circular(10),
+                        //           topEnd: Radius.circular(10),
+                        //         ),
+                        //         boxShadow: [
+                        //           BoxShadow(
+                        //             color: ColorsRes.subTitleMainTextColor,
+                        //             offset: Offset(1, 1),
+                        //             blurRadius: 5,
+                        //             spreadRadius: 0.1,
+                        //           )
+                        //         ],
+                        //       ),
+                        //       child: ClipRRect(
+                        //         borderRadius: BorderRadiusDirectional.only(
+                        //           topStart: Radius.circular(10),
+                        //           topEnd: Radius.circular(10),
+                        //         ),
+                        //         child: ProductDetailAddToCartButtonWidget(
+                        //           context: context,
+                        //           product: productDetailProvider.productData,
+                        //           bgColor: Theme.of(context).cardColor,
+                        //           padding: 10,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
                       ],
                     ),
                   );

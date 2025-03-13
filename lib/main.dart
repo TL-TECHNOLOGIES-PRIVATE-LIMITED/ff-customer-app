@@ -38,6 +38,9 @@ Future<void> main() async {
         ChangeNotifierProvider<CityByLatLongProvider>(
           create: (context) => CityByLatLongProvider(),
         ),
+        ChangeNotifierProvider<SelectedVariantItemProvider>(
+          create: (context) => SelectedVariantItemProvider(),
+        ),
         ChangeNotifierProvider<RatingListProvider>(
           create: (context) => RatingListProvider(),
         ),
