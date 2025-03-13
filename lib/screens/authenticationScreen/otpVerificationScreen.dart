@@ -1,6 +1,6 @@
 import 'package:project/helper/utils/generalImports.dart';
 import 'package:project/models/userProfile.dart' as userProf;
-
+import 'package:pinput/pinput.dart';
 class OtpVerificationScreen extends StatefulWidget {
   final String otpVerificationId;
   final String phoneNumber;
@@ -27,11 +27,11 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
   String resendOtpVerificationId = "";
   int? forceResendingToken;
 
-  late PinTheme defaultPinTheme;
+  // late PinTheme defaultPinTheme;
 
-  late PinTheme focusedPinTheme;
+  // late PinTheme focusedPinTheme;
 
-  late PinTheme submittedPinTheme;
+  // late PinTheme submittedPinTheme;
 
   /// Create Controller
   final pinController = TextEditingController();
@@ -56,6 +56,7 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
   @override
   void initState() {
     startTimer();
+    startTimer();
     // TODO REMOVE DEMO OTP FROM HERE
     super.initState();
   }
@@ -63,35 +64,35 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     print('widget.from ---------> ${widget.from}');
-    defaultPinTheme = PinTheme(
-      width: 56,
-      height: 56,
-      textStyle: TextStyle(
-        fontSize: 20,
-        color: ColorsRes.mainTextColor,
-        fontWeight: FontWeight.w600,
-      ),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: ColorsRes.mainTextColor,
-        ),
-        borderRadius: BorderRadius.circular(10),
-      ),
-    );
+    // defaultPinTheme = PinTheme(
+    //   width: 56,
+    //   height: 56,
+    //   textStyle: TextStyle(
+    //     fontSize: 20,
+    //     color: ColorsRes.mainTextColor,
+    //     fontWeight: FontWeight.w600,
+    //   ),
+    //   decoration: BoxDecoration(
+    //     border: Border.all(
+    //       color: ColorsRes.mainTextColor,
+    //     ),
+    //     borderRadius: BorderRadius.circular(10),
+    //   ),
+    // );
 
-    focusedPinTheme = defaultPinTheme.copyDecorationWith(
-      border: Border.all(color: ColorsRes.mainTextColor),
-      borderRadius: BorderRadius.circular(10),
-    );
+    // focusedPinTheme = defaultPinTheme.copyDecorationWith(
+    //   border: Border.all(color: ColorsRes.mainTextColor),
+    //   borderRadius: BorderRadius.circular(10),
+    // );
 
-    submittedPinTheme = defaultPinTheme.copyWith(
-      decoration: defaultPinTheme.decoration?.copyWith(
-        color: Theme.of(context).cardColor,
-        border: Border.all(
-          color: Theme.of(context).primaryColor,
-        ),
-      ),
-    );
+    // submittedPinTheme = defaultPinTheme.copyWith(
+    //   decoration: defaultPinTheme.decoration?.copyWith(
+    //     color: Theme.of(context).cardColor,
+    //     border: Border.all(
+    //       color: Theme.of(context).primaryColor,
+    //     ),
+    //   ),
+    // );
     return Scaffold(
       body: Stack(
         children: [
@@ -130,155 +131,131 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
     );
   }
 
-  Widget otpPinWidget() {
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Pinput(
-        defaultPinTheme: defaultPinTheme,
-        focusedPinTheme: focusedPinTheme,
-        submittedPinTheme: submittedPinTheme,
-        autofillHints: const [AutofillHints.oneTimeCode],
-        controller: pinController,
-        length: 6,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        hapticFeedbackType: HapticFeedbackType.heavyImpact,
-        inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,
-          FilteringTextInputFormatter.singleLineFormatter
-        ],
-        autofocus: true,
-        closeKeyboardWhenCompleted: true,
-        pinAnimationType: PinAnimationType.slide,
-        pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
-        animationCurve: Curves.bounceInOut,
-        enableSuggestions: true,
-        pinContentAlignment: AlignmentDirectional.center,
-        isCursorAnimationEnabled: true,
-        onCompleted: (value) async {
-          await checkOtpValidation().then((msg) {
-            if (msg != "") {
-              setState(() {
-                isLoading = false;
-              });
-              showMessage(context, msg, MessageType.warning);
-            } else {
-              setState(() {
-                isLoading = false;
-              });
-              if (Constant.firebaseAuthentication == "1") {
-                verifyOtp();
-              } else if (Constant.customSmsGatewayOtpBased == "1") {
-                context.read<UserProfileProvider>().verifyUserProvider(
-                  context: context,
-                  params: {
-                    ApiAndParams.phone: widget.phoneNumber,
-                    ApiAndParams.countryCode:
-                        widget.selectedCountryCode.countryCode.toString(),
-                    ApiAndParams.otp: pinController.text,
-                  },
-                ).then(
-                  (mainData) async {
-                    if (mainData["status"].toString() == "1") {
-                      if (mainData.containsKey(ApiAndParams.data)) {
-                        userProf.UserProfile? userProfile;
+// import 'package:pin_code_fields/pin_code_fields.dart';
+// import 'package:flutter/services.dart';
+// import 'package:flutter/material.dart';
 
-                        userProfile = userProf.UserProfile.fromJson(mainData);
-                        if (userProfile.status == "1") {
-                          await context
-                              .read<UserProfileProvider>()
-                              .setUserDataInSession(mainData, context);
-                        }
-
-                        if (widget.from == "add_to_cart_register") {
-                          print('add to cart');
-                          addGuestCartBulkToCartWhileLogin(
-                            context: context,
-                            params: Constant.setGuestCartParams(
-                              cartList:
-                                  context.read<CartListProvider>().cartList,
-                            ),
-                          ).then((value) {
-                            Navigator.pop(context);
-                            Navigator.pop(context);
-                          });
-                        } else if (Constant.session
-                            .getBoolData(SessionManager.isUserLogin)) {
-                          print('not add to cart');
-                          if (context
-                              .read<CartListProvider>()
-                              .cartList
-                              .isNotEmpty) {
-                            addGuestCartBulkToCartWhileLogin(
-                              context: context,
-                              params: Constant.setGuestCartParams(
-                                cartList:
-                                    context.read<CartListProvider>().cartList,
-                              ),
-                            ).then(
-                              (value) =>
-                                  Navigator.of(context).pushNamedAndRemoveUntil(
-                                mainHomeScreen,
-                                (Route<dynamic> route) => false,
-                              ),
-                            );
-                          } else {
-                            print('not add to cart');
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                              mainHomeScreen,
-                              (Route<dynamic> route) => false,
-                            );
-                          }
-                        }
-                      } else {
-                        Map<String, String> params = {
-                          ApiAndParams.id: widget.phoneNumber,
-                          ApiAndParams.type: "phone",
-                          ApiAndParams.name: "",
-                          ApiAndParams.email: "",
-                          ApiAndParams.countryCode:
-                              widget.selectedCountryCode.countryCode.toString(),
-                          ApiAndParams.mobile: widget.phoneNumber,
-                          ApiAndParams.type: "phone",
-                          ApiAndParams.platform:
-                              Platform.isAndroid ? "android" : "ios",
-                          ApiAndParams.fcmToken: Constant.session
-                              .getData(SessionManager.keyFCMToken),
-                        };
-
-                        Navigator.of(context).pushReplacementNamed(
-                            editProfileScreen,
-                            arguments: [widget.from ?? "register", params]);
-                      }
-                    } else {
-                      Map<String, String> params = {
-                        ApiAndParams.id: widget.phoneNumber,
-                        ApiAndParams.type: "phone",
-                        ApiAndParams.name: "",
-                        ApiAndParams.email: "",
-                        ApiAndParams.countryCode:
-                            widget.selectedCountryCode.countryCode.toString(),
-                        ApiAndParams.mobile: widget.phoneNumber,
-                        ApiAndParams.type: "phone",
-                        ApiAndParams.platform:
-                            Platform.isAndroid ? "android" : "ios",
-                        ApiAndParams.fcmToken: Constant.session
-                            .getData(SessionManager.keyFCMToken),
-                      };
-
-                      Navigator.of(context).pushReplacementNamed(
-                          editProfileScreen,
-                          arguments: [widget.from ?? "register", params]);
+Widget otpPinWidget() {
+  return Directionality(
+    textDirection: TextDirection.ltr,
+    child: PinCodeTextField(
+      appContext: context,
+      length: 6,
+      obscureText: false,
+      animationType: AnimationType.slide,
+      autoFocus: true,
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      enableActiveFill: true,
+      cursorColor: Colors.black,
+      // pinTheme: PinTheme(
+      //   shape: PinCodeFieldShape.box,
+      //   borderRadius: BorderRadius.circular(8),
+      //   fieldHeight: 50,
+      //   fieldWidth: 40,
+      //   activeFillColor: Colors.white,
+      //   inactiveFillColor: Colors.grey[300]!,
+      //   selectedFillColor: Colors.white,
+      // ),
+      controller: pinController,
+      onCompleted: (value) async {
+        await checkOtpValidation().then((msg) {
+          if (msg.isNotEmpty) {
+            setState(() => isLoading = false);
+            showMessage(context, msg, MessageType.warning);
+          } else {
+            setState(() => isLoading = false);
+            if (Constant.firebaseAuthentication == "1") {
+              verifyOtp();
+            } else if (Constant.customSmsGatewayOtpBased == "1") {
+              context.read<UserProfileProvider>().verifyUserProvider(
+                context: context,
+                params: {
+                  ApiAndParams.phone: widget.phoneNumber,
+                  ApiAndParams.countryCode:
+                      widget.selectedCountryCode.countryCode.toString(),
+                  ApiAndParams.otp: pinController.text,
+                },
+              ).then((mainData) async {
+                if (mainData["status"].toString() == "1") {
+                  if (mainData.containsKey(ApiAndParams.data)) {
+                    userProf.UserProfile? userProfile =
+                        userProf.UserProfile.fromJson(mainData);
+                    if (userProfile.status == "1") {
+                      await context
+                          .read<UserProfileProvider>()
+                          .setUserDataInSession(mainData, context);
                     }
-                  },
-                );
-              }
+
+                    if (widget.from == "add_to_cart_register") {
+                      print('add to cart');
+                      addGuestCartBulkToCartWhileLogin(
+                        context: context,
+                        params: Constant.setGuestCartParams(
+                          cartList:
+                              context.read<CartListProvider>().cartList,
+                        ),
+                      ).then((_) {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      });
+                    } else if (Constant.session
+                        .getBoolData(SessionManager.isUserLogin)) {
+                      print('not add to cart');
+                      if (context.read<CartListProvider>().cartList.isNotEmpty) {
+                        addGuestCartBulkToCartWhileLogin(
+                          context: context,
+                          params: Constant.setGuestCartParams(
+                            cartList: context.read<CartListProvider>().cartList,
+                          ),
+                        ).then((_) => Navigator.of(context)
+                            .pushNamedAndRemoveUntil(
+                          mainHomeScreen,
+                          (Route<dynamic> route) => false,
+                        ));
+                      } else {
+                        print('not add to cart');
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          mainHomeScreen,
+                          (Route<dynamic> route) => false,
+                        );
+                      }
+                    }
+                  } else {
+                    navigateToEditProfile();
+                  }
+                } else {
+                  navigateToEditProfile();
+                }
+              });
             }
-          });
-        },
-      ),
-    );
-  }
+          }
+        });
+      },
+    ),
+  );
+}
+
+void navigateToEditProfile() {
+  Map<String, String> params = {
+    ApiAndParams.id: widget.phoneNumber,
+    ApiAndParams.type: "phone",
+    ApiAndParams.name: "",
+    ApiAndParams.email: "",
+    ApiAndParams.countryCode:
+        widget.selectedCountryCode.countryCode.toString(),
+    ApiAndParams.mobile: widget.phoneNumber,
+    ApiAndParams.type: "phone",
+    ApiAndParams.platform: Platform.isAndroid ? "android" : "ios",
+    ApiAndParams.fcmToken: Constant.session.getData(SessionManager.keyFCMToken),
+  };
+
+  Navigator.of(context).pushReplacementNamed(
+    editProfileScreen,
+    arguments: [widget.from ?? "register", params],
+  );
+}
+
 
   Widget resendOtpWidget() {
     return Center(

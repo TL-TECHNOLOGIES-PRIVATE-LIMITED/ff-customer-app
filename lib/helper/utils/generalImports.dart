@@ -4,6 +4,7 @@ export 'dart:io';
 export 'dart:math';
 export 'dart:typed_data';
 
+
 export 'package:intl_phone_field/intl_phone_field.dart';
 export 'package:intl_phone_field/phone_number.dart';
 export 'package:project/helper/generalWidgets/cartFloatingButton.dart';
@@ -43,7 +44,7 @@ export 'package:paytm_allinonesdk/paytm_allinonesdk.dart';
 export 'package:permission_handler/permission_handler.dart';
 export 'package:photo_view/photo_view.dart';
 export 'package:photo_view/photo_view_gallery.dart';
-export 'package:pinput/pinput.dart';
+export 'package:pin_code_fields/pin_code_fields.dart';
 export 'package:project/firebase_options.dart';
 export 'package:project/helper/generalWidgets/OrderTrackingHistoryBottomSheet.dart';
 export 'package:project/helper/generalWidgets/bottomSheetLanguageListContainer.dart';
