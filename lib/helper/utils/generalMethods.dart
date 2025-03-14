@@ -279,7 +279,8 @@ phoneValidation(String value) {
   return null;
 }
 
-Future<String?> phoneNumberValidation(PhoneNumber? value, String countryCode) async {
+Future<String?> phoneNumberValidation(
+    PhoneNumber? value, String countryCode) async {
   if (value == null || value.number.isEmpty) {
     return "Please enter your phone number.";
   }
@@ -290,26 +291,161 @@ Future<String?> phoneNumberValidation(PhoneNumber? value, String countryCode) as
 
   // Define country-specific phone number length ranges
   Map<String, List<int>> countryPhoneLengths = {
-    "AF": [9], "AL": [9], "DZ": [9], "AD": [6], "AO": [9], "AR": [10], "AM": [8], "AU": [9], 
-    "AT": [10, 11], "AZ": [9], "BH": [8], "BD": [10], "BY": [9], "BE": [9], "BZ": [7], "BJ": [8], 
-    "BT": [8], "BO": [8], "BA": [8], "BW": [7, 8], "BR": [10, 11], "BG": [9], "BF": [8], "BI": [8], 
-    "KH": [8, 9], "CM": [9], "CA": [10], "CF": [8], "TD": [8], "CL": [9], "CN": [11], "CO": [10], 
-    "CG": [9], "CD": [9], "CR": [8], "HR": [8, 9], "CU": [8], "CY": [8], "CZ": [9], "DK": [8], 
-    "DJ": [8], "DO": [10], "EC": [9], "EG": [10, 11], "SV": [8], "GQ": [9], "ER": [7], "EE": [7, 8], 
-    "ET": [9], "FI": [9, 10], "FR": [9], "GA": [8], "GM": [7], "GE": [9], "DE": [10, 11], 
-    "GH": [9], "GR": [10], "GT": [8], "GN": [8], "GW": [7], "GY": [7], "HT": [8], "HN": [8], 
-    "HK": [8], "HU": [9], "IS": [7], "IN": [10], "ID": [10, 11], "IR": [10], "IQ": [10], "IE": [9], 
-    "IL": [9], "IT": [9, 10], "JM": [10], "JP": [10], "JO": [9], "KZ": [10], "KE": [9], "KW": [8], 
-    "LA": [10], "LV": [8], "LB": [8], "LS": [8], "LR": [7, 8], "LY": [9], "LT": [8], "LU": [9], 
-    "MG": [9], "MW": [9], "MY": [9, 10], "MV": [7], "ML": [8], "MT": [8], "MR": [8], "MU": [7, 8], 
-    "MX": [10], "MD": [8], "MC": [8], "MN": [8], "ME": [8], "MA": [9], "MZ": [9], "MM": [8, 9], 
-    "NA": [8], "NP": [10], "NL": [9], "NZ": [8, 9], "NI": [8], "NE": [8], "NG": [11], "NO": [8], 
-    "OM": [8], "PK": [10], "PA": [8], "PY": [9], "PE": [9], "PH": [10], "PL": [9], "PT": [9], 
-    "QA": [8], "RO": [9], "RU": [10], "RW": [9], "SA": [9], "SN": [9], "RS": [9], "SG": [8], 
-    "SK": [9], "SI": [8], "ZA": [9], "KR": [9, 10], "ES": [9], "LK": [9], "SD": [9], "SE": [9], 
-    "CH": [9], "SY": [9], "TW": [9, 10], "TZ": [9], "TH": [9, 10], "TG": [8], "TN": [8], 
-    "TR": [10], "UG": [9], "UA": [9], "AE": [9], "GB": [10], "US": [10], "UY": [9], "UZ": [9], 
-    "VE": [10], "VN": [9, 10], "YE": [9], "ZM": [9], "ZW": [9]
+    "AF": [9],
+    "AL": [9],
+    "DZ": [9],
+    "AD": [6],
+    "AO": [9],
+    "AR": [10],
+    "AM": [8],
+    "AU": [9],
+    "AT": [10, 11],
+    "AZ": [9],
+    "BH": [8],
+    "BD": [10],
+    "BY": [9],
+    "BE": [9],
+    "BZ": [7],
+    "BJ": [8],
+    "BT": [8],
+    "BO": [8],
+    "BA": [8],
+    "BW": [7, 8],
+    "BR": [10, 11],
+    "BG": [9],
+    "BF": [8],
+    "BI": [8],
+    "KH": [8, 9],
+    "CM": [9],
+    "CA": [10],
+    "CF": [8],
+    "TD": [8],
+    "CL": [9],
+    "CN": [11],
+    "CO": [10],
+    "CG": [9],
+    "CD": [9],
+    "CR": [8],
+    "HR": [8, 9],
+    "CU": [8],
+    "CY": [8],
+    "CZ": [9],
+    "DK": [8],
+    "DJ": [8],
+    "DO": [10],
+    "EC": [9],
+    "EG": [10, 11],
+    "SV": [8],
+    "GQ": [9],
+    "ER": [7],
+    "EE": [7, 8],
+    "ET": [9],
+    "FI": [9, 10],
+    "FR": [9],
+    "GA": [8],
+    "GM": [7],
+    "GE": [9],
+    "DE": [10, 11],
+    "GH": [9],
+    "GR": [10],
+    "GT": [8],
+    "GN": [8],
+    "GW": [7],
+    "GY": [7],
+    "HT": [8],
+    "HN": [8],
+    "HK": [8],
+    "HU": [9],
+    "IS": [7],
+    "IN": [10],
+    "ID": [10, 11],
+    "IR": [10],
+    "IQ": [10],
+    "IE": [9],
+    "IL": [9],
+    "IT": [9, 10],
+    "JM": [10],
+    "JP": [10],
+    "JO": [9],
+    "KZ": [10],
+    "KE": [9],
+    "KW": [8],
+    "LA": [10],
+    "LV": [8],
+    "LB": [8],
+    "LS": [8],
+    "LR": [7, 8],
+    "LY": [9],
+    "LT": [8],
+    "LU": [9],
+    "MG": [9],
+    "MW": [9],
+    "MY": [9, 10],
+    "MV": [7],
+    "ML": [8],
+    "MT": [8],
+    "MR": [8],
+    "MU": [7, 8],
+    "MX": [10],
+    "MD": [8],
+    "MC": [8],
+    "MN": [8],
+    "ME": [8],
+    "MA": [9],
+    "MZ": [9],
+    "MM": [8, 9],
+    "NA": [8],
+    "NP": [10],
+    "NL": [9],
+    "NZ": [8, 9],
+    "NI": [8],
+    "NE": [8],
+    "NG": [11],
+    "NO": [8],
+    "OM": [8],
+    "PK": [10],
+    "PA": [8],
+    "PY": [9],
+    "PE": [9],
+    "PH": [10],
+    "PL": [9],
+    "PT": [9],
+    "QA": [8],
+    "RO": [9],
+    "RU": [10],
+    "RW": [9],
+    "SA": [9],
+    "SN": [9],
+    "RS": [9],
+    "SG": [8],
+    "SK": [9],
+    "SI": [8],
+    "ZA": [9],
+    "KR": [9, 10],
+    "ES": [9],
+    "LK": [9],
+    "SD": [9],
+    "SE": [9],
+    "CH": [9],
+    "SY": [9],
+    "TW": [9, 10],
+    "TZ": [9],
+    "TH": [9, 10],
+    "TG": [8],
+    "TN": [8],
+    "TR": [10],
+    "UG": [9],
+    "UA": [9],
+    "AE": [9],
+    "GB": [10],
+    "US": [10],
+    "UY": [9],
+    "UZ": [9],
+    "VE": [10],
+    "VN": [9, 10],
+    "YE": [9],
+    "ZM": [9],
+    "ZW": [9]
   };
 
   // Validate phone number based on country code
@@ -324,8 +460,6 @@ Future<String?> phoneNumberValidation(PhoneNumber? value, String countryCode) as
 
   return null; // Valid phone number
 }
-
-
 
 validateName(String value) {
   if (value.trim().isEmpty) {
@@ -374,7 +508,7 @@ validateCity(String value) {
     return 'Enter a valid City (only letters and spaces)';
   }
   if (value.length < 3) {
-    return 'City must be at least 2 characters long';
+    return 'City must be at least 3 characters long';
   }
   return null;
 }
@@ -402,17 +536,16 @@ String? optionalPhoneValidation(PhoneNumber? value) {
 
   if (!regExp.hasMatch(phoneNumber)) {
     return "Phone number can only contain digits.";
-  } 
+  }
   if (phoneNumber.length > 15) {
     return "Phone number is too long.";
-  } 
+  }
   if (phoneNumber.length < Constant.minimumRequiredMobileNumberLength) {
     return "Phone number is too short.";
   }
 
   return null; // Valid input
 }
-
 
 getUserLocation() async {
   LocationPermission permission;
