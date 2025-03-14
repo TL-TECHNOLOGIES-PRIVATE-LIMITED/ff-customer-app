@@ -36,7 +36,7 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
   /// Create Controller
   final pinController = TextEditingController();
 
-  static const _duration = Duration(seconds: 45);
+  static const _duration = Duration(minutes: 1, seconds: 30);
   Timer? _timer;
   Duration _remaining = _duration;
 
@@ -53,46 +53,53 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
     });
   }
 
-  @override
-  void initState() {
-    startTimer();
-    startTimer();
-    // TODO REMOVE DEMO OTP FROM HERE
-    super.initState();
-  }
+@override
+void initState() {
+  super.initState();
+//startTimer();
+  // Delaying the function call by 1 second
+  Future.delayed(Duration(seconds: 3), () {
+    if (mounted) {
+      print('------------------initstate otp caall-------------------------');
+      resendOtpWidget();
+       // Ensures the widget is still in the tree
+    firebaseLoginProcess();
+    }
+  });
+}
 
   @override
   Widget build(BuildContext context) {
     print('widget.from ---------> ${widget.from}');
     defaultPinTheme = PinTheme(
-      fieldWidth: 45,
-      // fieldHeight: 50,
-      shape: PinCodeFieldShape.box,
-      activeBorderWidth: 1,
-      inactiveBorderWidth: 1,
-      selectedBorderWidth: 1,
-      inactiveFillColor: Colors.transparent,
-      selectedFillColor: Colors.transparent,
-      activeFillColor: Colors.transparent,
-      selectedColor: ColorsRes.mainTextColor,
-      borderRadius: BorderRadius.circular(10),
-      activeColor: Theme.of(context).primaryColor,
-      inactiveColor: ColorsRes.mainTextColor,
+      width: 56,
+      height: 56,
+      textStyle: TextStyle(
+        fontSize: 20,
+        color: ColorsRes.mainTextColor,
+        fontWeight: FontWeight.w600,
+      ),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: ColorsRes.mainTextColor,
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
     );
 
-    // focusedPinTheme = defaultPinTheme.copyDecorationWith(
-    //   border: Border.all(color: ColorsRes.mainTextColor),
-    //   borderRadius: BorderRadius.circular(10),
-    // );
+    focusedPinTheme = defaultPinTheme.copyDecorationWith(
+      border: Border.all(color: ColorsRes.mainTextColor),
+      borderRadius: BorderRadius.circular(10),
+    );
 
-    // submittedPinTheme = defaultPinTheme.copyWith(
-    //   decoration: defaultPinTheme.decoration?.copyWith(
-    //     color: Theme.of(context).cardColor,
-    //     border: Border.all(
-    //       color: Theme.of(context).primaryColor,
-    //     ),
-    //   ),
-    // );
+    submittedPinTheme = defaultPinTheme.copyWith(
+      decoration: defaultPinTheme.decoration?.copyWith(
+        color: Theme.of(context).cardColor,
+        border: Border.all(
+          color: Theme.of(context).primaryColor,
+        ),
+      ),
+    );
     return Scaffold(
       body: Stack(
         children: [
@@ -104,7 +111,6 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
             child: Column(
               children: [
                 Image.asset(
-                  filterQuality: FilterQuality.high,
                   Constant.getAssetsPath(0, "logo.png"),
                   height: 200,
                 ),
@@ -131,38 +137,42 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
     );
   }
 
-// import 'package:pin_code_fields/pin_code_fields.dart';
-// import 'package:flutter/services.dart';
-// import 'package:flutter/material.dart';
-
   Widget otpPinWidget() {
     return Directionality(
       textDirection: TextDirection.ltr,
-      child: PinCodeTextField(
-        appContext: context,
-        textStyle: TextStyle(
-          fontSize: 20,
-          color: ColorsRes.mainTextColor,
-          fontWeight: FontWeight.w600,
-        ),
-        enablePinAutofill: true,
-        length: 6,
-        obscureText: false,
-        animationType: AnimationType.slide,
-        autoFocus: true,
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        enableActiveFill: true,
-        cursorColor: ColorsRes.mainTextColor,
-        pinTheme: defaultPinTheme,
+      child: Pinput(
+        defaultPinTheme: defaultPinTheme,
+        focusedPinTheme: focusedPinTheme,
+        submittedPinTheme: submittedPinTheme,
+        autofillHints: const [AutofillHints.oneTimeCode],
         controller: pinController,
+        length: 6,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        hapticFeedbackType: HapticFeedbackType.heavyImpact,
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+          FilteringTextInputFormatter.singleLineFormatter
+        ],
+        autofocus: true,
+        closeKeyboardWhenCompleted: true,
+        pinAnimationType: PinAnimationType.slide,
+        pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
+        animationCurve: Curves.bounceInOut,
+        enableSuggestions: true,
+        pinContentAlignment: AlignmentDirectional.center,
+        isCursorAnimationEnabled: true,
         onCompleted: (value) async {
           await checkOtpValidation().then((msg) {
-            if (msg.isNotEmpty) {
-              setState(() => isLoading = false);
+            if (msg != "") {
+              setState(() {
+                isLoading = false;
+              });
               showMessage(context, msg, MessageType.warning);
             } else {
-              setState(() => isLoading = false);
+              setState(() {
+                isLoading = false;
+              });
               if (Constant.firebaseAuthentication == "1") {
                 verifyOtp();
               } else if (Constant.customSmsGatewayOtpBased == "1") {
@@ -174,61 +184,101 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
                         widget.selectedCountryCode.countryCode.toString(),
                     ApiAndParams.otp: pinController.text,
                   },
-                ).then((mainData) async {
-                  if (mainData["status"].toString() == "1") {
-                    if (mainData.containsKey(ApiAndParams.data)) {
-                      userProf.UserProfile? userProfile =
-                          userProf.UserProfile.fromJson(mainData);
-                      if (userProfile.status == "1") {
-                        await context
-                            .read<UserProfileProvider>()
-                            .setUserDataInSession(mainData, context);
-                      }
+                ).then(
+                  (mainData) async {
+                    if (mainData["status"].toString() == "1") {
+                      if (mainData.containsKey(ApiAndParams.data)) {
+                        userProf.UserProfile? userProfile;
 
-                      if (widget.from == "add_to_cart_register") {
-                        print('add to cart');
-                        addGuestCartBulkToCartWhileLogin(
-                          context: context,
-                          params: Constant.setGuestCartParams(
-                            cartList: context.read<CartListProvider>().cartList,
-                          ),
-                        ).then((_) {
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        });
-                      } else if (Constant.session
-                          .getBoolData(SessionManager.isUserLogin)) {
-                        print('not add to cart');
-                        if (context
-                            .read<CartListProvider>()
-                            .cartList
-                            .isNotEmpty) {
+                        userProfile = userProf.UserProfile.fromJson(mainData);
+                        if (userProfile.status == "1") {
+                          await context
+                              .read<UserProfileProvider>()
+                              .setUserDataInSession(mainData, context);
+                        }
+
+                        if (widget.from == "add_to_cart_register") {
+                          print('add to cart');
                           addGuestCartBulkToCartWhileLogin(
                             context: context,
                             params: Constant.setGuestCartParams(
                               cartList:
                                   context.read<CartListProvider>().cartList,
                             ),
-                          ).then((_) =>
-                              Navigator.of(context).pushNamedAndRemoveUntil(
+                          ).then((value) {
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          });
+                        } else if (Constant.session
+                            .getBoolData(SessionManager.isUserLogin)) {
+                          print('not add to cart');
+                          if (context
+                              .read<CartListProvider>()
+                              .cartList
+                              .isNotEmpty) {
+                            addGuestCartBulkToCartWhileLogin(
+                              context: context,
+                              params: Constant.setGuestCartParams(
+                                cartList:
+                                    context.read<CartListProvider>().cartList,
+                              ),
+                            ).then(
+                              (value) =>
+                                  Navigator.of(context).pushNamedAndRemoveUntil(
                                 mainHomeScreen,
                                 (Route<dynamic> route) => false,
-                              ));
-                        } else {
-                          print('not add to cart');
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                            mainHomeScreen,
-                            (Route<dynamic> route) => false,
-                          );
+                              ),
+                            );
+                          } else {
+                            print('not add to cart');
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                              mainHomeScreen,
+                              (Route<dynamic> route) => false,
+                            );
+                          }
                         }
+                      } else {
+                        Map<String, String> params = {
+                          ApiAndParams.id: widget.phoneNumber,
+                          ApiAndParams.type: "phone",
+                          ApiAndParams.name: "",
+                          ApiAndParams.email: "",
+                          ApiAndParams.countryCode:
+                              widget.selectedCountryCode.countryCode.toString(),
+                          ApiAndParams.mobile: widget.phoneNumber,
+                          ApiAndParams.type: "phone",
+                          ApiAndParams.platform:
+                              Platform.isAndroid ? "android" : "ios",
+                          ApiAndParams.fcmToken: Constant.session
+                              .getData(SessionManager.keyFCMToken),
+                        };
+
+                        Navigator.of(context).pushReplacementNamed(
+                            editProfileScreen,
+                            arguments: [widget.from ?? "register", params]);
                       }
                     } else {
-                      navigateToEditProfile();
+                      Map<String, String> params = {
+                        ApiAndParams.id: widget.phoneNumber,
+                        ApiAndParams.type: "phone",
+                        ApiAndParams.name: "",
+                        ApiAndParams.email: "",
+                        ApiAndParams.countryCode:
+                            widget.selectedCountryCode.countryCode.toString(),
+                        ApiAndParams.mobile: widget.phoneNumber,
+                        ApiAndParams.type: "phone",
+                        ApiAndParams.platform:
+                            Platform.isAndroid ? "android" : "ios",
+                        ApiAndParams.fcmToken: Constant.session
+                            .getData(SessionManager.keyFCMToken),
+                      };
+
+                      Navigator.of(context).pushReplacementNamed(
+                          editProfileScreen,
+                          arguments: [widget.from ?? "register", params]);
                     }
-                  } else {
-                    navigateToEditProfile();
-                  }
-                });
+                  },
+                );
               }
             }
           });
@@ -237,28 +287,8 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
     );
   }
 
-  void navigateToEditProfile() {
-    Map<String, String> params = {
-      ApiAndParams.id: widget.phoneNumber,
-      ApiAndParams.type: "phone",
-      ApiAndParams.name: "",
-      ApiAndParams.email: "",
-      ApiAndParams.countryCode:
-          widget.selectedCountryCode.countryCode.toString(),
-      ApiAndParams.mobile: widget.phoneNumber,
-      ApiAndParams.type: "phone",
-      ApiAndParams.platform: Platform.isAndroid ? "android" : "ios",
-      ApiAndParams.fcmToken:
-          Constant.session.getData(SessionManager.keyFCMToken),
-    };
-
-    Navigator.of(context).pushReplacementNamed(
-      editProfileScreen,
-      arguments: [widget.from ?? "register", params],
-    );
-  }
-
   Widget resendOtpWidget() {
+    print('-------------------------resendOtpWidget----------------------');
     return Center(
       child: RichText(
         textAlign: TextAlign.center,
@@ -456,7 +486,6 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
   }
 
   Future checkOtpValidation() async {
-    print('-----------------checkOtpValidation------------------------------');
     bool checkInternet = await checkInternetConnection();
     String? msg;
     if (checkInternet) {
@@ -487,23 +516,25 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
   }
 
   firebaseLoginProcess() async {
-    print(
-        '-----------------firebaseLoginProcess------------------------------');
-    if (widget.phoneNumber.isNotEmpty) {
-      // Reset the resending token to force a new OTP generation
-      forceResendingToken = null;
 
+    print('------------------------firebaseLoginProcess----------------------------------');
+    if (widget.phoneNumber.isNotEmpty) {
       await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber:
-            '${widget.selectedCountryCode.countryCode}${widget.phoneNumber}', // Remove unnecessary dash
+            '${widget.selectedCountryCode.countryCode} - ${widget.phoneNumber}',
         verificationCompleted: (PhoneAuthCredential credential) {
-          // pinController.(credential.smsCode ?? "");
-          pinController.text = credential.smsCode ?? "";
+          pinController.setText(credential.smsCode ?? "");
         },
         verificationFailed: (FirebaseAuthException e) {
-          showMessage(context, e.message!, MessageType.warning);
+          print('hai i am here');
+          showMessage(
+            context,
+            e.message!,
+            MessageType.warning,
+          );
           pinController.clear();
           if (mounted) {
+            print('hai i am here kkk');
             isLoading = false;
             setState(() {
               pinController.clear();
@@ -522,11 +553,12 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
         codeAutoRetrievalTimeout: (String verificationId) {
           if (mounted) {
             isLoading = false;
-            setState(() {});
+            setState(() {
+              // isLoading = false;
+            });
           }
         },
-        forceResendingToken:
-            forceResendingToken, // This remains null to always generate a new OTP
+        forceResendingToken: forceResendingToken,
       );
     }
   }

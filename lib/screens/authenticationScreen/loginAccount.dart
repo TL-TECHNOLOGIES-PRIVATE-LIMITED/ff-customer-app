@@ -530,6 +530,9 @@ class _LoginAccountState extends State<LoginAccount> {
   }
 
   firebaseLoginProcess() async {
+
+
+    print('----------------------authProvider == AuthProviders.phone;----------------------------');
     authProvider == AuthProviders.phone;
     setState(() {});
     if (edtPhoneNumber.text.isNotEmpty) {
@@ -581,6 +584,7 @@ class _LoginAccountState extends State<LoginAccount> {
           forceResendingToken: forceResendingToken,
         );
       } else if (Constant.customSmsGatewayOtpBased == "1") {
+        print('------------------------Constant.customSmsGatewayOtpBased == "1")----------------------');
         context.read<UserProfileProvider>().sendCustomOTPSmsProvider(
           context: context,
           params: {ApiAndParams.phone: fullNumber!.completeNumber},
