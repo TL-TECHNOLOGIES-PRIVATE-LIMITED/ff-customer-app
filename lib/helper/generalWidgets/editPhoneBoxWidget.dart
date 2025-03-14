@@ -29,15 +29,12 @@ Widget editPhoneBoxBoxWidget(
   TextInputAction? optionalTextInputAction,
   int? minLines,
   int? maxLines,
-  
   int? maxLength,
   FloatingLabelBehavior? floatingLabelBehavior,
   void Function()? onTap,
   bool? readOnly,
 }) {
   return IntlPhoneField(
-    
-    disableLengthCheck: true, // Disable package's internal length check
     controller: edtController,
     dropdownTextStyle: TextStyle(color: ColorsRes.mainTextColor),
     style: TextStyle(color: ColorsRes.mainTextColor),
@@ -57,11 +54,12 @@ Widget editPhoneBoxBoxWidget(
       debugPrint("Updated Country Code: ${value.code}");
       onCountryCodeChanged?.call(value.code);
     },
-    textInputAction: optionalTextInputAction ?? 
+    textInputAction: optionalTextInputAction ??
         (isLastField == true ? TextInputAction.done : TextInputAction.next),
-    autovalidateMode: AutovalidateMode.onUserInteraction,
+    autovalidateMode: AutovalidateMode.disabled,
     decoration: InputDecoration(
-      errorStyle: TextStyle(color: ColorsRes.appColorRed), // Explicit error style
+      errorStyle:
+          TextStyle(color: ColorsRes.appColorRed), // Explicit error style
       hintStyle: TextStyle(color: Theme.of(context).hintColor),
       counterText: "",
       alignLabelWithHint: true,
@@ -95,21 +93,27 @@ Widget editPhoneBoxBoxWidget(
           width: 1,
         ),
       ),
+
       labelText: label,
       labelStyle: TextStyle(color: ColorsRes.subTitleMainTextColor),
       isDense: true,
-      floatingLabelBehavior: floatingLabelBehavior ?? FloatingLabelBehavior.auto,
+      floatingLabelBehavior:
+          floatingLabelBehavior ?? FloatingLabelBehavior.auto,
     ),
-validator: (value) async {
-  if (validationFunction != null) {
-    final result = await validationFunction(value); // Await the async function
-    debugPrint("Validation Result: $result");
-    return result; // Return the result after completion
-  }
-  return null;
-},
-
+    validator: (value) async {
+      // if (validationFunction != null) {
+      //   final result =
+      //       await validationFunction(value); // Await the async function
+      //   debugPrint("Validation Result: $result");
+      //   return result; // Return the result after completion
+      // }
+      // return null;
+      if (validationFunction == null) {
+        print('here');
+        return null;
+      } else {
+        return validationFunction(value);
+      }
+    },
   );
 }
-
-

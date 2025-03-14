@@ -355,7 +355,7 @@
   "order_placed_on": "Order placed on:",
   "credit": "Credit",
   "debit": "Debit",
-  "seller_miss_match_item_message": "Item is not belonging to the seller, You ca add item of the same seller only,To add item you need to clear the cart first.\n\nYou want to clear cart?",
+  "seller_miss_match_item_message": "Item is not belonging to the seller, You can add item of the same seller only,To add item you need to clear the cart first.\n\nYou want to clear cart?",
   "attachments": "Attachments",
   "ratings": "Ratings",
   "rating": "Rating",
