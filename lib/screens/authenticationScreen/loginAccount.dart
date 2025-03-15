@@ -26,7 +26,7 @@ class _LoginAccountState extends State<LoginAccount> {
   TextEditingController edtPhoneNumber = TextEditingController();
   bool isDark = Constant.session.getBoolData(SessionManager.isDarkTheme);
   String otpVerificationId = "";
-  String phoneNumber = "";
+  // String phoneNumber = "";
   int? forceResendingToken;
 
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
@@ -536,7 +536,7 @@ firebaseLoginProcess() async {
                 firebaseAuth,
                // otpVerificationId,
                 edtPhoneNumber.text,
-                fullNumber!.countryCode,
+           fullNumber!.countryCode,
                 widget.from ?? null
               ];
               Navigator.pushNamed(context, otpScreen,

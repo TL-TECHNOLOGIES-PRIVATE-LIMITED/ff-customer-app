@@ -2,7 +2,7 @@ import 'package:project/helper/utils/generalImports.dart';
 import 'package:project/models/userProfile.dart' as userProf;
 
 class OtpVerificationScreen extends StatefulWidget {
- // final String otpVerificationId;
+  // final String otpVerificationId;
   final String phoneNumber;
   final FirebaseAuth firebaseAuth;
   final String selectedCountryCode;
@@ -23,10 +23,10 @@ class OtpVerificationScreen extends StatefulWidget {
 
 class _LoginAccountState extends State<OtpVerificationScreen> {
   int otpLength = 6;
-    String? verificationId;
+ // String? verificationId;
   bool isLoading = false;
-    late String phoneNumber;
-    String otpVerificationId="";
+  late String phoneNumber;
+  String otpVerificationId = "";
   String resendOtpVerificationId = "";
   int? forceResendingToken;
 
@@ -55,54 +55,60 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
       });
     });
   }
-@override
-void initState() {
-  super.initState();
-  
-  // Ensure proper initialization order
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    _verifyPhoneNumber();
-  });
-}
 
-@override
-void didChangeDependencies() {
-  super.didChangeDependencies();
-  phoneNumber = widget.phoneNumber;
-}
+  @override
+  void initState() {
+    super.initState();
+
+    // Ensure proper initialization order
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _verifyPhoneNumber();
+    });
+  }
+
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   phoneNumber = widget.phoneNumber;
+  // }
 
   Future<void> _verifyPhoneNumber() async {
     setState(() => isLoading = true);
-    print('-----------------------_verifyPhoneNumber------------------------------');
+    print(
+        '-----------------------_verifyPhoneNumber------------------------------');
     await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
+      phoneNumber: widget.selectedCountryCode +widget.phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) {
         // Auto-set OTP when verification is completed (e.g., Android auto-retrieval)
         pinController.setText(credential.smsCode ?? "");
-print('----------------------init--------------${credential.smsCode}-------------SUCCESS------codesms---------------------');
-  print('------------------------init------------${pinController.text}-------------SUCCESS-------------textpincontroller--------------');
+        print(
+            '----------------------init--------------${credential.smsCode}-------------SUCCESS------codesms---------------------');
+        print(
+            '------------------------init------------${pinController.text}-------------SUCCESS-------------textpincontroller--------------');
 
-       // verifyOtp();
-      //  _signInWithCredential(credential); // Optional: Auto-sign in if needed
+        // verifyOtp();
+        //  _signInWithCredential(credential); // Optional: Auto-sign in if needed
       },
       verificationFailed: (FirebaseAuthException e) {
         setState(() => isLoading = false);
-        print('------------------verification failed-------------------------------');
+        print(
+            '------------------verification failed-------------------------------');
         //showErrorMessage(e.message ?? "Verification failed");
       },
       codeSent: (String vId, int? resendToken) {
         setState(() {
-          verificationId = vId;
+          otpVerificationId = vId;
           forceResendingToken = resendToken;
           isLoading = false;
         });
       },
       codeAutoRetrievalTimeout: (String vId) {
-        verificationId = vId;
+        otpVerificationId = vId;
       },
       forceResendingToken: forceResendingToken,
     );
   }
+
   @override
   Widget build(BuildContext context) {
     print('widget.from ---------> ${widget.from}');
@@ -209,7 +215,8 @@ print('----------------------init--------------${credential.smsCode}------------
                 isLoading = false;
               });
               if (Constant.firebaseAuthentication == "1") {
-                print('--------------------verifyOtp()----on pinput------------------------');
+                print(
+                    '--------------------verifyOtp()----on pinput------------------------');
                 verifyOtp();
               } else if (Constant.customSmsGatewayOtpBased == "1") {
                 context.read<UserProfileProvider>().verifyUserProvider(
@@ -357,50 +364,50 @@ print('----------------------init--------------${credential.smsCode}------------
     );
   }
 
- Future<void> verifyOtp() async {
-  setState(() => isLoading = true); // Start loading
+  Future<void> verifyOtp() async {
+    setState(() => isLoading = true); // Start loading
 
-  try {
-    // 1. Get the verification ID from the OTP screen's state (not from widgets)
-    final verificationId = resendOtpVerificationId.isNotEmpty 
-        ? resendOtpVerificationId 
-        : otpVerificationId;
+    try {
+      // 1. Get the verification ID from the OTP screen's state (not from widgets)
+      final verificationId = resendOtpVerificationId.isNotEmpty
+          ? resendOtpVerificationId
+          : otpVerificationId;
 
-    // 2. Create the credential
-    final PhoneAuthCredential credential = PhoneAuthProvider.credential(
-      verificationId: verificationId,
-      smsCode: pinController.text,
-    );
+      // 2. Create the credential
+      final PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: pinController.text,
+      );
 
-    // 3. Sign in with the credential
-    final UserCredential userCredential = 
-        await widget.firebaseAuth.signInWithCredential(credential);
+      // 3. Sign in with the credential
+      final UserCredential userCredential =
+          await widget.firebaseAuth.signInWithCredential(credential);
 
-    // 4. Handle success
-    if (userCredential.user != null) {
-      await backendApiProcess(userCredential.user!);
-      // Navigate to the next screen (e.g., home/dashboard)
+      // 4. Handle success
+      if (userCredential.user != null) {
+        await backendApiProcess(userCredential.user!);
+        // Navigate to the next screen (e.g., home/dashboard)
+      }
+    } on FirebaseAuthException catch (e) {
+      // Handle Firebase errors (e.g., invalid OTP)
+      showMessage(
+        context,
+        getTranslatedValue(context, "enter_valid_otp"),
+        MessageType.warning,
+      );
+      pinController.clear();
+    } catch (e) {
+      // Generic error handling
+      showMessage(
+        context,
+        getTranslatedValue(context, "something_went_wrong"),
+        MessageType.warning,
+      );
+    } finally {
+      // Reset loading state in all cases
+      setState(() => isLoading = false);
     }
-  } on FirebaseAuthException catch (e) {
-    // Handle Firebase errors (e.g., invalid OTP)
-    showMessage(
-      context,
-      getTranslatedValue(context, "enter_valid_otp"),
-      MessageType.warning,
-    );
-    pinController.clear();
-  } catch (e) {
-    // Generic error handling
-    showMessage(
-      context,
-      getTranslatedValue(context, "something_went_wrong"),
-      MessageType.warning,
-    );
-  } finally {
-    // Reset loading state in all cases
-    setState(() => isLoading = false);
   }
-}
 
   otpWidgets() {
     return Container(
@@ -427,8 +434,7 @@ print('----------------------init--------------${credential.smsCode}------------
             jsonKey: "otp_send_message",
           ),
           CustomTextLabel(
-            text:
-                "${widget.selectedCountryCode}-${widget.phoneNumber}",
+            text: "${widget.selectedCountryCode}-${widget.phoneNumber}",
           ),
           const SizedBox(height: 60),
           otpPinWidget(),
@@ -517,12 +523,11 @@ print('----------------------init--------------${credential.smsCode}------------
             ApiAndParams.type: "phone",
             ApiAndParams.name: user.displayName ?? "",
             ApiAndParams.email: user.email ?? "",
-            ApiAndParams.countryCode: widget.selectedCountryCode
-                    .replaceAll("+", "")
-                    .toString() ??
-                "",
-            ApiAndParams.mobile: user.phoneNumber.toString().replaceAll(
-                widget.selectedCountryCode.toString(), ""),
+            ApiAndParams.countryCode:
+                widget.selectedCountryCode.replaceAll("+", "").toString() ?? "",
+            ApiAndParams.mobile: user.phoneNumber
+                .toString()
+                .replaceAll(widget.selectedCountryCode.toString(), ""),
             ApiAndParams.type: "phone",
             ApiAndParams.platform: Platform.isAndroid ? "android" : "ios",
             ApiAndParams.fcmToken:
@@ -569,13 +574,13 @@ print('----------------------init--------------${credential.smsCode}------------
   firebaseLoginProcess() async {
     if (widget.phoneNumber.isNotEmpty) {
       await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber:
-            '${widget.selectedCountryCode} - ${widget.phoneNumber}',
+        phoneNumber: widget.selectedCountryCode +widget.phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) {
           pinController.setText(credential.smsCode ?? "");
-  print('------------------------------------${credential.smsCode}-------------SUCCESS------codesms---------------------');
-  print('------------------------------------${pinController.text}-------------SUCCESS-------------textpincontroller--------------');
-
+          print(
+              '------------------------------------${credential.smsCode}-------------SUCCESS------codesms---------------------');
+          print(
+              '------------------------------------${pinController.text}-------------SUCCESS-------------textpincontroller--------------');
         },
         verificationFailed: (FirebaseAuthException e) {
           print('hai i am here');
@@ -599,12 +604,7 @@ print('----------------------init--------------${credential.smsCode}------------
             isLoading = false;
             setState(() {
               resendOtpVerificationId = verificationId;
-
-
-
-
             });
-
           }
         },
         codeAutoRetrievalTimeout: (String verificationId) {
