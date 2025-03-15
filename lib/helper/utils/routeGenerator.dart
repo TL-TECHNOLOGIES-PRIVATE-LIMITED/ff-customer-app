@@ -74,7 +74,7 @@ class RouteGenerator {
             firebaseAuth: firebaseArguments[0] as FirebaseAuth,
         //    otpVerificationId: firebaseArguments[1] as String,
             phoneNumber: firebaseArguments[1] as String,
-            selectedCountryCode: firebaseArguments[2] as PhoneNumber,
+            selectedCountryCode: firebaseArguments[2] as String,
             from: firebaseArguments[3] as String?,
           ),
         );

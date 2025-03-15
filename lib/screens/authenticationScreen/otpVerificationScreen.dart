@@ -5,7 +5,7 @@ class OtpVerificationScreen extends StatefulWidget {
  // final String otpVerificationId;
   final String phoneNumber;
   final FirebaseAuth firebaseAuth;
-  final PhoneNumber selectedCountryCode;
+  final String selectedCountryCode;
   final String? from;
 
   const OtpVerificationScreen({
@@ -217,7 +217,7 @@ print('----------------------init--------------${credential.smsCode}------------
                   params: {
                     ApiAndParams.phone: widget.phoneNumber,
                     ApiAndParams.countryCode:
-                        widget.selectedCountryCode.countryCode.toString(),
+                        widget.selectedCountryCode.toString(),
                     ApiAndParams.otp: pinController.text,
                   },
                 ).then(
@@ -280,7 +280,7 @@ print('----------------------init--------------${credential.smsCode}------------
                           ApiAndParams.name: "",
                           ApiAndParams.email: "",
                           ApiAndParams.countryCode:
-                              widget.selectedCountryCode.countryCode.toString(),
+                              widget.selectedCountryCode.toString(),
                           ApiAndParams.mobile: widget.phoneNumber,
                           ApiAndParams.type: "phone",
                           ApiAndParams.platform:
@@ -300,7 +300,7 @@ print('----------------------init--------------${credential.smsCode}------------
                         ApiAndParams.name: "",
                         ApiAndParams.email: "",
                         ApiAndParams.countryCode:
-                            widget.selectedCountryCode.countryCode.toString(),
+                            widget.selectedCountryCode.toString(),
                         ApiAndParams.mobile: widget.phoneNumber,
                         ApiAndParams.type: "phone",
                         ApiAndParams.platform:
@@ -428,7 +428,7 @@ print('----------------------init--------------${credential.smsCode}------------
           ),
           CustomTextLabel(
             text:
-                "${widget.selectedCountryCode.countryCode}-${widget.phoneNumber}",
+                "${widget.selectedCountryCode}-${widget.phoneNumber}",
           ),
           const SizedBox(height: 60),
           otpPinWidget(),
@@ -517,12 +517,12 @@ print('----------------------init--------------${credential.smsCode}------------
             ApiAndParams.type: "phone",
             ApiAndParams.name: user.displayName ?? "",
             ApiAndParams.email: user.email ?? "",
-            ApiAndParams.countryCode: widget.selectedCountryCode.countryCode
+            ApiAndParams.countryCode: widget.selectedCountryCode
                     .replaceAll("+", "")
                     .toString() ??
                 "",
             ApiAndParams.mobile: user.phoneNumber.toString().replaceAll(
-                widget.selectedCountryCode.countryCode.toString(), ""),
+                widget.selectedCountryCode.toString(), ""),
             ApiAndParams.type: "phone",
             ApiAndParams.platform: Platform.isAndroid ? "android" : "ios",
             ApiAndParams.fcmToken:
@@ -570,7 +570,7 @@ print('----------------------init--------------${credential.smsCode}------------
     if (widget.phoneNumber.isNotEmpty) {
       await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber:
-            '${widget.selectedCountryCode.countryCode} - ${widget.phoneNumber}',
+            '${widget.selectedCountryCode} - ${widget.phoneNumber}',
         verificationCompleted: (PhoneAuthCredential credential) {
           pinController.setText(credential.smsCode ?? "");
   print('------------------------------------${credential.smsCode}-------------SUCCESS------codesms---------------------');
