@@ -14,6 +14,17 @@ class HomeScreenProductListItem extends StatelessWidget {
       this.borderRadius})
       : super(key: key);
 
+// Helper function to extract the first 2 words
+  String _getFirstTwoWords(String text) {
+    // Split the text into words
+    List<String> words = text.trim().split(" ");
+
+    // Take the first 2 words (or fewer if the text has less than 2 words)
+    String firstTwoWords = words.take(2).join(" ");
+
+    return firstTwoWords;
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Variants>? variants = product.variants;
@@ -117,14 +128,20 @@ class HomeScreenProductListItem extends StatelessWidget {
                                   padding: EdgeInsetsDirectional.only(
                                       start: 5, bottom: 10, top: 10, end: 5),
                                   child: CustomTextLabel(
-                                    text: product.name ?? "",
+                                    text: _getFirstTwoWords(product.name ??
+                                        ""), // Use a helper function to format the text
                                     softWrap: true,
                                     maxLines: 1,
+                                    overflow: TextOverflow
+                                        .ellipsis, // Show ellipsis for overflow
                                     style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: ColorsRes.mainTextColor),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: ColorsRes.mainTextColor,
+                                    ),
                                   ),
+
+// Helper function to ensure at least 2 words and handle overflow
                                 ),
                                 ProductListRatingBuilderWidget(
                                   averageRating:
