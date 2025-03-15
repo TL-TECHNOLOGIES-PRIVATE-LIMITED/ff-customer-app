@@ -458,6 +458,7 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
 
   @override
   Widget build(BuildContext context) {
+    final checkoutProvider = context.read<CheckoutProvider>();
     return Container(
       decoration: DesignConfig.boxDecorationSpecific(
           Theme.of(context).cardColor, 10, true, false),
@@ -470,13 +471,10 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CustomTextLabel(
-              jsonKey: context
-                          .read<CheckoutProvider>()
-                          .timeSlotsData
-                          ?.timeSlotsIsEnabled ==
-                      "true"
-                  ? "preferred_delivery_date_time"
-                  : "estimate_delivery_date",
+              jsonKey:
+                  checkoutProvider.timeSlotsData?.timeSlotsIsEnabled == "true"
+                      ? "preferred_delivery_date_time"
+                      : "estimate_delivery_date",
               softWrap: true,
               style: TextStyle(
                 fontSize: 16,
@@ -487,38 +485,25 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
             getSizedBox(height: Constant.size10),
 
             // Time slots enabled section
-            if (context
-                    .read<CheckoutProvider>()
-                    .timeSlotsData
-                    ?.timeSlotsIsEnabled ==
-                "true")
-              _buildDateSelection(),
+            if (checkoutProvider.timeSlotsData?.timeSlotsIsEnabled == "true")
+              _buildDateSelection(checkoutProvider),
 
             // Time slots disabled section
-            if (context
-                    .read<CheckoutProvider>()
-                    .timeSlotsData
-                    ?.timeSlotsIsEnabled !=
-                "true")
+            if (checkoutProvider.timeSlotsData?.timeSlotsIsEnabled != "true")
               _buildEstimatedDeliveryText(),
 
             getSizedBox(height: Constant.size5),
 
             // Time slots list
-            if (context
-                    .read<CheckoutProvider>()
-                    .timeSlotsData
-                    ?.timeSlotsIsEnabled ==
-                "true")
-              _buildTimeSlotsList(),
+            if (checkoutProvider.timeSlotsData?.timeSlotsIsEnabled == "true")
+              _buildTimeSlotsList(checkoutProvider),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDateSelection() {
-    final checkoutProvider = context.read<CheckoutProvider>();
+  Widget _buildDateSelection(CheckoutProvider checkoutProvider) {
     final timeSlotsData = checkoutProvider.timeSlotsData;
 
     if (timeSlotsData == null) return const SizedBox.shrink();
@@ -555,10 +540,41 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
 
             return GestureDetector(
               onTap: () {
-                checkoutProvider.setSelectedTime(-1);
-                checkoutProvider.setSelectedDate(actualIndex);
-                checkoutProvider.selectedDate =
-                    "${currentDate.day}-${currentDate.month}-${currentDate.year}";
+                if ("${DateTime.now().day}-${DateTime.now().month}-${DateTime.now().year}" ==
+                    "${currentDate.day}-${currentDate.month}-${currentDate.year}") {
+                  checkoutProvider.setSelectedDate(actualIndex);
+                  checkoutProvider.selectedDate =
+                      "${currentDate.day}-${currentDate.month}-${currentDate.year}";
+
+                  for (int i = 0; i < timeSlotsData.timeSlots.length; i++) {
+                    var now = DateTime.now();
+                    String time =
+                        timeSlotsData.timeSlots[i].lastOrderTime.toString();
+                    DateTime slotTime = now.copyWith(
+                      hour: int.parse(time.split(":")[0]),
+                      minute: int.parse(time.split(":")[1]),
+                      second: int.parse(time.split(":")[2]),
+                    );
+
+                    if (now.isBefore(slotTime)) {
+                      print('id is $i');
+                      checkoutProvider
+                          .setSelectedTime(i); // Select this time slot
+                      break; // Exit the loop once the first available slot is found
+                    }
+                  }
+                  print(
+                      'if condition is working || ${checkoutProvider.selectedTime}');
+
+                  print('it is today');
+                } else {
+                  print("It is not today");
+
+                  checkoutProvider.setSelectedTime(-1);
+                  checkoutProvider.setSelectedDate(actualIndex);
+                  checkoutProvider.selectedDate =
+                      "${currentDate.day}-${currentDate.month}-${currentDate.year}";
+                }
               },
               child: Container(
                 padding:
@@ -641,26 +657,20 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
     );
   }
 
-  Widget _buildTimeSlotsList() {
+  Widget _buildTimeSlotsList(CheckoutProvider checkoutProvider) {
     return Column(
       children: List.generate(
-        context.read<CheckoutProvider>().timeSlotsData?.timeSlots.length ?? 0,
+        checkoutProvider.timeSlotsData?.timeSlots.length ?? 0,
         (index) {
           var now = DateTime.now();
           bool isActive = false;
-          bool isToday = context
-                      .read<CheckoutProvider>()
-                      .timeSlotsData
-                      ?.estimateDeliveryDays
-                      .toString() ==
-                  "1" &&
-              context.read<CheckoutProvider>().selectedDateId == 0;
+          bool isToday =
+              checkoutProvider.timeSlotsData?.estimateDeliveryDays.toString() ==
+                      "1" &&
+                  checkoutProvider.selectedDateId == 0;
 
-          String time = context
-                  .read<CheckoutProvider>()
-                  .timeSlotsData
-                  ?.timeSlots[index]
-                  .lastOrderTime
+          String time = checkoutProvider
+                  .timeSlotsData?.timeSlots[index].lastOrderTime
                   .toString() ??
               "";
 
@@ -676,16 +686,16 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
           }
 
           if (index == 0) {
-            context.read<CheckoutProvider>().addOrResetTimeSlots(true);
+            checkoutProvider.addOrResetTimeSlots(true);
           }
 
           if (!isActive) return const SizedBox.shrink();
 
-          context.read<CheckoutProvider>().addOrResetTimeSlots(false);
+          checkoutProvider.addOrResetTimeSlots(false);
 
           return GestureDetector(
             onTap: () {
-              context.read<CheckoutProvider>().setSelectedTime(index);
+              checkoutProvider.setSelectedTime(index);
             },
             child: Container(
               padding: EdgeInsets.zero,
@@ -694,11 +704,7 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
                 border: BorderDirectional(
                   bottom: BorderSide(
                     width: 1,
-                    color: context
-                                .read<CheckoutProvider>()
-                                .timeSlotsData
-                                ?.timeSlots
-                                .length ==
+                    color: checkoutProvider.timeSlotsData?.timeSlots.length ==
                             index + 1
                         ? Colors.transparent
                         : ColorsRes.grey.withOpacity(0.1),
@@ -708,11 +714,8 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
               child: Row(
                 children: [
                   CustomTextLabel(
-                    text: context
-                            .read<CheckoutProvider>()
-                            .timeSlotsData
-                            ?.timeSlots[index]
-                            .title ??
+                    text: checkoutProvider
+                            .timeSlotsData?.timeSlots[index].title ??
                         "",
                     style: TextStyle(
                       color: ColorsRes.mainTextColor,
@@ -723,11 +726,11 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
                     visualDensity: VisualDensity.compact,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     inactiveColor: ColorsRes.mainTextColor,
-                    value: context.read<CheckoutProvider>().selectedTime,
+                    value: checkoutProvider.selectedTime,
                     groupValue: index,
                     activeColor: Theme.of(context).primaryColor,
                     onChanged: (value) {
-                      context.read<CheckoutProvider>().setSelectedTime(index);
+                      checkoutProvider.setSelectedTime(index);
                     },
                   ),
                 ],

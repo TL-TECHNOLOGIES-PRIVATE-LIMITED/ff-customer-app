@@ -112,7 +112,6 @@ Widget editBoxWidget(
       floatingLabelBehavior:
           floatingLabelBehavior ?? FloatingLabelBehavior.auto,
     ),
-    autovalidateMode: AutovalidateMode.onUserInteraction,
     keyboardType: inputType,
     inputFormatters: inputFormatters ?? [],
     validator: (String? value) {

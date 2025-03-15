@@ -19,6 +19,7 @@ class LoginAccount extends StatefulWidget {
 }
 
 class _LoginAccountState extends State<LoginAccount> {
+  final formKey = GlobalKey<FormState>();
   PhoneNumber? fullNumber;
   bool isLoading = false;
 
@@ -26,7 +27,6 @@ class _LoginAccountState extends State<LoginAccount> {
   TextEditingController edtPhoneNumber = TextEditingController();
   bool isDark = Constant.session.getBoolData(SessionManager.isDarkTheme);
   String otpVerificationId = "";
-  // String phoneNumber = "";
   int? forceResendingToken;
 
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
@@ -216,11 +216,14 @@ class _LoginAccountState extends State<LoginAccount> {
             getSizedBox(
               height: Constant.size30,
             ),
-            Container(
-              margin: EdgeInsetsDirectional.only(start: 20, end: 20),
-              decoration: DesignConfig.boxDecoration(
-                  Theme.of(context).scaffoldBackgroundColor, 10),
-              child: mobileNoWidget(),
+            Form(
+              key: formKey,
+              child: Container(
+                margin: EdgeInsetsDirectional.only(start: 20, end: 20),
+                decoration: DesignConfig.boxDecoration(
+                    Theme.of(context).scaffoldBackgroundColor, 10),
+                child: mobileNoWidget(),
+              ),
             ),
             getSizedBox(
               height: Constant.size20,
@@ -389,6 +392,7 @@ class _LoginAccountState extends State<LoginAccount> {
           print('number is ${number}');
           fullNumber = number;
         },
+
         initialCountryCode: Constant.initialCountryCode,
         dropdownTextStyle: TextStyle(color: ColorsRes.mainTextColor),
         style: TextStyle(color: ColorsRes.mainTextColor),
@@ -396,6 +400,7 @@ class _LoginAccountState extends State<LoginAccount> {
           Icons.keyboard_arrow_down_rounded,
           color: ColorsRes.mainTextColor,
         ),
+        autovalidateMode: AutovalidateMode.disabled,
 
         dropdownIconPosition: IconPosition.trailing,
         flagsButtonMargin: EdgeInsets.only(left: 10),
@@ -497,8 +502,12 @@ class _LoginAccountState extends State<LoginAccount> {
   }
 
   loginWithPhoneNumber() async {
+    formKey.currentState!.save();
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
 
-
+      firebaseLoginProcess();
+    }
     print('--------------------loginWithPhoneNumber-----------------------');
     var validation = await mobileNumberValidation();
     if (validation) {
@@ -506,7 +515,6 @@ class _LoginAccountState extends State<LoginAccount> {
       setState(() {
         isLoading = true;
       });
-      firebaseLoginProcess();
     }
   }
 
@@ -529,34 +537,30 @@ class _LoginAccountState extends State<LoginAccount> {
     }
   }
 
-firebaseLoginProcess() async {
-  if (edtPhoneNumber.text.isNotEmpty) {
+  firebaseLoginProcess() async {
+    if (edtPhoneNumber.text.isNotEmpty) {
+      List<dynamic> firebaseArguments = [
+        firebaseAuth,
+        // otpVerificationId,
+        edtPhoneNumber.text,
+        fullNumber!.countryCode,
+        widget.from ?? null
+      ];
+      Navigator.pushNamed(context, otpScreen, arguments: firebaseArguments);
 
- List<dynamic> firebaseArguments = [
-                firebaseAuth,
-               // otpVerificationId,
-                edtPhoneNumber.text,
-           fullNumber!.countryCode,
-                widget.from ?? null
-              ];
-              Navigator.pushNamed(context, otpScreen,
-                  arguments: firebaseArguments);
-
-
-
-    // Navigator.pushNamed(
-    //   context,
-    //   otpScreen,
-    //   arguments: {
-    //     'firebaseAuth': FirebaseAuth.instance,
-    //    // 'otpVerificationId': verificationId, // Make sure this exists
-    //     'phoneNumber': edtPhoneNumber.text,
-    //     'selectedCountryCode': fullNumber!,
-    //     'from': widget.from,
-    //   },
-    // );
+      // Navigator.pushNamed(
+      //   context,
+      //   otpScreen,
+      //   arguments: {
+      //     'firebaseAuth': FirebaseAuth.instance,
+      //    // 'otpVerificationId': verificationId, // Make sure this exists
+      //     'phoneNumber': edtPhoneNumber.text,
+      //     'selectedCountryCode': fullNumber!,
+      //     'from': widget.from,
+      //   },
+      // );
+    }
   }
-}
 
   Widget buildDottedDivider() {
     return Row(
