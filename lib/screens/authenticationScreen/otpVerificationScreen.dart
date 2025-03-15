@@ -2,7 +2,7 @@ import 'package:project/helper/utils/generalImports.dart';
 import 'package:project/models/userProfile.dart' as userProf;
 
 class OtpVerificationScreen extends StatefulWidget {
-  final String otpVerificationId;
+ // final String otpVerificationId;
   final String phoneNumber;
   final FirebaseAuth firebaseAuth;
   final PhoneNumber selectedCountryCode;
@@ -10,7 +10,7 @@ class OtpVerificationScreen extends StatefulWidget {
 
   const OtpVerificationScreen({
     Key? key,
-    required this.otpVerificationId,
+//    required this.otpVerificationId,
     required this.phoneNumber,
     required this.firebaseAuth,
     required this.selectedCountryCode,
@@ -23,7 +23,10 @@ class OtpVerificationScreen extends StatefulWidget {
 
 class _LoginAccountState extends State<OtpVerificationScreen> {
   int otpLength = 6;
+    String? verificationId;
   bool isLoading = false;
+    late String phoneNumber;
+    String otpVerificationId="";
   String resendOtpVerificationId = "";
   int? forceResendingToken;
 
@@ -52,22 +55,54 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
       });
     });
   }
-
 @override
 void initState() {
   super.initState();
-//startTimer();
-  // Delaying the function call by 1 second
-  Future.delayed(Duration(seconds: 3), () {
-    if (mounted) {
-      print('------------------initstate otp caall-------------------------');
-      resendOtpWidget();
-       // Ensures the widget is still in the tree
-    firebaseLoginProcess();
-    }
+  
+  // Ensure proper initialization order
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _verifyPhoneNumber();
   });
 }
 
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  phoneNumber = widget.phoneNumber;
+}
+
+  Future<void> _verifyPhoneNumber() async {
+    setState(() => isLoading = true);
+    print('-----------------------_verifyPhoneNumber------------------------------');
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) {
+        // Auto-set OTP when verification is completed (e.g., Android auto-retrieval)
+        pinController.setText(credential.smsCode ?? "");
+print('----------------------init--------------${credential.smsCode}-------------SUCCESS------codesms---------------------');
+  print('------------------------init------------${pinController.text}-------------SUCCESS-------------textpincontroller--------------');
+
+       // verifyOtp();
+      //  _signInWithCredential(credential); // Optional: Auto-sign in if needed
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        setState(() => isLoading = false);
+        print('------------------verification failed-------------------------------');
+        //showErrorMessage(e.message ?? "Verification failed");
+      },
+      codeSent: (String vId, int? resendToken) {
+        setState(() {
+          verificationId = vId;
+          forceResendingToken = resendToken;
+          isLoading = false;
+        });
+      },
+      codeAutoRetrievalTimeout: (String vId) {
+        verificationId = vId;
+      },
+      forceResendingToken: forceResendingToken,
+    );
+  }
   @override
   Widget build(BuildContext context) {
     print('widget.from ---------> ${widget.from}');
@@ -174,6 +209,7 @@ void initState() {
                 isLoading = false;
               });
               if (Constant.firebaseAuthentication == "1") {
+                print('--------------------verifyOtp()----on pinput------------------------');
                 verifyOtp();
               } else if (Constant.customSmsGatewayOtpBased == "1") {
                 context.read<UserProfileProvider>().verifyUserProvider(
@@ -288,7 +324,6 @@ void initState() {
   }
 
   Widget resendOtpWidget() {
-    print('-------------------------resendOtpWidget----------------------');
     return Center(
       child: RichText(
         textAlign: TextAlign.center,
@@ -322,34 +357,50 @@ void initState() {
     );
   }
 
-  verifyOtp() async {
-    setState(() {
-      isLoading = true;
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: resendOtpVerificationId.isNotEmpty
-              ? resendOtpVerificationId
-              : widget.otpVerificationId,
-          smsCode: pinController.text);
+ Future<void> verifyOtp() async {
+  setState(() => isLoading = true); // Start loading
 
-      widget.firebaseAuth.signInWithCredential(credential).then((value) {
-        User? user = value.user;
-        backendApiProcess(user);
-      }).catchError((e) {
-        showMessage(
-          context,
-          getTranslatedValue(
-            context,
-            "enter_valid_otp",
-          ),
-          MessageType.warning,
-        );
-        setState(() {
-          isLoading = false;
-          pinController.clear();
-        });
-      });
-    });
+  try {
+    // 1. Get the verification ID from the OTP screen's state (not from widgets)
+    final verificationId = resendOtpVerificationId.isNotEmpty 
+        ? resendOtpVerificationId 
+        : otpVerificationId;
+
+    // 2. Create the credential
+    final PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: pinController.text,
+    );
+
+    // 3. Sign in with the credential
+    final UserCredential userCredential = 
+        await widget.firebaseAuth.signInWithCredential(credential);
+
+    // 4. Handle success
+    if (userCredential.user != null) {
+      await backendApiProcess(userCredential.user!);
+      // Navigate to the next screen (e.g., home/dashboard)
+    }
+  } on FirebaseAuthException catch (e) {
+    // Handle Firebase errors (e.g., invalid OTP)
+    showMessage(
+      context,
+      getTranslatedValue(context, "enter_valid_otp"),
+      MessageType.warning,
+    );
+    pinController.clear();
+  } catch (e) {
+    // Generic error handling
+    showMessage(
+      context,
+      getTranslatedValue(context, "something_went_wrong"),
+      MessageType.warning,
+    );
+  } finally {
+    // Reset loading state in all cases
+    setState(() => isLoading = false);
   }
+}
 
   otpWidgets() {
     return Container(
@@ -516,14 +567,15 @@ void initState() {
   }
 
   firebaseLoginProcess() async {
-
-    print('------------------------firebaseLoginProcess----------------------------------');
     if (widget.phoneNumber.isNotEmpty) {
       await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber:
             '${widget.selectedCountryCode.countryCode} - ${widget.phoneNumber}',
         verificationCompleted: (PhoneAuthCredential credential) {
           pinController.setText(credential.smsCode ?? "");
+  print('------------------------------------${credential.smsCode}-------------SUCCESS------codesms---------------------');
+  print('------------------------------------${pinController.text}-------------SUCCESS-------------textpincontroller--------------');
+
         },
         verificationFailed: (FirebaseAuthException e) {
           print('hai i am here');
@@ -547,7 +599,12 @@ void initState() {
             isLoading = false;
             setState(() {
               resendOtpVerificationId = verificationId;
+
+
+
+
             });
+
           }
         },
         codeAutoRetrievalTimeout: (String verificationId) {

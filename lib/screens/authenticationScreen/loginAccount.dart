@@ -529,95 +529,34 @@ class _LoginAccountState extends State<LoginAccount> {
     }
   }
 
-  firebaseLoginProcess() async {
+firebaseLoginProcess() async {
+  if (edtPhoneNumber.text.isNotEmpty) {
 
-
-    print('----------------------authProvider == AuthProviders.phone;----------------------------');
-    authProvider == AuthProviders.phone;
-    setState(() {});
-    if (edtPhoneNumber.text.isNotEmpty) {
-      if (Constant.firebaseAuthentication == "1") {
-        await firebaseAuth.verifyPhoneNumber(
-          timeout: Duration(minutes: 1, seconds: 30),
-          phoneNumber: fullNumber!.completeNumber,
-          verificationCompleted: (PhoneAuthCredential credential) {},
-          verificationFailed: (FirebaseAuthException e) {
-            print('Message is ------------' + e.code);
-            String errorMessage = getFriendlyErrorMessage(e.code);
-
-            showMessage(
-              context,
-              errorMessage,
-              MessageType.warning,
-            );
-
-            setState(() {
-              isLoading = false;
-            });
-          },
-          codeSent: (String verificationId, int? resendToken) {
-            forceResendingToken = resendToken;
-            isLoading = false;
-            setState(() {
-              phoneNumber =
-                  '${fullNumber!.countryCode} - ${fullNumber!.number}';
-              otpVerificationId = verificationId;
-
-              List<dynamic> firebaseArguments = [
+ List<dynamic> firebaseArguments = [
                 firebaseAuth,
-                otpVerificationId,
-                edtPhoneNumber.text,
-                fullNumber,
-                widget.from ?? null
-              ];
-              Navigator.pushNamed(context, otpScreen,
-                  arguments: firebaseArguments);
-            });
-          },
-          codeAutoRetrievalTimeout: (String verificationId) {
-            if (mounted) {
-              setState(() {
-                isLoading = false;
-              });
-            }
-          },
-          forceResendingToken: forceResendingToken,
-        );
-      } else if (Constant.customSmsGatewayOtpBased == "1") {
-        print('------------------------Constant.customSmsGatewayOtpBased == "1")----------------------');
-        context.read<UserProfileProvider>().sendCustomOTPSmsProvider(
-          context: context,
-          params: {ApiAndParams.phone: fullNumber!.completeNumber},
-        ).then(
-          (value) {
-            if (value == "1") {
-              List<dynamic> firebaseArguments = [
-                firebaseAuth,
-                otpVerificationId,
+               // otpVerificationId,
                 edtPhoneNumber.text,
                 fullNumber!.countryCode,
                 widget.from ?? null
               ];
               Navigator.pushNamed(context, otpScreen,
                   arguments: firebaseArguments);
-            } else {
-              setState(() {
-                isLoading = false;
-              });
-              showMessage(
-                context,
-                getTranslatedValue(
-                  context,
-                  "custom_send_sms_error_message",
-                ),
-                MessageType.warning,
-              );
-            }
-          },
-        );
-      }
-    }
+
+
+
+    // Navigator.pushNamed(
+    //   context,
+    //   otpScreen,
+    //   arguments: {
+    //     'firebaseAuth': FirebaseAuth.instance,
+    //    // 'otpVerificationId': verificationId, // Make sure this exists
+    //     'phoneNumber': edtPhoneNumber.text,
+    //     'selectedCountryCode': fullNumber!,
+    //     'from': widget.from,
+    //   },
+    // );
   }
+}
 
   Widget buildDottedDivider() {
     return Row(

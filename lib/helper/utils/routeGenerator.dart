@@ -72,10 +72,10 @@ class RouteGenerator {
         return CupertinoPageRoute(
           builder: (_) => OtpVerificationScreen(
             firebaseAuth: firebaseArguments[0] as FirebaseAuth,
-            otpVerificationId: firebaseArguments[1] as String,
-            phoneNumber: firebaseArguments[2] as String,
-            selectedCountryCode: firebaseArguments[3] as PhoneNumber,
-            from: firebaseArguments[4] as String?,
+        //    otpVerificationId: firebaseArguments[1] as String,
+            phoneNumber: firebaseArguments[1] as String,
+            selectedCountryCode: firebaseArguments[2] as PhoneNumber,
+            from: firebaseArguments[3] as String?,
           ),
         );
 
