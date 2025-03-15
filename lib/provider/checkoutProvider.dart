@@ -285,6 +285,7 @@ class CheckoutProvider extends ChangeNotifier {
   }
 
   setSelectedTime(int index) {
+    print('index is -------------------------> $index');
     initiallySelectedIndex = index;
     selectedTime = index;
     notifyListeners();
@@ -858,16 +859,17 @@ class CheckoutProvider extends ChangeNotifier {
       params[ApiAndParams.type] = ApiAndParams.orderType;
 
       Map<String, dynamic> getInitiatedTransactionResponse =
-      await getInitiatedTransactionApi(context: context, params: params);
+          await getInitiatedTransactionApi(context: context, params: params);
 
       if (getInitiatedTransactionResponse[ApiAndParams.status].toString() ==
           "1") {
         Map<String, dynamic> data =
-        getInitiatedTransactionResponse[ApiAndParams.data];
+            getInitiatedTransactionResponse[ApiAndParams.data];
 
-        if (data.containsKey("redirectUrl") && data["redirectUrl"].toString() != "") {
+        if (data.containsKey("redirectUrl") &&
+            data["redirectUrl"].toString() != "") {
           Navigator.pushNamed(context, paytabsPaymentScreen,
-              arguments: data["redirectUrl"])
+                  arguments: data["redirectUrl"])
               .then((status) {
             if (status is String) {
               if (status == "success" || status == "pending") {

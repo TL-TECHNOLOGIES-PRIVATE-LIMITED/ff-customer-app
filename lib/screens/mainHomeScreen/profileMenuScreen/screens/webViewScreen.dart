@@ -265,7 +265,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
       onLinkTap: (url, _, __) async {
         final Uri urllink = Uri.parse(url!);
         if (await canLaunchUrl(urllink)) {
-          await launchUrl(urllink);
+          await launchUrl(urllink, mode: LaunchMode.externalApplication);
         }
       },
     );
