@@ -99,7 +99,8 @@ class _WebViewScreenState extends State<WebViewScreen> {
                           padding: EdgeInsetsDirectional.only(
                             bottom: Constant.size5,
                           ),
-                          child: _getHtmlContainer(Constant.privacyPolicy),
+                          child: _getHtmlContainer(
+                              Constant.privacyPolicy, context),
                         )
                       ],
                     ),
@@ -137,7 +138,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
                             bottom: Constant.size5,
                           ),
                           child: _getHtmlContainer(
-                              Constant.returnAndExchangesPolicy),
+                              Constant.returnAndExchangesPolicy, context),
                         )
                       ],
                     ),
@@ -174,7 +175,8 @@ class _WebViewScreenState extends State<WebViewScreen> {
                           padding: EdgeInsetsDirectional.only(
                             bottom: Constant.size5,
                           ),
-                          child: _getHtmlContainer(Constant.shippingPolicy),
+                          child: _getHtmlContainer(
+                              Constant.shippingPolicy, context),
                         )
                       ],
                     ),
@@ -211,7 +213,8 @@ class _WebViewScreenState extends State<WebViewScreen> {
                           padding: EdgeInsetsDirectional.only(
                             bottom: Constant.size5,
                           ),
-                          child: _getHtmlContainer(Constant.cancellationPolicy),
+                          child: _getHtmlContainer(
+                              Constant.cancellationPolicy, context),
                         )
                       ],
                     ),
@@ -220,7 +223,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
               )
             : Padding(
                 padding: EdgeInsets.all(Constant.size10),
-                child: _getHtmlContainer(htmlContent),
+                child: _getHtmlContainer(htmlContent, context),
               ),
       ),
     );
@@ -231,34 +234,16 @@ class _WebViewScreenState extends State<WebViewScreen> {
         '<a ', '<a target="_blank" rel="noopener noreferrer" ');
   }
 
-  Widget _getHtmlContainer(String htmlContent) {
-    // return QuillHtmlEditor(
-    //   text: modifyHtmlForExternalLinks(htmlContent),
-    //   hintText: getTranslatedValue(context, "description_goes_here"),
-    //   isEnabled: false,
-    //   ensureVisible: false,
-    //   minHeight: 10,
-    //   autoFocus: false,
-    //   textStyle: TextStyle(color: ColorsRes.mainTextColor),
-    //   hintTextStyle: TextStyle(color: ColorsRes.subTitleMainTextColor),
-    //   hintTextAlign: TextAlign.start,
-    //   padding: const EdgeInsets.only(top: 5, left: 5, right: 5, bottom: 5),
-    //   hintTextPadding: const EdgeInsets.only(left: 20),
-    //   backgroundColor: Theme.of(context).cardColor,
-    //   inputAction: InputAction.newline,
-    //   loadingBuilder: (context) {
-    //     return Center(
-    //       child: CircularProgressIndicator(
-    //         color: Theme.of(context).primaryColor,
-    //       ),
-    //     );
-    //   },
-    //   controller: QuillEditorController(),
-    // );
+  Widget _getHtmlContainer(String htmlContent, BuildContext context) {
+    print("htmlContent: $htmlContent");
     return Html(
       style: {
         "*": Style(
           color: ColorsRes.mainTextColor,
+        ),
+        "a": Style(
+          color: Theme.of(context).primaryColor,
+          textDecoration: TextDecoration.none,
         ),
       },
       data: modifyHtmlForExternalLinks(htmlContent),
