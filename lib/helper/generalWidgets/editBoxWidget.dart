@@ -24,6 +24,8 @@ Widget editBoxWidget(
     onTap: onTap ?? null,
     enabled: isEditable,
     readOnly: readOnly ?? false,
+    
+    autovalidateMode: AutovalidateMode.onUserInteraction,
     style: TextStyle(
       color: ColorsRes.mainTextColor,
     ),

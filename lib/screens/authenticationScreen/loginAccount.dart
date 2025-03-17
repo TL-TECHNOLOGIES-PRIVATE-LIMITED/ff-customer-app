@@ -20,7 +20,7 @@ class LoginAccount extends StatefulWidget {
 
 class _LoginAccountState extends State<LoginAccount> {
   final formKey = GlobalKey<FormState>();
-  PhoneNumber? fullNumber;
+    PhoneNumber? fullNumber;
   bool isLoading = false;
 
   // TODO REMOVE DEMO NUMBER FROM HERE
@@ -45,9 +45,24 @@ class _LoginAccountState extends State<LoginAccount> {
         });
       } catch (ignore) {}
     });
+
+      phoneFocusNode.addListener(() {
+      if (!phoneFocusNode.hasFocus) {
+        setState(() {
+          hasInteracted = true;
+        });
+      }
+    });
     super.initState();
   }
 
+    final FocusNode phoneFocusNode = FocusNode();
+  bool hasInteracted = false;
+  // @override
+  // void dispose() {
+  // //  edtPhoneNumber.dispose();
+  //   phoneFocusNode.dispose();
+  //   super.dispose();}
   @override
   Widget build(BuildContext context) {
     print('widget.from------------------> ${widget.from}');
@@ -382,17 +397,14 @@ class _LoginAccountState extends State<LoginAccount> {
     );
   }
 
-  mobileNoWidget() {
+
+  Widget mobileNoWidget() {
     return IgnorePointer(
       ignoring: isLoading,
       child: IntlPhoneField(
         controller: edtPhoneNumber,
-
-        onChanged: (number) {
-          print('number is ${number}');
-          fullNumber = number;
-        },
-
+        focusNode: phoneFocusNode,
+        autovalidateMode: hasInteracted ? AutovalidateMode.onUserInteraction : AutovalidateMode.disabled,
         initialCountryCode: Constant.initialCountryCode,
         dropdownTextStyle: TextStyle(color: ColorsRes.mainTextColor),
         style: TextStyle(color: ColorsRes.mainTextColor),
@@ -400,16 +412,14 @@ class _LoginAccountState extends State<LoginAccount> {
           Icons.keyboard_arrow_down_rounded,
           color: ColorsRes.mainTextColor,
         ),
-        autovalidateMode: AutovalidateMode.disabled,
-
         dropdownIconPosition: IconPosition.trailing,
         flagsButtonMargin: EdgeInsets.only(left: 10),
+
         decoration: InputDecoration(
           counterText: '',
           hintText: 'Mobile Number',
           hintStyle: TextStyle(color: Theme.of(context).hintColor),
           contentPadding: EdgeInsets.zero,
-          iconColor: ColorsRes.subTitleMainTextColor,
           filled: true,
           fillColor: Theme.of(context).cardColor,
           border: OutlineInputBorder(
@@ -426,24 +436,29 @@ class _LoginAccountState extends State<LoginAccount> {
           ),
           focusColor: Theme.of(context).scaffoldBackgroundColor,
           prefixIcon: Icon(
-            Icons.search_rounded,
+            Icons.phone,
             color: ColorsRes.subTitleMainTextColor,
           ),
         ),
 
-        // backgroundColor: Theme.of(context).cardColor,
-        // textStyle: TextStyle(color: ColorsRes.mainTextColor),
-        // dialogBackgroundColor: Theme.of(context).cardColor,
-        // dialogSize: Size(context.width, context.height),
-        // barrierColor: ColorsRes.subTitleMainTextColor,
-        // padding: EdgeInsets.zero,
+        onChanged: (number) {
+          print('Number is: ${number.completeNumber}');
+          fullNumber = number;
+        },
 
-        // searchStyle: TextStyle(
-        //   color: ColorsRes.subTitleMainTextColor,
-        // ),
+        validator: (number) {
+          if (number == null || number.number.isEmpty) {
+            return "Please enter a valid mobile number";
+          } else if (!RegExp(r'^[0-9]{6,15}$').hasMatch(number.number)) {
+            return "Enter a valid mobile number";
+          }
+          return null;
+        },
       ),
     );
   }
+
+
 
   getRedirection() async {
     if (Constant.session.getBoolData(SessionManager.keySkipLogin) ||

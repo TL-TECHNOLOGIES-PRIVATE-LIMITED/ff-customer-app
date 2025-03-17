@@ -43,10 +43,20 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
 
   //Address types
   static Map addressTypes = {};
-
+  final FocusNode phoneFocusNode = FocusNode();
+  final FocusNode phoneFocusNodenull = FocusNode();
+  bool hasInteracted = false;
   @override
   void initState() {
     super.initState();
+
+    phoneFocusNode.addListener(() {
+      if (!phoneFocusNode.hasFocus) {
+        setState(() {
+          hasInteracted = true;
+        });
+      }
+    });
     // Future.delayed(
     //   Duration.zero,
     //   () {
@@ -120,6 +130,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                 children: [
                   Form(
                       key: formKey,
+                      autovalidateMode: AutovalidateMode.disabled,
                       child: Column(
                         children: [
                           contactWidget(),
@@ -181,9 +192,13 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
             ),
             getSizedBox(height: Constant.size15),
             editPhoneBoxBoxWidget(
+              hasInteracted
+                  ? AutovalidateMode.onUserInteraction
+                  : AutovalidateMode.disabled,
+              phoneFocusNode,
               context,
               edtMobile,
-            optionalPhoneValidation,
+              optionalPhoneValidation,
               getTranslatedValue(
                 context,
                 "mobile_number",
@@ -204,6 +219,8 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
             ),
             getSizedBox(height: Constant.size15),
             editPhoneBoxBoxWidget(
+              AutovalidateMode.disabled,
+              phoneFocusNodenull,
               context,
               edtAltMobile,
               optionalPhoneValidation,
