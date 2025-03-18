@@ -1160,23 +1160,30 @@ Widget getProductDetailShimmer(BuildContext context) {
     padding: EdgeInsets.symmetric(
         vertical: Constant.size10, horizontal: Constant.size10),
     child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        CustomShimmer(
-          height: context.height * 0.44,
-          width: context.width,
-        ),
-        getSizedBox(
-          height: Constant.size12,
-        ),
-        CustomShimmer(
-          height: context.height * 0.35,
-        ),
-        getSizedBox(
-          height: Constant.size10,
-        ),
-        CustomShimmer(
-          height: context.height * 0.35,
-        ),
+        Row(mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+          ],
+        )
+        //   CustomShimmer(
+        //     height: context.height * 0.44,
+        //     width: context.width,
+        //   ),
+        //   getSizedBox(
+        //     height: Constant.size12,
+        //   ),
+        //   CustomShimmer(
+        //     height: context.height * 0.35,
+        //   ),
+        //   getSizedBox(
+        //     height: Constant.size10,
+        //   ),
+        //   CustomShimmer(
+        //     height: context.height * 0.35,
+        //   ),
       ],
     ),
   );

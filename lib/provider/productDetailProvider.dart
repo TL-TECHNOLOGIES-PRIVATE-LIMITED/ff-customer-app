@@ -20,10 +20,12 @@ class ProductDetailProvider extends ChangeNotifier {
       {required Map<String, dynamic> params,
       required BuildContext context,
       String? productId}) async {
+        print('----------------------------------------getProductDetailProvider--------------------------------------------');
     productDetailState = ProductDetailState.loading;
     notifyListeners();
 
     try {
+    //  print('----------------------------------------getProductDetailProvider--------------------------------------------');
       Map<String, dynamic> data =
           await getProductDetailApi(context: context, params: params);
       if (data[ApiAndParams.status].toString() == "1") {

@@ -50,6 +50,8 @@ class RatingListProvider extends ChangeNotifier {
     required BuildContext context,
     String? limit,
   }) async {
+    
+    print('---------------------------getRatingApiProvider-----------------------------');
     if (offset == 0) {
       ratingState = RatingState.loading;
     } else {
@@ -99,6 +101,8 @@ class RatingListProvider extends ChangeNotifier {
     required BuildContext context,
     String? limit,
   }) async {
+    
+    print('---------------------------getRatingImagesApiProvider-----------------------------');
     if (imagesOffset == 0) {
       ratingImagesState = RatingImagesState.loading;
     } else {
@@ -107,6 +111,7 @@ class RatingListProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      //   print('---------------------------getRatingImagesApiProvider-----------------------------');
       params[ApiAndParams.limit] =
           limit ?? Constant.defaultImagesLoadLimitAtOnce.toString();
       params[ApiAndParams.offset] = imagesOffset.toString();

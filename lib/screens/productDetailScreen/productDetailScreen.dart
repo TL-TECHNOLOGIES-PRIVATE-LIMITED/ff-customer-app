@@ -27,12 +27,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     super.initState();
 
 
-// // Print productListItem details
-//   if (widget.productListItem != null) {
-//     debugPrint("Product List Item:-------------------------- ${widget.productListItem.toString()}---------------------------------------------------");
-//   } else {
-//     debugPrint("-----------------------------------------------Product List Item is null---------------------------------------------------------");
-//   }
+
 
     scrollController.addListener(scrollListener);
    _productDetailsFuture = fetchProductDetails();
@@ -55,7 +50,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       } else {
         params[ApiAndParams.slug] = widget.id;
       }
-
+     await context
+          .read<ProductDetailProvider>()
+          .getProductDetailProvider(context: context, params: params);
+    } catch (e) {
+      debugPrint("Error fetching product details: $e");
+    }
       // Parallel API calls for performance boost
         print('---------------------1------------------------');
       await Future.wait([
@@ -71,14 +71,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           limit: "5",
           context: context,
         ),
+        
       ]);
-
-      await context
-          .read<ProductDetailProvider>()
-          .getProductDetailProvider(context: context, params: params);
-    } catch (e) {
-      debugPrint("Error fetching product details: $e");
-    }
+        print('---------------------2------------------------');
+ 
   }
 
   @override
@@ -233,7 +229,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   },
 );
-;
+
         },
       ),
     );
