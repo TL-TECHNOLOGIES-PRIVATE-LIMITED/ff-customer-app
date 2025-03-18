@@ -1,87 +1,96 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:project/helper/generalWidgets/ratingImagesWidget.dart';
 import 'package:project/helper/utils/generalImports.dart';
-import 'package:project/screens/productDetailScreen/widget/otherImagesViewWidget.dart';
+
 import 'package:project/screens/productDetailScreen/widget/productDetailImportantInformationWidget.dart';
 import 'package:project/screens/productDetailScreen/widget/productDetailSimilarProductsWidget.dart';
 import 'package:project/screens/productDetailScreen/widget/productDetailVariantsWidget.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ProductDetailWidget extends StatefulWidget {
   final BuildContext context;
   final ProductData product;
+   // final ProductListItem? productListItem;
 
   ProductDetailWidget(
-      {super.key, required this.context, required this.product});
+      {super.key, required this.context, required this.product,
+   //   required this.productListItem
+      });
 
   @override
   State<ProductDetailWidget> createState() => _ProductDetailWidgetState();
 }
 
 class _ProductDetailWidgetState extends State<ProductDetailWidget> {
-  // late final QuillEditorController _controller;
+
 
   @override
   void initState() {
     super.initState();
-    // _controller = QuillEditorController();
-  }
 
+  }
+  int currentIndex = 0;
+ 
   @override
   Widget build(BuildContext context) {
+       final productDetailProvider = context.read<ProductDetailProvider>();
+       final images = productDetailProvider.images;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        LayoutBuilder(
+      LayoutBuilder(
           builder: (context, constraints) {
-            return Row(
+            double imageSize = constraints.maxWidth * 1;
+
+            return Column(
               children: [
-                OtherImagesViewWidget(context, Axis.vertical, constraints),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      fullScreenProductImageScreen,
-                      arguments: [
-                        context.read<ProductDetailProvider>().currentImage,
-                        context.read<ProductDetailProvider>().images,
-                      ],
+                CarouselSlider.builder(
+               
+                  itemCount: images.length,
+                  itemBuilder: (context, index, realIndex) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          fullScreenProductImageScreen,
+                          arguments: [productDetailProvider.currentImage, images],
+                        );
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: setNetworkImg(
+                          boxFit: BoxFit.cover,
+                          image: images[index],
+                          height: imageSize,
+                          width: imageSize,
+                        ),
+                      ),
                     );
                   },
-                  child: Consumer<SelectedVariantItemProvider>(
-                    builder: (context, selectedVariantItemProvider, child) {
-                      return Padding(
-                        padding: EdgeInsetsDirectional.only(
-                            start: 10, top: 10, end: 10),
-                        child: ClipRRect(
-                          borderRadius: Constant.borderRadius10,
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          child: setNetworkImg(
-                            boxFit: BoxFit.cover,
-                            image: context.read<ProductDetailProvider>().images[
-                                context
-                                    .read<ProductDetailProvider>()
-                                    .currentImage],
-                            height: (context
-                                        .read<ProductDetailProvider>()
-                                        .productData
-                                        .images
-                                        .length >
-                                    1)
-                                ? ((constraints.maxWidth * 0.8) - 10)
-                                : constraints.maxWidth - 20,
-                            width: (context
-                                        .read<ProductDetailProvider>()
-                                        .productData
-                                        .images
-                                        .length >
-                                    1)
-                                ? ((constraints.maxWidth * 0.8) - 10)
-                                : constraints.maxWidth - 20,
-                          ),
-                        ),
-                      );
+                  options: CarouselOptions(
+                    height: imageSize,
+                    viewportFraction: 1.0,
+                    enableInfiniteScroll: true,
+                    enlargeCenterPage: true,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        currentIndex = index;
+                      });
                     },
                   ),
+                ),
+                SizedBox(height: 10),
+                AnimatedSmoothIndicator(
+                  activeIndex: currentIndex,
+                  count: images.length,
+                  effect: ExpandingDotsEffect(
+                    dotHeight: 8,
+                    dotWidth: 8,
+                    activeDotColor: Colors.blue,
+                    dotColor: Colors.grey,
+                  ),
+          
                 ),
               ],
             );
@@ -393,32 +402,7 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                   end: 5,
                 ),
                 child: Container(
-                  // margin: EdgeInsetsDirectional.all(10),
-                  // child: QuillHtmlEditor(
-                  //   text: widget.product.description,
-                  //   hintText:
-                  //       getTranslatedValue(context, "description_goes_here"),
-                  //   isEnabled: false,
-                  //   ensureVisible: false,
-                  //   minHeight: 10,
-                  //   autoFocus: false,
-                  //   textStyle: TextStyle(color: ColorsRes.mainTextColor),
-                  //   hintTextStyle:
-                  //       TextStyle(color: ColorsRes.subTitleMainTextColor),
-                  //   hintTextAlign: TextAlign.start,
-                  //   padding: const EdgeInsets.only(left: 6),
-                  //   hintTextPadding: const EdgeInsets.only(left: 20),
-                  //   backgroundColor: Theme.of(context).cardColor,
-                  //   inputAction: InputAction.newline,
-                  //   loadingBuilder: (context) {
-                  //     return Center(
-                  //       child: CircularProgressIndicator(
-                  //         color: Theme.of(context).primaryColor,
-                  //       ),
-                  //     );
-                  //   },
-                  //   controller: _controller,
-                  // ),
+             
                   child: Html(
                     style: {
                       "*": Style(

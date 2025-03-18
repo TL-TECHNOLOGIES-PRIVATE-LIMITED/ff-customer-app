@@ -6,9 +6,13 @@ class ProductDetailScreen extends StatefulWidget {
   final ProductListItem? productListItem;
   final String? from;
 
-  const ProductDetailScreen(
-      {Key? key, this.title, required this.id, this.productListItem, this.from})
-      : super(key: key);
+  const ProductDetailScreen({
+    Key? key,
+    this.title,
+    required this.id,
+    this.productListItem,
+    this.from,
+  }) : super(key: key);
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -16,12 +20,22 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final ScrollController scrollController = ScrollController();
+  late Future<void> _productDetailsFuture;
 
   @override
   void initState() {
     super.initState();
-    scrollController.addListener(scrollListener);
-    fetchProductDetails();
+
+
+// // Print productListItem details
+//   if (widget.productListItem != null) {
+//     debugPrint("Product List Item:-------------------------- ${widget.productListItem.toString()}---------------------------------------------------");
+//   } else {
+//     debugPrint("-----------------------------------------------Product List Item is null---------------------------------------------------------");
+//   }
+
+//     scrollController.addListener(scrollListener);
+//     _productDetailsFuture = fetchProductDetails();
   }
 
   void scrollListener() {
@@ -42,14 +56,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         params[ApiAndParams.slug] = widget.id;
       }
 
+      // Parallel API calls for performance boost
       await Future.wait([
         context.read<RatingListProvider>().getRatingApiProvider(
-          params: {ApiAndParams.productId: widget.id.toString()},
+          params: {ApiAndParams.productId: widget.id},
           context: context,
           limit: "5",
         ),
         context.read<RatingListProvider>().getRatingImagesApiProvider(
-          params: {ApiAndParams.productId: widget.id.toString()},
+          params: {ApiAndParams.productId: widget.id},
           limit: "5",
           context: context,
         ),
@@ -75,51 +90,26 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton:
-          context.watch<CartListProvider>().cartList.isNotEmpty
-              ? CartFloating()
-              : null,
-      bottomNavigationBar: Consumer<ProductDetailProvider>(
-          builder: (context, productDetailProvider, child) {
-        if (productDetailProvider.expanded) {
-          return AnimatedContainer(
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            width: context.width,
-            height: 70,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadiusDirectional.only(
-                  topStart: Radius.circular(10),
-                  topEnd: Radius.circular(10),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: ColorsRes.subTitleMainTextColor,
-                    offset: Offset(1, 1),
-                    blurRadius: 5,
-                    spreadRadius: 0.1,
-                  )
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadiusDirectional.only(
-                  topStart: Radius.circular(10),
-                  topEnd: Radius.circular(10),
-                ),
-                child: ProductDetailAddToCartButtonWidget(
-                  context: context,
-                  product: productDetailProvider.productData,
-                  bgColor: Theme.of(context).cardColor,
-                  padding: 10,
-                ),
-              ),
-            ),
-          );
-        } else {
-          return SizedBox.shrink();
-        }
-      }),
-      appBar: getAppBar(
+          context.watch<CartListProvider>().cartList.isNotEmpty ? CartFloating() : null,
+      bottomNavigationBar: Selector<ProductDetailProvider, bool>(
+        selector: (_, provider) => provider.expanded,
+        builder: (_, expanded, __) {
+          return expanded
+              ? AnimatedContainer(
+                  duration: Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  height: 70,
+                  child: ProductDetailAddToCartButtonWidget(
+                    context: context,
+                    product: context.read<ProductDetailProvider>().productData,
+                    bgColor: Theme.of(context).cardColor,
+                    padding: 10,
+                  ),
+                )
+              : SizedBox.shrink();
+        },
+      ),
+  appBar: getAppBar(
         context: context,
         title: SizedBox.shrink(),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -205,90 +195,43 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          Consumer<ProductDetailProvider>(
-            builder: (context, productDetailProvider, child) {
-              switch (productDetailProvider.productDetailState) {
-                case ProductDetailState.loaded:
-                  return ChangeNotifierProvider<SelectedVariantItemProvider>(
-                    create: (_) => SelectedVariantItemProvider(),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            controller: scrollController,
-                            child: ProductDetailWidget(
-                              context: context,
-                              product: productDetailProvider.productDetail.data,
-                            ),
-                          ),
-                        ),
-                        // if (productDetailProvider.expanded)
-                        //   AnimatedContainer(
-                        //     duration: Duration(milliseconds: 300),
-                        //     curve: Curves.easeInOut,
-                        //     width: context.width,
-                        //     height: 70,
-                        //     child: Container(
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadiusDirectional.only(
-                        //           topStart: Radius.circular(10),
-                        //           topEnd: Radius.circular(10),
-                        //         ),
-                        //         boxShadow: [
-                        //           BoxShadow(
-                        //             color: ColorsRes.subTitleMainTextColor,
-                        //             offset: Offset(1, 1),
-                        //             blurRadius: 5,
-                        //             spreadRadius: 0.1,
-                        //           )
-                        //         ],
-                        //       ),
-                        //       child: ClipRRect(
-                        //         borderRadius: BorderRadiusDirectional.only(
-                        //           topStart: Radius.circular(10),
-                        //           topEnd: Radius.circular(10),
-                        //         ),
-                        //         child: ProductDetailAddToCartButtonWidget(
-                        //           context: context,
-                        //           product: productDetailProvider.productData,
-                        //           bgColor: Theme.of(context).cardColor,
-                        //           padding: 10,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ),
-                      ],
-                    ),
-                  );
+      body: FutureBuilder(
+        future: _productDetailsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return getProductDetailShimmer(context);
+          } else if (snapshot.hasError) {
+            return DefaultBlankItemMessageScreen(
+              title: "Oops",
+              description: "Product is either unavailable or does not exist",
+              image: "no_product_icon",
+              buttonTitle: "Go Back",
+              callback: () => Navigator.pop(context),
+            );
+          }
 
-                case ProductDetailState.loading:
-                case ProductDetailState.initial:
-                  return SingleChildScrollView(
-                      physics: NeverScrollableScrollPhysics(),
-                      child: getProductDetailShimmer(context));
-
-                case ProductDetailState.error:
-                  return DefaultBlankItemMessageScreen(
-                    title: "Oops",
-                    description:
-                        "Product is either unavailable or does not exist",
-                    image: "no_product_icon",
-                    buttonTitle: "Go Back",
-                    callback: () => Navigator.pop(context),
-                  );
-
-                default:
-                  return NoInternetConnectionScreen(
-                    height: context.height * 0.65,
-                    message: productDetailProvider.message,
-                    callback: fetchProductDetails,
-                  );
-              }
-            },
-          ),
-        ],
+        return Consumer<ProductDetailProvider>(
+  builder: (context, provider, child) {
+    if (provider.productDetailState == ProductDetailState.loaded) {
+      return SingleChildScrollView(
+        controller: scrollController,
+        child: ProductDetailWidget(
+          context: context,
+          product: provider.productDetail.data,
+        //  productListItem: widget.productListItem, // Pass productListItem here
+        ),
+      );
+    } else {
+      return NoInternetConnectionScreen(
+        height: context.height * 0.65,
+        message: provider.message,
+        callback: fetchProductDetails,
+      );
+    }
+  },
+);
+;
+        },
       ),
     );
   }
