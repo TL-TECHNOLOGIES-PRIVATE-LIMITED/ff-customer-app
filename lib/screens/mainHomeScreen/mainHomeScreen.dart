@@ -147,6 +147,8 @@ class HomeMainScreenState extends State<HomeMainScreen>
         break;
       case AppLifecycleState.resumed:
         // App is resumed
+          context.read<DeepLinkProvider>().getDeepLinkRedirection(context: context);
+          
         Constant.session.setBoolData(SessionManager.isFetched, true, false);
         print('App is resumed');
         break;

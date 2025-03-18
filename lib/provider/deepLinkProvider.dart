@@ -31,8 +31,12 @@ class DeepLinkProvider extends ChangeNotifier {
   }
 
   getDeepLinkRedirection({required BuildContext context}) {
+
+    print('----------------------------------getDeepLinkRedirection-----------1---------------------------');
     if (_initialUri != null) {
+       print('----------------------------------getDeepLinkRedirection-----------2--------------------------');
       String? productSlug = _initialUri?.path.toString().split("/").last;
+         print('----------------------------------getDeepLinkRedirection-----------3--------------------------');
       print('product----------> $productSlug');
       Navigator.pushNamed(
         context,
@@ -43,7 +47,10 @@ class DeepLinkProvider extends ChangeNotifier {
           null
         ],
       );
+       print('----------------------------------getDeepLinkRedirection-----------4--------------------------');
       _initialUri = null;
+    }else{
+      print('----------------------------------getDeepLinkRedirection-----faile------5--------------------------');
     }
   }
 }

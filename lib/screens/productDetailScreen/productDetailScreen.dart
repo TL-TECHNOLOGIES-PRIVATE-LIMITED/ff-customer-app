@@ -57,12 +57,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       }
 
       // Parallel API calls for performance boost
+        print('---------------------1------------------------');
       await Future.wait([
+      
         context.read<RatingListProvider>().getRatingApiProvider(
           params: {ApiAndParams.productId: widget.id},
           context: context,
           limit: "5",
         ),
+        
         context.read<RatingListProvider>().getRatingImagesApiProvider(
           params: {ApiAndParams.productId: widget.id},
           limit: "5",
