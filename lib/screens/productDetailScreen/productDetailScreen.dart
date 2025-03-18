@@ -34,8 +34,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 //     debugPrint("-----------------------------------------------Product List Item is null---------------------------------------------------------");
 //   }
 
-//     scrollController.addListener(scrollListener);
-//     _productDetailsFuture = fetchProductDetails();
+    scrollController.addListener(scrollListener);
+   _productDetailsFuture = fetchProductDetails();
   }
 
   void scrollListener() {

@@ -31,7 +31,7 @@ class _ProductFullScreenImagesScreenState
       children: [
         PhotoViewGallery.builder(
           builder: (BuildContext context, int index) {
-            return PhotoViewGalleryPageOptions(
+            return PhotoViewGalleryPageOptions(filterQuality:FilterQuality.high ,
               imageProvider: NetworkImage(widget.images[index]),
               initialScale: PhotoViewComputedScale.contained,
               minScale: PhotoViewComputedScale.contained,
