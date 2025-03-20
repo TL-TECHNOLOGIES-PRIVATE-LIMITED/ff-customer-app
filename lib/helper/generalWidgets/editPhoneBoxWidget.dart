@@ -16,13 +16,13 @@ class Debouncer {
   }
 }
 
-Widget editPhoneBoxBoxWidget( AutovalidateMode autovalidateMode,  FocusNode focusNode,
+Widget editPhoneBoxBoxWidget(
+  AutovalidateMode autovalidateMode,
+  FocusNode focusNode,
   BuildContext context,
   TextEditingController edtController,
   FutureOr<String?> Function(PhoneNumber?)? validationFunction,
-   
   String label, {
-    
   bool? isLastField,
   Function(String)? onCountryCodeChanged,
   Function(String)? onNumberChanged,
@@ -40,7 +40,7 @@ Widget editPhoneBoxBoxWidget( AutovalidateMode autovalidateMode,  FocusNode focu
     controller: edtController,
     dropdownTextStyle: TextStyle(color: ColorsRes.mainTextColor),
     style: TextStyle(color: ColorsRes.mainTextColor),
-      focusNode: focusNode,
+    focusNode: focusNode,
     dropdownIcon: Icon(
       Icons.keyboard_arrow_down_rounded,
       color: ColorsRes.mainTextColor,
