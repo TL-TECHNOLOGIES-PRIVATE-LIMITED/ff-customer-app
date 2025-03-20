@@ -20,7 +20,7 @@ class LoginAccount extends StatefulWidget {
 
 class _LoginAccountState extends State<LoginAccount> {
   final formKey = GlobalKey<FormState>();
-    PhoneNumber? fullNumber;
+  PhoneNumber? fullNumber;
   bool isLoading = false;
 
   // TODO REMOVE DEMO NUMBER FROM HERE
@@ -46,7 +46,7 @@ class _LoginAccountState extends State<LoginAccount> {
       } catch (ignore) {}
     });
 
-      phoneFocusNode.addListener(() {
+    phoneFocusNode.addListener(() {
       if (!phoneFocusNode.hasFocus) {
         setState(() {
           hasInteracted = true;
@@ -56,7 +56,7 @@ class _LoginAccountState extends State<LoginAccount> {
     super.initState();
   }
 
-    final FocusNode phoneFocusNode = FocusNode();
+  final FocusNode phoneFocusNode = FocusNode();
   bool hasInteracted = false;
   // @override
   // void dispose() {
@@ -113,21 +113,7 @@ class _LoginAccountState extends State<LoginAccount> {
             end: 0,
             child: loginWidgets(),
           ),
-          if (isLoading && authProvider != AuthProviders.phone)
-            PositionedDirectional(
-              top: 0,
-              end: 0,
-              bottom: 0,
-              start: 0,
-              child: Container(
-                color: Colors.black.withOpacity(0.3),
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ),
-            ),
+
           PositionedDirectional(
             top: 40,
             end: 10,
@@ -397,68 +383,61 @@ class _LoginAccountState extends State<LoginAccount> {
     );
   }
 
-
   Widget mobileNoWidget() {
-    return IgnorePointer(
-      ignoring: isLoading,
-      child: IntlPhoneField(
-        controller: edtPhoneNumber,
-        focusNode: phoneFocusNode,
-        autovalidateMode: hasInteracted ? AutovalidateMode.onUserInteraction : AutovalidateMode.disabled,
-        initialCountryCode: Constant.initialCountryCode,
-        dropdownTextStyle: TextStyle(color: ColorsRes.mainTextColor),
-        style: TextStyle(color: ColorsRes.mainTextColor),
-        dropdownIcon: Icon(
-          Icons.keyboard_arrow_down_rounded,
-          color: ColorsRes.mainTextColor,
-        ),
-        dropdownIconPosition: IconPosition.trailing,
-        flagsButtonMargin: EdgeInsets.only(left: 10),
-
-        decoration: InputDecoration(
-          counterText: '',
-          hintText: 'Mobile Number',
-          hintStyle: TextStyle(color: Theme.of(context).hintColor),
-          contentPadding: EdgeInsets.zero,
-          filled: true,
-          fillColor: Theme.of(context).cardColor,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: ColorsRes.subTitleMainTextColor),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: ColorsRes.subTitleMainTextColor),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: ColorsRes.subTitleMainTextColor),
-          ),
-          focusColor: Theme.of(context).scaffoldBackgroundColor,
-          prefixIcon: Icon(
-            Icons.phone,
-            color: ColorsRes.subTitleMainTextColor,
-          ),
-        ),
-
-        onChanged: (number) {
-          print('Number is: ${number.completeNumber}');
-          fullNumber = number;
-        },
-
-        validator: (number) {
-          if (number == null || number.number.isEmpty) {
-            return "Please enter a valid mobile number";
-          } else if (!RegExp(r'^[0-9]{6,15}$').hasMatch(number.number)) {
-            return "Enter a valid mobile number";
-          }
-          return null;
-        },
+    return IntlPhoneField(
+      controller: edtPhoneNumber,
+      focusNode: phoneFocusNode,
+      autovalidateMode: hasInteracted
+          ? AutovalidateMode.onUserInteraction
+          : AutovalidateMode.disabled,
+      initialCountryCode: Constant.initialCountryCode,
+      dropdownTextStyle: TextStyle(color: ColorsRes.mainTextColor),
+      style: TextStyle(color: ColorsRes.mainTextColor),
+      dropdownIcon: Icon(
+        Icons.keyboard_arrow_down_rounded,
+        color: ColorsRes.mainTextColor,
       ),
+      dropdownIconPosition: IconPosition.trailing,
+      flagsButtonMargin: EdgeInsets.only(left: 10),
+      decoration: InputDecoration(
+        counterText: '',
+        hintText: 'Mobile Number',
+        hintStyle: TextStyle(color: Theme.of(context).hintColor),
+        contentPadding: EdgeInsets.zero,
+        filled: true,
+        fillColor: Theme.of(context).cardColor,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: ColorsRes.subTitleMainTextColor),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: ColorsRes.subTitleMainTextColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: ColorsRes.subTitleMainTextColor),
+        ),
+        focusColor: Theme.of(context).scaffoldBackgroundColor,
+        prefixIcon: Icon(
+          Icons.phone,
+          color: ColorsRes.subTitleMainTextColor,
+        ),
+      ),
+      onChanged: (number) {
+        print('Number is: ${number.completeNumber}');
+        fullNumber = number;
+      },
+      validator: (number) {
+        if (number == null || number.number.isEmpty) {
+          return "Please enter a valid mobile number";
+        } else if (!RegExp(r'^[0-9]{6,15}$').hasMatch(number.number)) {
+          return "Enter a valid mobile number";
+        }
+        return null;
+      },
     );
   }
-
-
 
   getRedirection() async {
     if (Constant.session.getBoolData(SessionManager.keySkipLogin) ||
@@ -491,22 +470,12 @@ class _LoginAccountState extends State<LoginAccount> {
         MessageType.warning,
       );
       return false;
-    } else if (mobileValidate == "") {
+    } else if (edtPhoneNumber.length == 0) {
       showMessage(
         context,
         getTranslatedValue(
           context,
-          "enter_valid_mobile",
-        ),
-        MessageType.warning,
-      );
-      return false;
-    } else if (edtPhoneNumber.text.length > 15) {
-      showMessage(
-        context,
-        getTranslatedValue(
-          context,
-          "enter_valid_mobile",
+          "Oops! Mobile number is missing",
         ),
         MessageType.warning,
       );

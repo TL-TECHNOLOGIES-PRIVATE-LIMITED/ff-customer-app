@@ -683,6 +683,11 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                       ),
                       MessageType.warning,
                     );
+                  } else if (alternateCountryCode == countryCode) {
+                    showMessage(
+                        context,
+                        "Alternate number must be from the same country as the primary number!.",
+                        MessageType.warning);
                   } else {
                     print('country code is ${countryCode}');
                     print('alternate country code is ${alternateCountryCode}');
