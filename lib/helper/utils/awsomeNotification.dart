@@ -153,7 +153,9 @@ class LocalAwesomeNotification {
       Constant.session
           .setIntData(SessionManager.notificationTotalCount, currentCount + 1);
       print(
-          'new notification value is -----------------> ${Constant.session.getIntData(SessionManager.notificationTotalCount)}');
+          'new notification image value is -----------------> ${Constant.session.getIntData(SessionManager.notificationTotalCount)}');
+             notificationCount.value = currentCount + 1;
+      print('count is --------image notification count----> ${notificationCount.value}');
       await notification?.createNotification(
         content: NotificationContent(
           id: Random().nextInt(5000),

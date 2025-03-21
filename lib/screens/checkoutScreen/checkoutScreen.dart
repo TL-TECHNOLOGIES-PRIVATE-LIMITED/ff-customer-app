@@ -18,66 +18,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     Constant.discount = 0.0;
     Constant.selectedPromoCodeId = "0";
     super.initState();
-    // Future.delayed(Duration.zero).then(
-    //   (value) async {
-    //     await context
-    //         .read<CheckoutProvider>()
-    //         .getTimeSlotsSettings(context: context);
-
-    //     await context
-    //         .read<CheckoutProvider>()
-    //         .getSingleAddressProvider(context: context)
-    //         .then(
-    //       (selectedAddress) async {
-    //         Map<String, String> params = {
-    //           ApiAndParams.latitude: selectedAddress?.latitude?.toString() ??
-    //               Constant.session.getData(SessionManager.keyLatitude),
-    //           ApiAndParams.longitude: selectedAddress?.longitude?.toString() ??
-    //               Constant.session.getData(SessionManager.keyLongitude),
-    //           ApiAndParams.isCheckout: "1"
-    //         };
-
-    //         if (Constant.selectedPromoCodeId != "0") {
-    //           params[ApiAndParams.promoCodeId] = Constant.selectedPromoCodeId;
-    //         }
-
-    //         await context
-    //             .read<CheckoutProvider>()
-    //             .getOrderChargesProvider(
-    //               context: context,
-    //               params: params,
-    //             )
-    //             .then(
-    //           (value) async {
-    //             setState(() {});
-    //             await context
-    //                 .read<PaymentMethodsProvider>()
-    //                 .getPaymentMethods(context: context, from: "checkout")
-    //                 .then(
-    //               (value) {
-    //                 setState(() {});
-    //                 StripeService.init(
-    //                   stripeId: context
-    //                           .read<PaymentMethodsProvider>()
-    //                           .paymentMethods
-    //                           ?.data
-    //                           .stripePublishableKey ??
-    //                       "",
-    //                   secretKey: context
-    //                           .read<PaymentMethodsProvider>()
-    //                           .paymentMethods
-    //                           ?.data
-    //                           .stripeSecretKey ??
-    //                       "",
-    //                 );
-    //               },
-    //             );
-    //           },
-    //         );
-    //       },
-    //     );
-    //   },
-    // );
+  
     fetchCheckoutDetails();
   }
 
@@ -480,34 +421,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ],
                 ),
               ),
-              // const SizedBox(height: 12),
-              // if (Constant.isPromoCodeApplied == true)
-              //   Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     crossAxisAlignment: CrossAxisAlignment.center,
-              //     textDirection: Directionality.of(context),
-              //     children: [
-              //       CustomTextLabel(
-              //         text: "${getTranslatedValue(
-              //           context,
-              //           "coupon",
-              //         )} (${Constant.selectedCoupon})",
-              //         softWrap: true,
-              //         style: TextStyle(
-              //           fontSize: 17,
-              //           color: ColorsRes.mainTextColor,
-              //         ),
-              //       ),
-              //       CustomTextLabel(
-              //         text: "-${Constant.discount.toString().currency}",
-              //         softWrap: true,
-              //         style: TextStyle(
-              //           fontSize: 17,
-              //           color: ColorsRes.mainTextColor,
-              //         ),
-              //       ),
-              //     ],
-              //   ),
+          
             ],
           ),
         );

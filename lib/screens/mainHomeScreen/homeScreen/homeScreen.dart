@@ -526,6 +526,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         map = homeScreenProvider.homeOfferImagesMap;
                         if (homeScreenProvider.homeScreenState ==
                             HomeScreenState.loaded) {
+
+
+                              print('-------------------------${homeScreenProvider
+                                      .homeScreenData.sliders?.first.imageUrl}------------slider image---------------');
                           for (int i = 0;
                               i <
                                   homeScreenProvider
@@ -540,6 +544,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                           return Column(
                             children: [
+                           //   Image.network('https://admin.myfrostyfoods.com/storage/sliders/1737432637_86260.png'),
                               // Top Sections
                               SectionWidget(position: 'top'),
                               //top offer images

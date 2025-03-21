@@ -7,7 +7,9 @@ enum ThemeList { systemDefault, light, dark }
 class Constant {
   //Add your admin panel url here with postfix slash eg. https://www.admin.panel/
   // TODO ADMIN PANEL URL HERE
-  static String hostUrl = "https://admin.myfrostyfoods.com/";
+  static String hostUrl =
+  "https://admin.frostys.in/";
+ // "https://admin.myfrostyfoods.com/";
   static String shareUrl = "https://myfrostyfoods.com/";
 
   static String baseUrl = "${hostUrl}customer/";

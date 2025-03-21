@@ -90,6 +90,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
         return Column(
           children: List.generate(notifications.length, (index) {
             NotificationListData notification = notifications[index];
+             print('-------------------------${notification.imageUrl}-------------------------');  
             return GestureDetector(
               onTap: () async {
                 if (notification.type == "category") {
@@ -110,6 +111,7 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                   }
                 }
               },
+              
               child: Container(
                 padding: EdgeInsets.symmetric(
                     vertical: Constant.size5, horizontal: Constant.size5),
@@ -120,7 +122,9 @@ class _NotificationListScreenState extends State<NotificationListScreen> {
                   10,
                 ),
                 child: Row(
+               
                   children: [
+                   
                     notification.imageUrl != ""
                         ? ClipRRect(
                             borderRadius: Constant.borderRadius10,

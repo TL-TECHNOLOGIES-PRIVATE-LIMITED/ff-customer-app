@@ -16,7 +16,7 @@ class AddressProvider extends ChangeNotifier {
   bool hasMoreData = false;
   int totalData = 0;
   int offset = 0;
-  int selectedAddressId = 0;
+  var selectedAddressId ;
 
   getAddressProvider(
       {required BuildContext context, required String addressId}) async {
@@ -114,55 +114,7 @@ class AddressProvider extends ChangeNotifier {
     }
   }
 
-  // void addOrUpdateAddress(
-  //     {required BuildContext context,
-  //     var address,
-  //     required Map<String, String> params,
-  //     required Function function}) async {
-  //   addressState = AddressState.editing;
-  //   notifyListeners();
 
-  //   try {
-  //     Map<String, dynamic> getData = {};
-
-  //     if (params.containsKey(ApiAndParams.id)) {
-  //       getData = (await updateAddressApi(context: context, params: params));
-  //     } else {
-  //       getData = (await addAddressApi(context: context, params: params));
-  //     }
-
-  //     late UserAddressData tempAddress;
-  //     if (getData[ApiAndParams.status].toString() == "1") {
-  //       tempAddress = UserAddressData.fromJson(getData[ApiAndParams.data]);
-  //       if (params.containsKey(ApiAndParams.id)) {
-  //         addresses.remove(address);
-  //       }
-
-  //       addresses.add(tempAddress);
-
-  //       if (int.parse(tempAddress.isDefault.toString()) == 1) {
-  //         selectedAddressId = int.parse(tempAddress.id.toString());
-  //       }
-
-  //       addressState = AddressState.loaded;
-  //       notifyListeners();
-
-  //       function();
-  //     } else {
-  //       addressState = AddressState.error;
-  //       notifyListeners();
-  //     }
-  //   } catch (e) {
-  //     message = e.toString();
-  //     addressState = AddressState.error;
-  //     showMessage(
-  //       context,
-  //       message,
-  //       MessageType.warning,
-  //     );
-  //     notifyListeners();
-  //   }
-  // }
 
   void addOrUpdateAddress({
     required BuildContext context,
