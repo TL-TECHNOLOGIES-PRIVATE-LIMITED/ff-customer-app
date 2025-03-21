@@ -51,7 +51,9 @@ Widget editPhoneBoxBoxWidget(
     initialCountryCode: countryCode ?? "IN",
     onChanged: (value) {
       debugPrint("Updated Number: ${value.completeNumber}");
+      debugPrint("Updated code is: ${value.countryISOCode}");
       onNumberChanged?.call(value.completeNumber);
+      onCountryCodeChanged?.call(value.countryISOCode);
     },
     onCountryChanged: (value) {
       debugPrint("Updated Country Code: ${value.code}");
