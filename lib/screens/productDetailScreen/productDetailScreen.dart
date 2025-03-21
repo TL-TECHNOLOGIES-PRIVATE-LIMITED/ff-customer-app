@@ -26,11 +26,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   void initState() {
     super.initState();
 
-
-
-
     scrollController.addListener(scrollListener);
-   _productDetailsFuture = fetchProductDetails();
+    _productDetailsFuture = fetchProductDetails();
   }
 
   void scrollListener() {
@@ -50,31 +47,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       } else {
         params[ApiAndParams.slug] = widget.id;
       }
-     await context
+      await context
           .read<ProductDetailProvider>()
           .getProductDetailProvider(context: context, params: params);
     } catch (e) {
       debugPrint("Error fetching product details: $e");
     }
-      // Parallel API calls for performance boost
-        print('---------------------1------------------------');
-      await Future.wait([
-      
-        context.read<RatingListProvider>().getRatingApiProvider(
-          params: {ApiAndParams.productId: widget.id},
-          context: context,
-          limit: "5",
-        ),
-        
-        context.read<RatingListProvider>().getRatingImagesApiProvider(
-          params: {ApiAndParams.productId: widget.id},
-          limit: "5",
-          context: context,
-        ),
-        
-      ]);
-        print('---------------------2------------------------');
- 
+    // Parallel API calls for performance boost
+    print('---------------------1------------------------');
+    await Future.wait([
+      context.read<RatingListProvider>().getRatingApiProvider(
+        params: {ApiAndParams.productId: widget.id},
+        context: context,
+        limit: "5",
+      ),
+      context.read<RatingListProvider>().getRatingImagesApiProvider(
+        params: {ApiAndParams.productId: widget.id},
+        limit: "5",
+        context: context,
+      ),
+    ]);
+    print('---------------------2------------------------');
   }
 
   @override
@@ -89,7 +82,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton:
-          context.watch<CartListProvider>().cartList.isNotEmpty ? CartFloating() : null,
+          context.watch<CartListProvider>().cartList.isNotEmpty
+              ? CartFloating()
+              : null,
       bottomNavigationBar: Selector<ProductDetailProvider, bool>(
         selector: (_, provider) => provider.expanded,
         builder: (_, expanded, __) {
@@ -108,7 +103,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               : SizedBox.shrink();
         },
       ),
-  appBar: getAppBar(
+      appBar: getAppBar(
         context: context,
         title: SizedBox.shrink(),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -126,7 +121,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         box!.localToGlobal(Offset.zero) & box.size;
 
                     await Share.share(
-                      "${product.name}\n\n${Constant.shareUrl}product/${product.slug}",
+                      "${product.name}${getTranslatedValue(context, "share_product_message")}${Constant.shareUrl}product/${product.slug}",
                       subject: "Share app",
                       sharePositionOrigin: sharePositionOrigin,
                     );
@@ -198,7 +193,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         future: _productDetailsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return getProductDetailShimmer(context);
+            return SingleChildScrollView(
+                physics: NeverScrollableScrollPhysics(),
+                child: getProductDetailShimmer(context));
           } else if (snapshot.hasError) {
             return DefaultBlankItemMessageScreen(
               title: "Oops",
@@ -209,27 +206,26 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             );
           }
 
-        return Consumer<ProductDetailProvider>(
-  builder: (context, provider, child) {
-    if (provider.productDetailState == ProductDetailState.loaded) {
-      return SingleChildScrollView(
-        controller: scrollController,
-        child: ProductDetailWidget(
-          context: context,
-          product: provider.productDetail.data,
-        //  productListItem: widget.productListItem, // Pass productListItem here
-        ),
-      );
-    } else {
-      return NoInternetConnectionScreen(
-        height: context.height * 0.65,
-        message: provider.message,
-        callback: fetchProductDetails,
-      );
-    }
-  },
-);
-
+          return Consumer<ProductDetailProvider>(
+            builder: (context, provider, child) {
+              if (provider.productDetailState == ProductDetailState.loaded) {
+                return SingleChildScrollView(
+                  controller: scrollController,
+                  child: ProductDetailWidget(
+                    context: context,
+                    product: provider.productDetail.data,
+                    //  productListItem: widget.productListItem, // Pass productListItem here
+                  ),
+                );
+              } else {
+                return NoInternetConnectionScreen(
+                  height: context.height * 0.65,
+                  message: provider.message,
+                  callback: fetchProductDetails,
+                );
+              }
+            },
+          );
         },
       ),
     );

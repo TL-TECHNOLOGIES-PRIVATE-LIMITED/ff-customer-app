@@ -23,7 +23,7 @@ class OtpVerificationScreen extends StatefulWidget {
 
 class _LoginAccountState extends State<OtpVerificationScreen> {
   int otpLength = 6;
- // String? verificationId;
+  // String? verificationId;
   bool isLoading = false;
   late String phoneNumber;
   String otpVerificationId = "";
@@ -73,11 +73,10 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
   // }
 
   Future<void> _verifyPhoneNumber() async {
-    setState(() => isLoading = true);
     print(
         '-----------------------_verifyPhoneNumber------------------------------');
     await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: widget.selectedCountryCode +widget.phoneNumber,
+      phoneNumber: widget.selectedCountryCode + widget.phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) {
         // Auto-set OTP when verification is completed (e.g., Android auto-retrieval)
         pinController.setText(credential.smsCode ?? "");
@@ -99,7 +98,6 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
         setState(() {
           otpVerificationId = vId;
           forceResendingToken = resendToken;
-          isLoading = false;
         });
       },
       codeAutoRetrievalTimeout: (String vId) {
@@ -195,7 +193,6 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
           FilteringTextInputFormatter.digitsOnly,
           FilteringTextInputFormatter.singleLineFormatter
         ],
-        autofocus: true,
         closeKeyboardWhenCompleted: true,
         pinAnimationType: PinAnimationType.slide,
         pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
@@ -212,7 +209,7 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
               showMessage(context, msg, MessageType.warning);
             } else {
               setState(() {
-                isLoading = false;
+                isLoading = true;
               });
               if (Constant.firebaseAuthentication == "1") {
                 print(
@@ -230,6 +227,9 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
                 ).then(
                   (mainData) async {
                     if (mainData["status"].toString() == "1") {
+                      setState(() {
+                        isLoading = false;
+                      });
                       if (mainData.containsKey(ApiAndParams.data)) {
                         userProf.UserProfile? userProfile;
 
@@ -365,8 +365,6 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
   }
 
   Future<void> verifyOtp() async {
-    setState(() => isLoading = true); // Start loading
-
     try {
       // 1. Get the verification ID from the OTP screen's state (not from widgets)
       final verificationId = resendOtpVerificationId.isNotEmpty
@@ -437,7 +435,14 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
             text: "${widget.selectedCountryCode}-${widget.phoneNumber}",
           ),
           const SizedBox(height: 60),
-          otpPinWidget(),
+          isLoading
+              ? PositionedDirectional(
+                  bottom: 0,
+                  start: 0,
+                  end: 0,
+                  top: 0,
+                  child: Center(child: CircularProgressIndicator()))
+              : otpPinWidget(),
           const SizedBox(height: 60),
           GestureDetector(
             onTap: _timer != null && _timer!.isActive
@@ -574,7 +579,7 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
   firebaseLoginProcess() async {
     if (widget.phoneNumber.isNotEmpty) {
       await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: widget.selectedCountryCode +widget.phoneNumber,
+        phoneNumber: widget.selectedCountryCode + widget.phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) {
           pinController.setText(credential.smsCode ?? "");
           print(

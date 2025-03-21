@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:project/helper/utils/generalImports.dart';
 
 class AddressListScreen extends StatefulWidget {
@@ -66,7 +67,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
       // Show an alert dialog if no address is selected
       await showDialog(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (context) => CupertinoAlertDialog(
           title: Text("Address Required"),
           content: Text("Please select an address before proceeding."),
           actions: [
@@ -273,23 +274,51 @@ class _AddressListScreenState extends State<AddressListScreen> {
                                                         ),
                                                         GestureDetector(
                                                           onTap: () {
-                                                            final addressProvider =
-                                                                context.read<
-                                                                    AddressProvider>();
+                                                            showDialog(
+                                                                context:
+                                                                    context,
+                                                                builder: (ctx) {
+                                                                  return CupertinoAlertDialog(
+                                                                    title: Text(getTranslatedValue(
+                                                                        context,
+                                                                        "are_you_sure")),
+                                                                    content: Text(getTranslatedValue(
+                                                                        context,
+                                                                        "delete_address_message")),
+                                                                    actions: [
+                                                                      TextButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child: Text(getTranslatedValue(
+                                                                              context,
+                                                                              "cancel"))),
+                                                                      TextButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            final addressProvider =
+                                                                                context.read<AddressProvider>();
 
-                                                            // Check if the deleted address is the selected one
-                                                            // if (addressProvider.selectedAddressId == int.parse(address.id.toString())) {
-                                                            addressProvider
-                                                                    .selectedAddressId =
-                                                                null; // Clear selectedAddressId
-                                                            //}
+                                                                            // Check if the deleted address is the selected one
+                                                                            // if (addressProvider.selectedAddressId == int.parse(address.id.toString())) {
+                                                                            addressProvider.selectedAddressId =
+                                                                                null; // Clear selectedAddressId
+                                                                            //}
 
-                                                            // Delete the address
-                                                            addressProvider
-                                                                .deleteAddress(
-                                                              address: address,
-                                                              context: context,
-                                                            );
+                                                                            // Delete the address
+                                                                            addressProvider.deleteAddress(
+                                                                              address: address,
+                                                                              context: context,
+                                                                            );
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child: Text(getTranslatedValue(
+                                                                              context,
+                                                                              "ok")))
+                                                                    ],
+                                                                  );
+                                                                });
                                                           },
                                                           child: Container(
                                                             padding: EdgeInsets
