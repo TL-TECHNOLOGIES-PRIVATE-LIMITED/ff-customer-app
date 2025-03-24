@@ -14,16 +14,21 @@ class HomeScreenProductListItem extends StatelessWidget {
       this.borderRadius})
       : super(key: key);
 
-// Helper function to extract the first 2 words
-  String _getFirstTwoWords(String text) {
-    // Split the text into words
-    List<String> words = text.trim().split(" ");
+String formatText(String text, {int minWords = 2}) {
+  text = text.trim();
+  List<String> words = text.split(RegExp(r'\s+'));
 
-    // Take the first 2 words (or fewer if the text has less than 2 words)
-    String firstTwoWords = words.take(2).join(" ");
-
-    return firstTwoWords;
+  if (words.length <= minWords) {
+    return text; // Return full text if it's short
   }
+
+  // Ensure at least the first two words are included
+  String firstTwoWords = words.take(minWords).join(" ");
+  String remainingText = words.skip(minWords).join(" ");
+
+  return "$firstTwoWords $remainingText";
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -124,25 +129,21 @@ class HomeScreenProductListItem extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Padding(
-                                  padding: EdgeInsetsDirectional.only(
-                                      start: 5, bottom: 10, top: 10, end: 5),
-                                  child: CustomTextLabel(
-                                    text: _getFirstTwoWords(product.name ??
-                                        ""), // Use a helper function to format the text
-                                    softWrap: true,
-                                    maxLines: 1,
-                                    overflow: TextOverflow
-                                        .ellipsis, // Show ellipsis for overflow
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: ColorsRes.mainTextColor,
-                                    ),
-                                  ),
+                               Padding(
+  padding: EdgeInsetsDirectional.only(start: 5, bottom: 10, top: 10, end: 5),
+  child: CustomTextLabel(
+    text: formatText(product.name ?? ""),
+    softWrap: true,
+    maxLines: 2, // Allow multiple lines
+    overflow: TextOverflow.ellipsis, // Show ellipsis if needed
+    style: TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+      color: ColorsRes.mainTextColor,
+    ),
+  ),
+),
 
-// Helper function to ensure at least 2 words and handle overflow
-                                ),
                                 ProductListRatingBuilderWidget(
                                   averageRating:
                                       product.averageRating.toString().toDouble,
