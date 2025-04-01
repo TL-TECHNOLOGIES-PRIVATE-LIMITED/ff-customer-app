@@ -159,21 +159,26 @@ class _AddressListScreenState extends State<AddressListScreen> {
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.start,
                                                 children: [
-                                                  Icon(
-                                                    addressProvider.selectedAddressId ==
-                                                            int.parse(address.id
-                                                                .toString())
-                                                        ? Icons
-                                                            .radio_button_on_outlined
-                                                        : Icons
-                                                            .radio_button_off_rounded,
-                                                    color: addressProvider
-                                                                .selectedAddressId ==
-                                                            int.parse(address.id
-                                                                .toString())
-                                                        ? ColorsRes.appColor
-                                                        : ColorsRes.grey,
-                                                  ),
+                                                  widget.from != "quick_widget"
+                                                      ? Icon(
+                                                          addressProvider.selectedAddressId ==
+                                                                  int.parse(address
+                                                                      .id
+                                                                      .toString())
+                                                              ? Icons
+                                                                  .radio_button_on_outlined
+                                                              : Icons
+                                                                  .radio_button_off_rounded,
+                                                          color: addressProvider
+                                                                      .selectedAddressId ==
+                                                                  int.parse(address
+                                                                      .id
+                                                                      .toString())
+                                                              ? ColorsRes
+                                                                  .appColor
+                                                              : ColorsRes.grey,
+                                                        )
+                                                      : SizedBox(),
                                                   getSizedBox(
                                                     width: Constant.size5,
                                                   ),

@@ -763,9 +763,9 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                           }
                         });
 
-                setState(() {
-                  isLoading = true;
-                });
+                // setState(() {
+                //   isLoading = true;
+                // });
               } else {
                 showMessage(context, "Please fill in all required fields!",
                     MessageType.error);
