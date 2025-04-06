@@ -172,7 +172,7 @@ class ColorsRes {
     ),
     colorScheme:
         ColorScheme.fromSwatch(primarySwatch: ColorsRes.darkAppColor).copyWith(
-      surface: bgColorDark,
+      surface: bgColorLight,
       brightness: Brightness.dark,
     ),
     cardTheme: CardTheme(

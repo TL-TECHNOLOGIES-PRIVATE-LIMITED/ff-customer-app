@@ -309,6 +309,8 @@ class _ConfirmLocationState extends State<ConfirmLocation> {
   confirmBtnWidget() {
     print(
         'is delivered ${context.read<CityByLatLongProvider>().isDeliverable}');
+    print(
+        '---------------------------------- ${context.read<CityByLatLongProvider>().cityByLatLongState} ------------------------------------');
     return Card(
       color: Theme.of(context).cardColor,
       surfaceTintColor: Theme.of(context).cardColor,
@@ -326,63 +328,79 @@ class _ConfirmLocationState extends State<ConfirmLocation> {
                       ),
                 )
               : const SizedBox.shrink(),
-          Padding(
-            padding: EdgeInsetsDirectional.only(start: 20, end: 20, top: 20),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                defaultImg(
-                  image: "address_icon",
-                  iconColor: Theme.of(context).primaryColor,
-                  height: 25,
-                  width: 25,
+          context.watch<CityByLatLongProvider>().cityByLatLongState ==
+                  CityByLatLongState.loading
+              ? Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: CircularProgressIndicator(),
+                )
+              : Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsetsDirectional.only(
+                          start: 20, end: 20, top: 20),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          defaultImg(
+                            image: "address_icon",
+                            iconColor: Theme.of(context).primaryColor,
+                            height: 25,
+                            width: 25,
+                          ),
+                          getSizedBox(
+                            width: 20,
+                          ),
+                          Expanded(
+                            child: CustomTextLabel(
+                              text: Constant.cityAddressMap["address"] ?? "",
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (((widget.from == "location" ||
+                                widget.from == "home_screen" ||
+                                widget.from == "bottom_sheet") &&
+                            context
+                                .read<CityByLatLongProvider>()
+                                .isDeliverable) ||
+                        widget.from == "address")
+                      ConfirmButtonWidget(
+                        voidCallback: () {
+                          Constant.session.setData(SessionManager.keyLongitude,
+                              kMapCenter.longitude.toString(), false);
+                          Constant.session.setData(SessionManager.keyLatitude,
+                              kMapCenter.latitude.toString(), false);
+                          Constant.session.setBoolData(
+                              SessionManager.isFetched, true, false);
+                          if ((widget.from == "location" ||
+                                  widget.from == "home_screen" ||
+                                  widget.from == "bottom_sheet") &&
+                              context
+                                  .read<CityByLatLongProvider>()
+                                  .isDeliverable) {
+                            context
+                                .read<CartListProvider>()
+                                .getAllCartItems(context: context);
+                            Constant.session.setData(SessionManager.keyAddress,
+                                Constant.cityAddressMap["address"], true);
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                              mainHomeScreen,
+                              (Route<dynamic> route) => false,
+                            );
+                          } else if (widget.from == "address") {
+                            Future.delayed(const Duration(milliseconds: 500))
+                                .then(
+                              (value) {
+                                Navigator.pop(context, true);
+                              },
+                            );
+                          }
+                        },
+                      )
+                  ],
                 ),
-                getSizedBox(
-                  width: 20,
-                ),
-                Expanded(
-                  child: CustomTextLabel(
-                    text: Constant.cityAddressMap["address"] ?? "",
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (((widget.from == "location" ||
-                      widget.from == "home_screen" ||
-                      widget.from == "bottom_sheet") &&
-                  context.read<CityByLatLongProvider>().isDeliverable) ||
-              widget.from == "address")
-            ConfirmButtonWidget(
-              voidCallback: () {
-                Constant.session.setData(SessionManager.keyLongitude,
-                    kMapCenter.longitude.toString(), false);
-                Constant.session.setData(SessionManager.keyLatitude,
-                    kMapCenter.latitude.toString(), false);
-                Constant.session
-                    .setBoolData(SessionManager.isFetched, true, false);
-                if ((widget.from == "location" ||
-                        widget.from == "home_screen" ||
-                        widget.from == "bottom_sheet") &&
-                    context.read<CityByLatLongProvider>().isDeliverable) {
-                  context
-                      .read<CartListProvider>()
-                      .getAllCartItems(context: context);
-                  Constant.session.setData(SessionManager.keyAddress,
-                      Constant.cityAddressMap["address"], true);
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    mainHomeScreen,
-                    (Route<dynamic> route) => false,
-                  );
-                } else if (widget.from == "address") {
-                  Future.delayed(const Duration(milliseconds: 500)).then(
-                    (value) {
-                      Navigator.pop(context, true);
-                    },
-                  );
-                }
-              },
-            )
         ],
       ),
     );

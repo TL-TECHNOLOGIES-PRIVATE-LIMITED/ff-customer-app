@@ -63,7 +63,8 @@ class _AddressListScreenState extends State<AddressListScreen> {
   Future<bool> snackbarforeptyaddress() async {
     final addressProvider = context.read<AddressProvider>();
 
-    if (addressProvider.selectedAddressId == null) {
+    if (addressProvider.selectedAddressId == null &&
+        widget.from == "checkout") {
       // Show an alert dialog if no address is selected
       await showDialog(
         context: context,
@@ -93,7 +94,8 @@ class _AddressListScreenState extends State<AddressListScreen> {
           onTap: () {
             final addressProviders = context.read<AddressProvider>();
 
-            if (addressProviders.selectedAddressId == null) {
+            if (addressProviders.selectedAddressId == null &&
+                widget.from == "checkout") {
               snackbarforeptyaddress();
             } else {
               Navigator.pop(context);

@@ -73,7 +73,6 @@ String setFirstLetterUppercase(String value) {
   return value.toTitleCase();
 }
 
-
 Future sendApiRequest(
     {required String apiName,
     required Map<String, dynamic> params,
@@ -141,7 +140,6 @@ Future sendApiRequest(
     throw Constant.somethingWentWrong;
   }
 }
-
 
 Future sendApiMultiPartRequest(
     {required String apiName,
@@ -483,6 +481,19 @@ validateCountry(String value) {
   }
   if (value.length < 3) {
     return 'Country must be at least 3 characters long';
+  }
+  return null;
+}
+
+String? validateHouseNo(String value) {
+  if (value.trim().isEmpty) {
+    return "This field cannot be empty";
+  }
+  if (!RegExp(r"^[a-zA-Z0-9\s,.-]+$").hasMatch(value)) {
+    return 'Enter a valid input (letters, numbers, spaces, comma, dot, hyphen allowed)';
+  }
+  if (value.length < 3) {
+    return 'Must be at least 3 characters long';
   }
   return null;
 }
