@@ -331,7 +331,7 @@ class _LoginAccountState extends State<LoginAccount> {
                   )}\t",
                   children: <TextSpan>[
                     TextSpan(
-                        text: getTranslatedValue(context, "terms_of_service"),
+                        text: getTranslatedValue(context, "terms_and_conditions"),
                         style: TextStyle(
                           color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.w500,

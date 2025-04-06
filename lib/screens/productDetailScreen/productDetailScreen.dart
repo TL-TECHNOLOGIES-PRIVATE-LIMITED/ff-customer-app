@@ -25,6 +25,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
+    print('Product ID or Slug: ${widget.id}');
+    if (widget.productListItem != null) {
+      print(
+          'Product slug from productListItem: ${widget.productListItem!.slug}');
+    }
 
     scrollController.addListener(scrollListener);
     _productDetailsFuture = fetchProductDetails();
@@ -40,34 +45,53 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Future<void> fetchProductDetails() async {
     if (!mounted) return;
 
+    print('[fetchProductDetails] 🚀 Started');
+
     try {
       Map<String, String> params = await Constant.getProductsDefaultParams();
-      if (RegExp(r'\d').hasMatch(widget.id)) {
+      print('[fetchProductDetails] 📦 Default Params: $params');
+
+      // Improved check: use tryParse to distinguish ID vs Slug
+      if (int.tryParse(widget.id) != null) {
         params[ApiAndParams.id] = widget.id;
+        print('[fetchProductDetails] Using ID: ${widget.id}');
       } else {
         params[ApiAndParams.slug] = widget.id;
+        print('[fetchProductDetails] Using Slug: ${widget.id}');
       }
-      await context
-          .read<ProductDetailProvider>()
-          .getProductDetailProvider(context: context, params: params);
-    } catch (e) {
-      debugPrint("Error fetching product details: $e");
+
+      print('[fetchProductDetails] 🔄 Calling getProductDetailProvider...');
+      await context.read<ProductDetailProvider>().getProductDetailProvider(
+            context: context,
+            params: params,
+          );
+      print('[fetchProductDetails] ✅ Product detail fetched successfully');
+    } catch (e, stackTrace) {
+      debugPrint('[fetchProductDetails] ❌ Error fetching product details: $e');
+      debugPrint('[fetchProductDetails] StackTrace: $stackTrace');
     }
-    // Parallel API calls for performance boost
-    print('---------------------1------------------------');
-    await Future.wait([
-      context.read<RatingListProvider>().getRatingApiProvider(
-        params: {ApiAndParams.productId: widget.id},
-        context: context,
-        limit: "5",
-      ),
-      context.read<RatingListProvider>().getRatingImagesApiProvider(
-        params: {ApiAndParams.productId: widget.id},
-        limit: "5",
-        context: context,
-      ),
-    ]);
-    print('---------------------2------------------------');
+
+    print('[fetchProductDetails] ⏳ Fetching ratings in parallel...');
+    try {
+      await Future.wait([
+        context.read<RatingListProvider>().getRatingApiProvider(
+          params: {ApiAndParams.productId: widget.id},
+          context: context,
+          limit: "5",
+        ),
+        context.read<RatingListProvider>().getRatingImagesApiProvider(
+          params: {ApiAndParams.productId: widget.id},
+          limit: "5",
+          context: context,
+        ),
+      ]);
+      print('[fetchProductDetails] ✅ Ratings and images fetched');
+    } catch (e, stackTrace) {
+      debugPrint('[fetchProductDetails] ❌ Error fetching ratings/images: $e');
+      debugPrint('[fetchProductDetails] StackTrace: $stackTrace');
+    }
+
+    print('[fetchProductDetails] 🏁 Finished');
   }
 
   @override

@@ -14,21 +14,20 @@ class HomeScreenProductListItem extends StatelessWidget {
       this.borderRadius})
       : super(key: key);
 
-String formatText(String text, {int minWords = 2}) {
-  text = text.trim();
-  List<String> words = text.split(RegExp(r'\s+'));
+  String formatText(String text, {int minWords = 2}) {
+    text = text.trim();
+    List<String> words = text.split(RegExp(r'\s+'));
 
-  if (words.length <= minWords) {
-    return text; // Return full text if it's short
+    if (words.length <= minWords) {
+      return text; // Return full text if it's short
+    }
+
+    // Ensure at least the first two words are included
+    String firstTwoWords = words.take(minWords).join(" ");
+    String remainingText = words.skip(minWords).join(" ");
+
+    return "$firstTwoWords $remainingText";
   }
-
-  // Ensure at least the first two words are included
-  String firstTwoWords = words.take(minWords).join(" ");
-  String remainingText = words.skip(minWords).join(" ");
-
-  return "$firstTwoWords $remainingText";
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -129,21 +128,27 @@ String formatText(String text, {int minWords = 2}) {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                               Padding(
-  padding: EdgeInsetsDirectional.only(start: 5, bottom: 10, top: 10, end: 5),
-  child: CustomTextLabel(
-    text: formatText(product.name ?? ""),
-    softWrap: true,
-    maxLines: 2, // Allow multiple lines
-    overflow: TextOverflow.ellipsis, // Show ellipsis if needed
-    style: TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w500,
-      color: ColorsRes.mainTextColor,
-    ),
-  ),
-),
-
+                                Padding(
+                                  padding: const EdgeInsetsDirectional.only(
+                                      start: 5, bottom: 10, top: 10, end: 5),
+                                  child: SizedBox(
+                                    height:
+                                        40, // Set fixed height for alignment (adjust as needed)
+                                    child: CustomTextLabel(
+                                      text: formatText(product.name ?? ""),
+                                      softWrap: true,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: ColorsRes.mainTextColor,
+                                        height:
+                                            1.3, // Line height for better vertical spacing
+                                      ),
+                                    ),
+                                  ),
+                                ),
                                 ProductListRatingBuilderWidget(
                                   averageRating:
                                       product.averageRating.toString().toDouble,

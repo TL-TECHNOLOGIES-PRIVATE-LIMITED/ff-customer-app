@@ -16,40 +16,59 @@ class ProductDetailProvider extends ChangeNotifier {
   late List<String> images = [];
   bool expanded = false;
 
-  Future getProductDetailProvider(
-      {required Map<String, dynamic> params,
-      required BuildContext context,
-      String? productId}) async {
-        print('----------------------------------------getProductDetailProvider--------------------------------------------');
-    productDetailState = ProductDetailState.loading;
+ Future<void> getProductDetailProvider({
+  required Map<String, dynamic> params,
+  required BuildContext context,
+  String? productId,
+}) async {
+  print('[ProductDetailProvider] Fetching product details...');
+  print('[ProductDetailProvider] Params: $params');
+  
+  productDetailState = ProductDetailState.loading;
+  notifyListeners();
+
+  try {
+    Map<String, dynamic> data = await getProductDetailApi(
+      context: context,
+      params: params,
+    );
+
+    print('[ProductDetailProvider] API Response: $data');
+
+    if (data[ApiAndParams.status].toString() == "1") {
+      productDetail = ProductDetail.fromJson(data);
+      productData = productDetail.data;
+
+      print('[ProductDetailProvider] ✅ Product fetched:');
+      print('  - Product Name: ${productData.name}');
+      print('  - Product ID: ${productData.id}');
+      print('  - Product Slug: ${productData.slug}');
+      print('  - Product Images: ${productData.images.length}');
+      print('  - Product Main Image: ${productData.imageUrl}');
+
+      setOtherImages(0, productDetail.data);
+
+      productDetailState = ProductDetailState.loaded;
+    } else {
+      message = Constant.somethingWentWrong;
+      productDetailState = ProductDetailState.error;
+
+      print('[ProductDetailProvider] ❌ Error: ${data[ApiAndParams.message] ?? "Unknown error"}');
+    }
+
+    notifyListeners();
+  } catch (e, stackTrace) {
+    message = e.toString();
+    productDetailState = ProductDetailState.error;
     notifyListeners();
 
-    try {
-    //  print('----------------------------------------getProductDetailProvider--------------------------------------------');
-      Map<String, dynamic> data =
-          await getProductDetailApi(context: context, params: params);
-      if (data[ApiAndParams.status].toString() == "1") {
-        productDetail = ProductDetail.fromJson(data);
+    print('[ProductDetailProvider] ❌ Exception: $e');
+    print('[ProductDetailProvider] StackTrace: $stackTrace');
 
-        productData = productDetail.data;
-
-        setOtherImages(0, productDetail.data);
-
-        productDetailState = ProductDetailState.loaded;
-
-        notifyListeners();
-      } else {
-        message = Constant.somethingWentWrong;
-        productDetailState = ProductDetailState.error;
-        notifyListeners();
-      }
-    } catch (e) {
-      message = e.toString();
-      productDetailState = ProductDetailState.error;
-      notifyListeners();
-      rethrow;
-    }
+    rethrow;
   }
+}
+
 
   setCurrentImageIndex(int index) {
     currentImage = index;

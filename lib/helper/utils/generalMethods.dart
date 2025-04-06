@@ -73,6 +73,7 @@ String setFirstLetterUppercase(String value) {
   return value.toTitleCase();
 }
 
+
 Future sendApiRequest(
     {required String apiName,
     required Map<String, dynamic> params,
@@ -96,6 +97,7 @@ Future sendApiRequest(
         apiName.contains("http") ? apiName : "${Constant.baseUrl}$apiName";
 
     http.Response response;
+
     if (isPost) {
       response = await http.post(Uri.parse(mainUrl),
           body: params.isNotEmpty ? params : null, headers: headersData);
@@ -103,45 +105,43 @@ Future sendApiRequest(
       mainUrl = await Constant.getGetMethodUrlWithParams(
           apiName.contains("http") ? apiName : "${Constant.baseUrl}$apiName",
           params);
-
       response = await http.get(Uri.parse(mainUrl), headers: headersData);
     }
 
+    // Generate cURL debug print
     if (kDebugMode) {
-      debugPrint("API IS ${"$mainUrl,{$params}, ${response.body}"}");
+      String curlCommand = "curl -X ${isPost ? "POST" : "GET"} '$mainUrl' \\\n";
+
+      headersData.forEach((key, value) {
+        curlCommand += "  -H '$key: $value' \\\n";
+      });
+
+      if (isPost && params.isNotEmpty) {
+        curlCommand += "  -d '${jsonEncode(params)}'";
+      }
+
+      debugPrint("==== API Request Debug Info ====");
+      debugPrint("URL: $mainUrl");
+      debugPrint("Method: ${isPost ? "POST" : "GET"}");
+      debugPrint("Headers: ${jsonEncode(headersData)}");
+      debugPrint("Params: ${jsonEncode(params)}");
+      debugPrint("cURL Command:\n$curlCommand");
+      debugPrint("Response: ${response.body}");
+      debugPrint("================================");
     }
 
     if (response.statusCode == 200) {
-      if (response.body == "null") {
-        return null;
-      }
-
       return isRequestedForInvoice == true ? response.bodyBytes : response.body;
     } else {
-      if (kDebugMode) {
-        print(
-            "ERROR IS ${"$mainUrl,{$params},Status Code - ${response.statusCode}, ${response.body}"}");
-        showMessage(
-          context,
-          "$mainUrl,{$params},Status Code - ${response.statusCode}",
-          MessageType.warning,
-        );
-      }
       return null;
     }
   } on SocketException {
     throw Constant.noInternetConnection;
   } catch (c) {
-    if (kDebugMode) {
-      showMessage(
-        context,
-        c.toString(),
-        MessageType.warning,
-      );
-    }
     throw Constant.somethingWentWrong;
   }
 }
+
 
 Future sendApiMultiPartRequest(
     {required String apiName,
