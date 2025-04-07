@@ -407,19 +407,19 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
     }
   }
 
-  otpWidgets() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
+otpWidgets() {
+  return Container(
+    decoration: BoxDecoration(
+      color: Theme.of(context).cardColor,
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(30),
+        topRight: Radius.circular(30),
       ),
-      child: Padding(
-        padding: EdgeInsetsDirectional.only(start: 20, end: 20, top: 20),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          CustomTextLabel(
+    ),
+    child: Padding(
+      padding: EdgeInsetsDirectional.only(start: 20, end: 20, top: 20),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        CustomTextLabel(
             jsonKey: "enter_verification_code",
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -434,32 +434,28 @@ class _LoginAccountState extends State<OtpVerificationScreen> {
           CustomTextLabel(
             text: "${widget.selectedCountryCode}-${widget.phoneNumber}",
           ),
-          const SizedBox(height: 60),
-          isLoading
-              ? PositionedDirectional(
-                  bottom: 0,
-                  start: 0,
-                  end: 0,
-                  top: 0,
-                  child: Center(child: CircularProgressIndicator()))
-              : otpPinWidget(),
-          const SizedBox(height: 60),
-          GestureDetector(
-            onTap: _timer != null && _timer!.isActive
-                ? null
-                : () {
-                    setState(() {
-                      startTimer();
-                    });
-                    firebaseLoginProcess();
-                  },
-            child: resendOtpWidget(),
-          ),
-          const SizedBox(height: 60),
-        ]),
-      ),
-    );
-  }
+        // ... other widgets
+        const SizedBox(height: 60),
+        isLoading
+            ? Center(child: CircularProgressIndicator()) // Fixed this line
+            : otpPinWidget(),
+        const SizedBox(height: 60),
+        GestureDetector(
+          onTap: _timer != null && _timer!.isActive
+              ? null
+              : () {
+                  setState(() {
+                    startTimer();
+                  });
+                  firebaseLoginProcess();
+                },
+          child: resendOtpWidget(),
+        ),
+        const SizedBox(height: 60),
+      ]),
+    ),
+  );
+}
 
   backendApiProcess(User? user) async {
     if (user != null) {
