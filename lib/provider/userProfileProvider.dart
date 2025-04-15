@@ -7,12 +7,10 @@ class UserProfileProvider extends ChangeNotifier {
   ProfileState profileState = ProfileState.initial;
 
   Future updateUserProfile(
-
-   
       {required BuildContext context,
       required String selectedImagePath,
       required Map<String, String> params}) async {
-         print('-------------------updateUserProfile-------------------------');
+    print('-------------------updateUserProfile-------------------------');
     var returnValue;
     try {
       profileState = ProfileState.loading;
@@ -20,16 +18,19 @@ class UserProfileProvider extends ChangeNotifier {
 
       List<String> fileParamsNames = [];
       List<String> fileParamsFilesPath = [];
-      print('--------------------${fileParamsFilesPath}-----------------------');
+      print(
+          '--------------------${fileParamsFilesPath}-----------------------');
+      print(
+          '--------image path------------${selectedImagePath}-----------------------');
       if (selectedImagePath.isNotEmpty) {
         fileParamsNames.add(ApiAndParams.profile);
         fileParamsFilesPath.add(selectedImagePath);
 
-
         print('--------------------$fileParamsNames--------------------------');
-            print('--------------------${fileParamsFilesPath}-----------------------');
+        print(
+            '--------------------${fileParamsFilesPath}-----------------------');
 
-            print('--------------$params------------------');
+        print('--------------$params------------------');
       }
 
       await getUpdateProfileApi(
@@ -94,6 +95,7 @@ class UserProfileProvider extends ChangeNotifier {
       {required BuildContext context,
       required Map<String, String> params}) async {
     try {
+      print('-------------------loginApi-----2----$params----------------');
       UserProfile? userProfile;
       await getLoginApi(context: context, params: params)
           .then((mainData) async {
@@ -102,6 +104,8 @@ class UserProfileProvider extends ChangeNotifier {
           await setUserDataInSession(mainData, context);
         }
       });
+      print(
+          '-------------------${userProfile?.status}-------------------------');
       return userProfile!.data?.user?.status ?? "0";
     } catch (e) {
       return "0";

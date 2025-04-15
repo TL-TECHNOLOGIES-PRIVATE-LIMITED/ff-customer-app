@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -80,6 +81,7 @@ Future sendApiRequest(
     required BuildContext context,
     bool? isRequestedForInvoice}) async {
   try {
+    print('how much time =============$apiName=======================');
     String token = Constant.session.getData(SessionManager.keyToken);
 
     Map<String, String> headersData = {
@@ -98,9 +100,11 @@ Future sendApiRequest(
     http.Response response;
 
     if (isPost) {
+      print('-------------------post method map---------------------');
       response = await http.post(Uri.parse(mainUrl),
           body: params.isNotEmpty ? params : null, headers: headersData);
     } else {
+      print('-------------------get method map---------------------');
       mainUrl = await Constant.getGetMethodUrlWithParams(
           apiName.contains("http") ? apiName : "${Constant.baseUrl}$apiName",
           params);
@@ -125,8 +129,8 @@ Future sendApiRequest(
       debugPrint("Headers: ${jsonEncode(headersData)}");
       debugPrint("Params: ${jsonEncode(params)}");
       debugPrint("cURL Command:\n$curlCommand");
-      debugPrint("Response: ${response.body}");
-      debugPrint("================================");
+      // debugPrint("Response: ${response.body}");
+      debugPrint("================map called ================");
     }
 
     if (response.statusCode == 200) {
@@ -580,6 +584,62 @@ getUserLocation() async {
   }
 }
 
+Future<bool> exitDialog(BuildContext context) async {
+  return await showCupertinoDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text("Exit App"),
+            content: Text("Are you sure you want to exit the app?"),
+            actions: [
+              CupertinoDialogAction(
+                child: Text("Cancel"),
+                onPressed: () => Navigator.of(context).pop(false),
+              ),
+              CupertinoDialogAction(
+                child: Text("Exit"),
+                isDestructiveAction: true,
+                onPressed: () {
+                  if (Platform.isAndroid) {
+                    SystemNavigator.pop();
+                  } else if (Platform.isIOS) {
+                    exit(0);
+                  }
+                },
+              ),
+            ],
+          );
+        },
+      ) ??
+      false;
+}
+
+showLoader({required BuildContext context}) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Center(
+          child: Container(
+            height: 50,
+            width: 260,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: CircularProgressIndicator(
+              strokeWidth: 5,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+        );
+      },
+    );
+  });
+}
+
 Future<GeoAddress?> displayPrediction(
     Prediction? p, BuildContext context) async {
   if (p != null) {
@@ -613,10 +673,12 @@ Future<GeoAddress?> displayPrediction(
     final lat = detail.result.geometry!.location.lat;
     final lng = detail.result.geometry!.location.lng;
 
-//if zipcode not found
-    if (zipcode.trim().isEmpty) {
-      zipcode = await getZipCode(lat, lng, context);
-    }
+    print('zipcode ========================== $zipcode');
+
+// //if zipcode not found
+//     if (zipcode.trim().isEmpty) {
+//       zipcode = await getZipCode(lat, lng, context);
+//     }
 //
     address.address = detail.result.formattedAddress;
     address.lattitud = lat.toString();

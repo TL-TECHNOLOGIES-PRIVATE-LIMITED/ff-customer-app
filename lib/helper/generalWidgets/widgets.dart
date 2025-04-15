@@ -612,6 +612,9 @@ Widget setRefreshIndicator(
 ValueNotifier<int> notificationCount = ValueNotifier(
   Constant.session.getIntData(SessionManager.notificationTotalCount),
 );
+
+ValueNotifier<bool> mapLoading = ValueNotifier(false);
+
 void updateNotificationCount() {
   notificationCount.value =
       Constant.session.getIntData(SessionManager.notificationTotalCount);

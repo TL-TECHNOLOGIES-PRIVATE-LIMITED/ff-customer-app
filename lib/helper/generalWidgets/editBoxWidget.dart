@@ -7,6 +7,7 @@ Widget editBoxWidget(
   String label,
   String errorLabel,
   TextInputType inputType, {
+  TextCapitalization? textCapitalization,
   Widget? tailIcon,
   Widget? leadingIcon,
   bool? isLastField,
@@ -23,8 +24,8 @@ Widget editBoxWidget(
   return TextFormField(
     onTap: onTap ?? null,
     enabled: isEditable,
+    textCapitalization: textCapitalization ?? TextCapitalization.none,
     readOnly: readOnly ?? false,
-    
     autovalidateMode: AutovalidateMode.onUserInteraction,
     style: TextStyle(
       color: ColorsRes.mainTextColor,
@@ -107,7 +108,7 @@ Widget editBoxWidget(
         (Set<WidgetState> states) {
           final Color color = states.contains(WidgetState.error)
               ? Theme.of(context).colorScheme.error
-              : ColorsRes.appColor;
+              : Theme.of(context).primaryColor;
           return TextStyle(color: color, letterSpacing: 1.3);
         },
       ),
