@@ -21,6 +21,7 @@ class _ConfirmLocationState extends State<ConfirmLocation> {
   late CameraPosition kGooglePlex;
   late LatLng kMapCenter;
   double mapZoom = 14.4746;
+  bool _isDialogShowing = false;
 
   List<Marker> customMarkers = [];
   String googleMapCurrentStyle = "[]";
@@ -63,13 +64,16 @@ class _ConfirmLocationState extends State<ConfirmLocation> {
     await hasLocationPermissionGiven().then(
       (value) async {
         if (value is PermissionStatus) {
+          mapLoading.value = true;
           if (value.isGranted) {
             await Geolocator.getCurrentPosition().then((value) async {
               updateMap(value.latitude, value.longitude);
             });
           } else if (value.isDenied) {
+            mapLoading.value = false;
             await Permission.location.request();
           } else if (value.isPermanentlyDenied) {
+            mapLoading.value = false;
             if (!Constant.session.getBoolData(
                 SessionManager.keyPermissionLocationHidePromptPermanently)) {
               showModalBottomSheet(
@@ -135,6 +139,7 @@ class _ConfirmLocationState extends State<ConfirmLocation> {
     if (widget.from == "location" ||
         widget.from == "home_screen" ||
         widget.from == "bottom_sheet") {
+      print('good good good===============================  ');
       Map<String, dynamic> params = {};
       // params[ApiAndParams.cityName] = Constant.cityAddressMap["city"];
 
@@ -162,123 +167,173 @@ class _ConfirmLocationState extends State<ConfirmLocation> {
               : Navigator.of(context).canPop(),
         ),
         body: PopScope(
-          canPop: false,
-          onPopInvokedWithResult: (didPop, _) {
-            if (didPop) {
-              print('done true');
-              return;
-            } else {
-              print('done false');
-              widget.from == 'bottom_sheet'
-                  ? showMessage(
-                      context,
-                      "You must select a location to use this app. Please choose your location.",
-                      MessageType.warning)
-                  : Future.delayed(const Duration(milliseconds: 500))
-                      .then((value) {
-                      Navigator.pop(context, true);
-                    });
-            }
-          },
-          child: Column(children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  PositionedDirectional(
-                    top: 0,
-                    end: 0,
-                    start: 0,
-                    bottom: 0,
-                    child: mapWidget(),
-                  ),
-                  PositionedDirectional(
-                    top: 15,
-                    end: 15,
-                    start: 15,
-                    child: Row(children: [
-                      Expanded(
-                          child: GestureDetector(
-                        onTap: () async {
-                          Prediction? p = await PlacesAutocomplete.show(
-                              context: context,
-                              apiKey: Constant.googleApiKey,
-                              decoration: InputDecoration(
-                                labelStyle: TextStyle(
-                                  color: ColorsRes.mainTextColor,
-                                ),
-                              ),
-                              textStyle: TextStyle(
-                                color: ColorsRes.mainTextColor,
-                              ));
-
-                          displayPrediction(p, context).then(
-                            (value) {
-                              if (value != null) {
-                                updateMap(
-                                  double.parse(value.lattitud ?? "0.0"),
-                                  double.parse(
-                                    value.longitude ?? "0.0",
-                                  ),
+            canPop: false,
+            onPopInvokedWithResult: (didPop, _) {
+              if (didPop) {
+                print('done true');
+                return;
+              } else {
+                print('done false');
+                widget.from == 'bottom_sheet'
+                    ? showMessage(
+                        context,
+                        "You must select a location to use this app. Please choose your location.",
+                        MessageType.warning)
+                    : Future.delayed(const Duration(milliseconds: 500))
+                        .then((value) {
+                        Navigator.pop(context, true);
+                      });
+              }
+            },
+            child: Stack(
+              children: [
+                Column(children: [
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        PositionedDirectional(
+                          top: 0,
+                          end: 0,
+                          start: 0,
+                          bottom: 0,
+                          child: mapWidget(),
+                        ),
+                        PositionedDirectional(
+                          top: 15,
+                          end: 15,
+                          start: 15,
+                          child: Row(children: [
+                            Expanded(
+                                child: GestureDetector(
+                              onTap: () async {
+                                Prediction? p = await PlacesAutocomplete.show(
+                                    context: context,
+                                    apiKey: Constant.googleApiKey,
+                                    decoration: InputDecoration(
+                                      labelStyle: TextStyle(
+                                        color: ColorsRes.mainTextColor,
+                                      ),
+                                    ),
+                                    textStyle: TextStyle(
+                                      color: ColorsRes.mainTextColor,
+                                    ));
+                                print(
+                                    'haitttttttt------------------------------');
+                                displayPrediction(p, context).then(
+                                  (value) {
+                                    print(
+                                        '---------------now i am called-------------');
+                                    if (value != null) {
+                                      updateMap(
+                                        double.parse(value.lattitud ?? "0.0"),
+                                        double.parse(
+                                          value.longitude ?? "0.0",
+                                        ),
+                                      );
+                                    }
+                                  },
                                 );
-                              }
-                            },
-                          );
-                        },
-                        child: Container(
-                          decoration: DesignConfig.boxDecoration(
-                            Theme.of(context).scaffoldBackgroundColor,
-                            10,
-                          ),
-                          child: ListTile(
-                            title: TextField(
-                              enabled: false,
-                              decoration: InputDecoration(
-                                isDense: true,
-                                border: InputBorder.none,
-                                hintText: getTranslatedValue(
-                                    context, "search_location_hint"),
-                                hintStyle: TextStyle(
-                                  color: ColorsRes.subTitleMainTextColor,
+                              },
+                              child: Container(
+                                decoration: DesignConfig.boxDecoration(
+                                  Theme.of(context).scaffoldBackgroundColor,
+                                  10,
+                                ),
+                                child: ListTile(
+                                  title: TextField(
+                                    enabled: false,
+                                    decoration: InputDecoration(
+                                      isDense: true,
+                                      border: InputBorder.none,
+                                      hintText: getTranslatedValue(
+                                          context, "search_location_hint"),
+                                      hintStyle: TextStyle(
+                                        color: ColorsRes.subTitleMainTextColor,
+                                      ),
+                                    ),
+                                  ),
+                                  contentPadding: EdgeInsetsDirectional.only(
+                                    start: Constant.size12,
+                                  ),
+                                  trailing: Padding(
+                                    padding: const EdgeInsets.only(right: 10.0),
+                                    child: Icon(
+                                      Icons.search,
+                                      color: ColorsRes.mainTextColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )),
+                            SizedBox(width: Constant.size10),
+                            GestureDetector(
+                              onTap: () async {
+                                await checkPermission();
+                              },
+                              child: Container(
+                                decoration: DesignConfig.boxGradient(10),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 18, vertical: 18),
+                                child: defaultImg(
+                                  image: "my_location_icon",
+                                  iconColor: ColorsRes.mainIconColor,
                                 ),
                               ),
                             ),
-                            contentPadding: EdgeInsetsDirectional.only(
-                              start: Constant.size12,
-                            ),
-                            trailing: IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: Icon(
-                                Icons.search,
-                                color: ColorsRes.mainTextColor,
-                              ),
-                              onPressed: () {},
-                            ),
-                          ),
+                          ]),
                         ),
-                      )),
-                      SizedBox(width: Constant.size10),
-                      GestureDetector(
-                        onTap: () async {
-                          await checkPermission();
-                        },
-                        child: Container(
-                          decoration: DesignConfig.boxGradient(10),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 18, vertical: 18),
-                          child: defaultImg(
-                            image: "my_location_icon",
-                            iconColor: ColorsRes.mainIconColor,
-                          ),
-                        ),
-                      ),
-                    ]),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
-            confirmBtnWidget(),
-          ]),
-        ));
+                  confirmBtnWidget(),
+                ]),
+                ValueListenableBuilder<bool>(
+                  valueListenable: mapLoading,
+                  builder: (context, value, child) {
+                    if (value && !_isDialogShowing) {
+                      _isDialogShowing = true;
+
+                      // Delay to ensure dialog opens after current frame
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) {
+                            return Center(
+                              child: Container(
+                                height: 50,
+                                width: 260,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 5,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      });
+                    } else if (!value && _isDialogShowing) {
+                      _isDialogShowing = false;
+
+                      // Dismiss loader if visible
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (Navigator.of(context, rootNavigator: true)
+                            .canPop()) {
+                          Navigator.of(context, rootNavigator: true).pop();
+                        }
+                      });
+                    }
+
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ],
+            )));
   }
 
   Widget mapWidget() {
@@ -288,6 +343,7 @@ class _ConfirmLocationState extends State<ConfirmLocation> {
       myLocationEnabled: false,
       myLocationButtonEnabled: false,
       onTap: (argument) async {
+        mapLoading.value = true;
         updateMap(argument.latitude, argument.longitude);
       },
       onMapCreated: _onMapCreated,
@@ -309,6 +365,8 @@ class _ConfirmLocationState extends State<ConfirmLocation> {
   confirmBtnWidget() {
     print(
         'is delivered ${context.read<CityByLatLongProvider>().isDeliverable}');
+    print(
+        '---------------------------------- ${context.read<CityByLatLongProvider>().cityByLatLongState} ------------------------------------');
     return Card(
       color: Theme.of(context).cardColor,
       surfaceTintColor: Theme.of(context).cardColor,
@@ -326,63 +384,71 @@ class _ConfirmLocationState extends State<ConfirmLocation> {
                       ),
                 )
               : const SizedBox.shrink(),
-          Padding(
-            padding: EdgeInsetsDirectional.only(start: 20, end: 20, top: 20),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                defaultImg(
-                  image: "address_icon",
-                  iconColor: Theme.of(context).primaryColor,
-                  height: 25,
-                  width: 25,
+          Column(
+            children: [
+              Padding(
+                padding:
+                    EdgeInsetsDirectional.only(start: 20, end: 20, top: 20),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    defaultImg(
+                      image: "address_icon",
+                      iconColor: Theme.of(context).primaryColor,
+                      height: 25,
+                      width: 25,
+                    ),
+                    getSizedBox(
+                      width: 20,
+                    ),
+                    Expanded(
+                      child: CustomTextLabel(
+                        text: Constant.cityAddressMap["address"] ?? "",
+                      ),
+                    ),
+                  ],
                 ),
-                getSizedBox(
-                  width: 20,
-                ),
-                Expanded(
-                  child: CustomTextLabel(
-                    text: Constant.cityAddressMap["address"] ?? "",
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (((widget.from == "location" ||
-                      widget.from == "home_screen" ||
-                      widget.from == "bottom_sheet") &&
-                  context.read<CityByLatLongProvider>().isDeliverable) ||
-              widget.from == "address")
-            ConfirmButtonWidget(
-              voidCallback: () {
-                Constant.session.setData(SessionManager.keyLongitude,
-                    kMapCenter.longitude.toString(), false);
-                Constant.session.setData(SessionManager.keyLatitude,
-                    kMapCenter.latitude.toString(), false);
-                Constant.session
-                    .setBoolData(SessionManager.isFetched, true, false);
-                if ((widget.from == "location" ||
-                        widget.from == "home_screen" ||
-                        widget.from == "bottom_sheet") &&
-                    context.read<CityByLatLongProvider>().isDeliverable) {
-                  context
-                      .read<CartListProvider>()
-                      .getAllCartItems(context: context);
-                  Constant.session.setData(SessionManager.keyAddress,
-                      Constant.cityAddressMap["address"], true);
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    mainHomeScreen,
-                    (Route<dynamic> route) => false,
-                  );
-                } else if (widget.from == "address") {
-                  Future.delayed(const Duration(milliseconds: 500)).then(
-                    (value) {
-                      Navigator.pop(context, true);
-                    },
-                  );
-                }
-              },
-            )
+              ),
+              if (((widget.from == "location" ||
+                          widget.from == "home_screen" ||
+                          widget.from == "bottom_sheet") &&
+                      context.read<CityByLatLongProvider>().isDeliverable) ||
+                  widget.from == "address")
+                ConfirmButtonWidget(
+                  voidCallback: () {
+                    if (mapLoading.value == true) {
+                      return;
+                    }
+                    Constant.session.setData(SessionManager.keyLongitude,
+                        kMapCenter.longitude.toString(), false);
+                    Constant.session.setData(SessionManager.keyLatitude,
+                        kMapCenter.latitude.toString(), false);
+                    Constant.session
+                        .setBoolData(SessionManager.isFetched, true, false);
+                    if ((widget.from == "location" ||
+                            widget.from == "home_screen" ||
+                            widget.from == "bottom_sheet") &&
+                        context.read<CityByLatLongProvider>().isDeliverable) {
+                      context
+                          .read<CartListProvider>()
+                          .getAllCartItems(context: context);
+                      Constant.session.setData(SessionManager.keyAddress,
+                          Constant.cityAddressMap["address"], true);
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        mainHomeScreen,
+                        (Route<dynamic> route) => false,
+                      );
+                    } else if (widget.from == "address") {
+                      Future.delayed(const Duration(milliseconds: 500)).then(
+                        (value) {
+                          Navigator.pop(context, true);
+                        },
+                      );
+                    }
+                  },
+                )
+            ],
+          )
         ],
       ),
     );

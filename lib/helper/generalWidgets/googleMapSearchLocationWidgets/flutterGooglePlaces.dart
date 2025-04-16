@@ -82,33 +82,34 @@ class PlacesAutocompleteWidget extends StatefulWidget {
 class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
   @override
   Widget build(BuildContext context) {
-    final header = Column(
-      children: <Widget>[
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(7),
-            color: Theme.of(context).cardColor,
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              IconButton(
-                color: Theme.of(context).brightness == Brightness.light
-                    ? Colors.black45
-                    : null,
-                icon: Icon(
-                  Icons.search_rounded,
-                  color: ColorsRes.mainTextColor,
-                ),
-                onPressed: () {},
-              ),
-              Expanded(
-                child: _textField(context),
-              ),
-            ],
-          ),
+    final header = Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: ColorsRes.mainTextColor.withOpacity(0.5),
+          width: 1,
         ),
-      ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          IconButton(
+            color: Theme.of(context).brightness == Brightness.light
+                ? Colors.black45
+                : null,
+            icon: Icon(
+              Icons.search_rounded,
+              color: ColorsRes.mainTextColor,
+            ),
+            onPressed: () {},
+          ),
+          Expanded(
+            child: _textField(context),
+          ),
+        ],
+      ),
     );
 
     Widget body;
@@ -123,17 +124,18 @@ class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
         _response!.predictions.isEmpty) {
       body = Container();
     } else {
+      print('================ prediction 1 ==================== ');
+
       body = SingleChildScrollView(
         child: ListBody(
-          children: _response!.predictions
-              .map(
-                (p) => PredictionTile(
-                  prediction: p,
-                  onTap: Navigator.of(context).pop,
-                  resultTextStyle: widget.resultTextStyle,
-                ),
-              )
-              .toList(),
+          children: _response!.predictions.map((p) {
+            print('---------------------poiiiiiiiiiiiiiiiii-----------------');
+            return PredictionTile(
+              prediction: p,
+              onTap: Navigator.of(context).pop,
+              resultTextStyle: widget.resultTextStyle,
+            );
+          }).toList(),
         ),
       );
     }
@@ -163,7 +165,23 @@ class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
         controller: _queryTextController,
         autofocus: true,
         style: widget.textStyle,
-        decoration: InputDecoration(border: InputBorder.none),
+        decoration: InputDecoration(
+            suffixIcon: _queryTextController!.length != 0
+                ? IconButton(
+                    onPressed: () {
+                      _queryTextController!.clear();
+                    },
+                    icon: Icon(
+                      Icons.clear_rounded,
+                      color: ColorsRes.mainTextColor,
+                    ))
+                : null,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.only(
+              bottom: 10,
+            ),
+            hintText: widget.hint,
+            hintStyle: TextStyle(color: Theme.of(context).hintColor)),
       );
 }
 
@@ -236,6 +254,8 @@ class PredictionsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('================ prediction 2 ==================== ');
+
     return ListView(
       children: predictions
           .map(
@@ -266,6 +286,9 @@ class PredictionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        print("================before===============>${mapLoading.value}");
+        mapLoading.value = true;
+        print("================after===============>${mapLoading.value}");
         onTap?.call(prediction);
       },
       child: Padding(
@@ -327,6 +350,8 @@ abstract class PlacesAutocompleteState extends State<PlacesAutocompleteWidget> {
   }
 
   Future<void> _initPlaces() async {
+    print(
+        'this is working ===============================1===================');
     _places = places.GoogleMapsPlaces(
       apiKey: widget.apiKey,
       baseUrl: widget.proxyBaseUrl,

@@ -21,7 +21,10 @@ class CityByLatLongProvider extends ChangeNotifier {
     required Map<String, dynamic> params,
     required BuildContext context,
   }) async {
+    print('=======================Map Api called========1=============');
     cityByLatLongState = CityByLatLongState.loading;
+    print(
+        "================= CityByLatLongState - 1: $cityByLatLongState =================");
     notifyListeners();
 
     try {
@@ -35,16 +38,24 @@ class CityByLatLongProvider extends ChangeNotifier {
             SessionManager.keyLongitude, params[ApiAndParams.longitude], false);
 
         cityByLatLongState = CityByLatLongState.loaded;
+        mapLoading.value = false;
+        print(
+            "================= CityByLatLongState - 2: $cityByLatLongState =================");
         notifyListeners();
         isDeliverable = true;
       } else {
-        cityByLatLongState = CityByLatLongState.error;
+        mapLoading.value = false;
+        cityByLatLongState = CityByLatLongState.loaded;
+        print(
+            "================= CityByLatLongState - 3: $cityByLatLongState =================");
         notifyListeners();
         isDeliverable = false;
       }
     } catch (e) {
       message = e.toString();
       cityByLatLongState = CityByLatLongState.error;
+      print(
+          "================= CityByLatLongState - 4: $cityByLatLongState =================");
       showMessage(
         context,
         message,

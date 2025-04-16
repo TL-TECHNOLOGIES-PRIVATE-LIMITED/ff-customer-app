@@ -147,8 +147,10 @@ class HomeMainScreenState extends State<HomeMainScreen>
         break;
       case AppLifecycleState.resumed:
         // App is resumed
-          context.read<DeepLinkProvider>().getDeepLinkRedirection(context: context);
-          
+        context
+            .read<DeepLinkProvider>()
+            .getDeepLinkRedirection(context: context);
+
         Constant.session.setBoolData(SessionManager.isFetched, true, false);
         print('App is resumed');
         break;
@@ -176,11 +178,7 @@ class HomeMainScreenState extends State<HomeMainScreen>
                       return;
                     } else {
                       if (homeMainScreenProvider.currentPage == 0) {
-                        if (Platform.isAndroid) {
-                          SystemNavigator.pop();
-                        } else if (Platform.isIOS) {
-                          exit(0);
-                        }
+                        exitDialog(context);
                       } else {
                         setState(() {});
                         homeMainScreenProvider.currentPage = 0;

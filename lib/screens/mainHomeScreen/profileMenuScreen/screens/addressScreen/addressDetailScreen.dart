@@ -29,7 +29,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
   final TextEditingController edtCity = TextEditingController();
   final TextEditingController edtArea = TextEditingController();
   final TextEditingController edtZipcode = TextEditingController();
-  final TextEditingController edtCountry = TextEditingController();
+  final TextEditingController edtHouseNo = TextEditingController();
   final TextEditingController edtState = TextEditingController();
   String? countryCode;
   String? alternateCountryCode;
@@ -86,7 +86,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
     edtCity.text = widget.address?.city ?? "";
     edtArea.text = widget.address?.area ?? "";
     edtZipcode.text = widget.address?.pincode ?? "";
-    edtCountry.text = widget.address?.country ?? "";
+    edtHouseNo.text = widget.address?.country ?? "";
     edtState.text = widget.address?.state ?? "";
     isDefaultAddress = widget.address?.isDefault == "1";
     countryCode = widget.address?.countryCode;
@@ -293,19 +293,9 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
 
                       edtArea.text = Constant.cityAddressMap["area"];
 
-                      edtLandmark.text = edtLandmark.text.toString().isNotEmpty
-                          ? edtLandmark.text.toString()
-                          : Constant.cityAddressMap["landmark"];
-
                       edtZipcode.text = edtZipcode.text.isNotEmpty
                           ? edtZipcode.text.toString()
                           : Constant.cityAddressMap["pin_code"];
-
-                      edtCountry.text = Constant.cityAddressMap["country"]
-                              .toString()
-                              .isNotEmpty
-                          ? Constant.cityAddressMap["country"]
-                          : "";
 
                       edtState.text =
                           Constant.cityAddressMap["state"].toString().isNotEmpty
@@ -345,7 +335,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                                 ? edtZipcode.text.toString()
                                 : Constant.cityAddressMap["pin_code"];
 
-                            edtCountry.text = Constant.cityAddressMap["country"]
+                            edtHouseNo.text = Constant.cityAddressMap["country"]
                                     .toString()
                                     .isNotEmpty
                                 ? Constant.cityAddressMap["country"]
@@ -373,6 +363,22 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                     color: ColorsRes.appColor,
                   ),
                 )),
+            getSizedBox(height: Constant.size15),
+            editBoxWidget(
+              context,
+              edtHouseNo,
+              validateHouseNo,
+              getTranslatedValue(
+                context,
+                "house_no",
+              ),
+              getTranslatedValue(
+                context,
+                "enter_house_no",
+              ),
+              TextInputType.text,
+              maxLength: 191,
+            ),
             getSizedBox(height: Constant.size15),
             editBoxWidget(
               context,
@@ -450,23 +456,6 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
               getTranslatedValue(
                 context,
                 "enter_state",
-              ),
-              TextInputType.text,
-              maxLength: 191,
-            ),
-            getSizedBox(height: Constant.size15),
-            editBoxWidget(
-              context,
-              edtCountry,
-              validateCountry,
-              getTranslatedValue(
-                context,
-                "country",
-              ),
-              isEditable: false,
-              getTranslatedValue(
-                context,
-                "enter_country",
               ),
               TextInputType.text,
               maxLength: 191,
@@ -727,7 +716,7 @@ class _AddressDetailScreenState extends State<AddressDetailScreen> {
                 params[ApiAndParams.pinCode] = edtZipcode.text.trim();
                 params[ApiAndParams.city] = edtCity.text.trim();
                 params[ApiAndParams.state] = edtState.text.trim();
-                params[ApiAndParams.country] = edtCountry.text.trim();
+                params[ApiAndParams.country] = edtHouseNo.text.trim();
                 params[ApiAndParams.alternateMobile] = edtAltMobile.text.trim();
                 params[ApiAndParams.latitude] = latitude;
                 params[ApiAndParams.longitude] = longitude;
