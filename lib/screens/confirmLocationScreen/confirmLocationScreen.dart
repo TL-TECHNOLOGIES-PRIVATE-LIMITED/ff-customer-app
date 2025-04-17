@@ -99,6 +99,7 @@ class _ConfirmLocationState extends State<ConfirmLocation> {
   }
 
   updateMap(double latitude, double longitude) {
+    print('update map is called =======================================>');
     kMapCenter = LatLng(latitude, longitude);
     kGooglePlex = CameraPosition(
       target: kMapCenter,
@@ -136,20 +137,16 @@ class _ConfirmLocationState extends State<ConfirmLocation> {
 
     Constant.cityAddressMap = await getCityNameAndAddress(kMapCenter, context);
 
-    if (widget.from == "location" ||
-        widget.from == "home_screen" ||
-        widget.from == "bottom_sheet") {
-      print('good good good===============================  ');
-      Map<String, dynamic> params = {};
-      // params[ApiAndParams.cityName] = Constant.cityAddressMap["city"];
+    print('good good good===============================  ');
+    Map<String, dynamic> params = {};
+    // params[ApiAndParams.cityName] = Constant.cityAddressMap["city"];
 
-      params[ApiAndParams.longitude] = kMapCenter.longitude.toString();
-      params[ApiAndParams.latitude] = kMapCenter.latitude.toString();
+    params[ApiAndParams.longitude] = kMapCenter.longitude.toString();
+    params[ApiAndParams.latitude] = kMapCenter.latitude.toString();
 
-      await context
-          .read<CityByLatLongProvider>()
-          .getCityByLatLongApiProvider(context: context, params: params);
-    }
+    await context
+        .read<CityByLatLongProvider>()
+        .getCityByLatLongApiProvider(context: context, params: params);
 
     setState(() {});
   }

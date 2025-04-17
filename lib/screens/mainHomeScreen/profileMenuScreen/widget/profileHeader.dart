@@ -135,7 +135,7 @@ class ProfileHeader extends StatelessWidget {
                             context,
                             loginScreen,
                             arguments: "header",
-                          );
+                          ).then((value) {});
                         },
                         child: Container(
                           decoration: BoxDecoration(
