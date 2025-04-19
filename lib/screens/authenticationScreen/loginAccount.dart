@@ -149,51 +149,30 @@ class _LoginAccountState extends State<LoginAccount> {
       child: Scaffold(
         body: Stack(
           children: [
-            PositionedDirectional(
-              bottom: 0,
-              start: 0,
-              end: 0,
-              top: 25,
-              // child: Image.asset(
-              //   Constant.getAssetsPath(0, "bg.jpg"),
-              //   fit: BoxFit.fill,
-              // ),
-              child: Column(
-                children: [
-                  Image.asset(
-                    filterQuality: FilterQuality.high,
-                    Constant.getAssetsPath(0, "logo.png"),
-                    height: 200,
+            Column(mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  filterQuality: FilterQuality.high,
+                  Constant.getAssetsPath(0, "logo.png"),
+                  height: 200,
+                ),
+                CustomTextLabel(
+                  text: "Bite into Premium",
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.75,
                   ),
-                  CustomTextLabel(
-                    text: "Bite into Premium",
-                    style: TextStyle(
-                      fontSize: 25,
-                      color: Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.75,
-                    ),
-                  )
-                ],
-              ),
+                ),SizedBox(height: 40,),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    child: hasCodeSent ? otpWidgets() : loginWidgets(),
+                  ),
+                ),
+              ],
             ),
-            // PositionedDirectional(
-            //   bottom: 0,
-            //   start: 0,
-            //   end: 0,
-            //   top: 0,
-            //   child: Image.asset(
-            //     Constant.getAssetsPath(0, "bg_overlay.png"),
-            //     fit: BoxFit.fill,
-            //   ),
-            // ),
-            PositionedDirectional(
-              bottom: 0,
-              start: 0,
-              end: 0,
-              child: hasCodeSent ? otpWidgets() : loginWidgets(),
-            ),
-
             PositionedDirectional(
               top: 40,
               end: 10,
@@ -253,10 +232,7 @@ class _LoginAccountState extends State<LoginAccount> {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
+        borderRadius:BorderRadius.circular(30)
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,7 +385,7 @@ class _LoginAccountState extends State<LoginAccount> {
                   )}\t",
                   children: <TextSpan>[
                     TextSpan(
-                        text: getTranslatedValue(context, "terms_of_service"),
+                        text: getTranslatedValue(context, "terms_and_conditions"),
                         style: TextStyle(
                           color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.w500,
@@ -482,7 +458,6 @@ class _LoginAccountState extends State<LoginAccount> {
           Icons.keyboard_arrow_down_rounded,
           color: ColorsRes.mainTextColor,
         ),
-
         dropdownIconPosition: IconPosition.trailing,
         flagsButtonMargin: EdgeInsets.only(left: 10),
         decoration: InputDecoration(
@@ -511,17 +486,6 @@ class _LoginAccountState extends State<LoginAccount> {
             color: ColorsRes.subTitleMainTextColor,
           ),
         ),
-
-        // backgroundColor: Theme.of(context).cardColor,
-        // textStyle: TextStyle(color: ColorsRes.mainTextColor),
-        // dialogBackgroundColor: Theme.of(context).cardColor,
-        // dialogSize: Size(context.width, context.height),
-        // barrierColor: ColorsRes.subTitleMainTextColor,
-        // padding: EdgeInsets.zero,
-
-        // searchStyle: TextStyle(
-        //   color: ColorsRes.subTitleMainTextColor,
-        // ),
       ),
     );
   }
@@ -753,10 +717,7 @@ class _LoginAccountState extends State<LoginAccount> {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
+        borderRadius: BorderRadius.circular(30)
       ),
       child: Padding(
         padding: EdgeInsetsDirectional.only(start: 20, end: 20, top: 20),

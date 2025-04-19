@@ -359,97 +359,106 @@ class _ConfirmLocationState extends State<ConfirmLocation> {
     controller = controllerParam;
   }
 
-  confirmBtnWidget() {
-    print(
-        'is delivered ${context.read<CityByLatLongProvider>().isDeliverable}');
-    print(
-        '---------------------------------- ${context.read<CityByLatLongProvider>().cityByLatLongState} ------------------------------------');
-    return Card(
-      color: Theme.of(context).cardColor,
-      surfaceTintColor: Theme.of(context).cardColor,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ((widget.from == "location" ||
-                      widget.from == "home_screen" ||
-                      widget.from == "bottom_sheet") &&
-                  !context.read<CityByLatLongProvider>().isDeliverable)
-              ? CustomTextLabel(
-                  jsonKey: "does_not_delivery_long_message",
-                  style: Theme.of(context).textTheme.bodySmall!.apply(
-                        color: ColorsRes.appColorRed,
-                      ),
-                )
-              : const SizedBox.shrink(),
-          Column(
-            children: [
-              Padding(
-                padding:
-                    EdgeInsetsDirectional.only(start: 20, end: 20, top: 20),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    defaultImg(
-                      image: "address_icon",
-                      iconColor: Theme.of(context).primaryColor,
-                      height: 25,
-                      width: 25,
+bool isLoading = false; // Add this in your State class
+
+Widget confirmBtnWidget() {
+  return Card(
+    color: Theme.of(context).cardColor,
+    surfaceTintColor: Theme.of(context).cardColor,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ((widget.from == "location" ||
+                    widget.from == "home_screen" ||
+                    widget.from == "bottom_sheet") &&
+                !context.read<CityByLatLongProvider>().isDeliverable)
+            ? CustomTextLabel(
+                jsonKey: "does_not_delivery_long_message",
+                style: Theme.of(context).textTheme.bodySmall!.apply(
+                      color: ColorsRes.appColorRed,
                     ),
-                    getSizedBox(
-                      width: 20,
+              )
+            : const SizedBox.shrink(),
+        Column(
+          children: [
+            Padding(
+              padding: const EdgeInsetsDirectional.only(
+                  start: 20, end: 20, top: 20),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  defaultImg(
+                    image: "address_icon",
+                    iconColor: Theme.of(context).primaryColor,
+                    height: 25,
+                    width: 25,
+                  ),
+                  getSizedBox(width: 20),
+                  Expanded(
+                    child: CustomTextLabel(
+                      text: Constant.cityAddressMap["address"] ?? "",
                     ),
-                    Expanded(
-                      child: CustomTextLabel(
-                        text: Constant.cityAddressMap["address"] ?? "",
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              if (((widget.from == "location" ||
+            ),
+            if (isLoading)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: CircularProgressIndicator(),
+              )
+            else if (((widget.from == "location" ||
+                        widget.from == "home_screen" ||
+                        widget.from == "bottom_sheet") &&
+                    context.read<CityByLatLongProvider>().isDeliverable) ||
+                widget.from == "address")
+              ConfirmButtonWidget(
+                voidCallback: () async {
+                  if (mapLoading.value == true) {
+                    return;
+                  }
+                  setState(() {
+                    isLoading = true;
+                  });
+
+                  Constant.session.setData(SessionManager.keyLongitude,
+                      kMapCenter.longitude.toString(), false);
+                  Constant.session.setData(SessionManager.keyLatitude,
+                      kMapCenter.latitude.toString(), false);
+                  Constant.session.setBoolData(
+                      SessionManager.isFetched, true, false);
+
+                  if ((widget.from == "location" ||
                           widget.from == "home_screen" ||
                           widget.from == "bottom_sheet") &&
-                      context.read<CityByLatLongProvider>().isDeliverable) ||
-                  widget.from == "address")
-                ConfirmButtonWidget(
-                  voidCallback: () {
-                    if (mapLoading.value == true) {
-                      return;
-                    }
-                    Constant.session.setData(SessionManager.keyLongitude,
-                        kMapCenter.longitude.toString(), false);
-                    Constant.session.setData(SessionManager.keyLatitude,
-                        kMapCenter.latitude.toString(), false);
-                    Constant.session
-                        .setBoolData(SessionManager.isFetched, true, false);
-                    if ((widget.from == "location" ||
-                            widget.from == "home_screen" ||
-                            widget.from == "bottom_sheet") &&
-                        context.read<CityByLatLongProvider>().isDeliverable) {
-                      context
-                          .read<CartListProvider>()
-                          .getAllCartItems(context: context);
-                      Constant.session.setData(SessionManager.keyAddress,
-                          Constant.cityAddressMap["address"], true);
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        mainHomeScreen,
-                        (Route<dynamic> route) => false,
-                      );
-                    } else if (widget.from == "address") {
-                      Future.delayed(const Duration(milliseconds: 500)).then(
-                        (value) {
-                          Navigator.pop(context, true);
-                        },
-                      );
-                    }
-                  },
-                )
-            ],
-          )
-        ],
-      ),
-    );
-  }
+                      context.read<CityByLatLongProvider>().isDeliverable) {
+                    await context
+                        .read<CartListProvider>()
+                        .getAllCartItems(context: context);
+                    Constant.session.setData(SessionManager.keyAddress,
+                        Constant.cityAddressMap["address"], true);
+
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      mainHomeScreen,
+                      (Route<dynamic> route) => false,
+                    );
+                  } else if (widget.from == "address") {
+                    await Future.delayed(const Duration(milliseconds: 500));
+                    Navigator.pop(context, true);
+                  }
+
+                  setState(() {
+                    isLoading = false;
+                  });
+                },
+              )
+          ],
+        )
+      ],
+    ),
+  );
+}
+
 
   @override
   Future<void> didChangeDependencies() async {

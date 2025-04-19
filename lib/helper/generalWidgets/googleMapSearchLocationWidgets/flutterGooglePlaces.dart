@@ -83,7 +83,7 @@ class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
   @override
   Widget build(BuildContext context) {
     final header = Container(
-      height: 40,
+      height: 50,
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
@@ -93,7 +93,7 @@ class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
         ),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           IconButton(
             color: Theme.of(context).brightness == Brightness.light
@@ -145,7 +145,7 @@ class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
         children: <Widget>[
           header,
           Padding(
-            padding: const EdgeInsets.only(top: 48.0),
+            padding: const EdgeInsets.only(top: 60.0),
             child: body,
           ),
         ],
@@ -164,24 +164,33 @@ class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
   Widget _textField(BuildContext context) => TextField(
         controller: _queryTextController,
         autofocus: true,
-        style: widget.textStyle,
+        style:
+            widget.textStyle ?? TextStyle(fontSize: 16), // fallback font size
         decoration: InputDecoration(
-            suffixIcon: _queryTextController!.length != 0
-                ? IconButton(
-                    onPressed: () {
-                      _queryTextController!.clear();
-                    },
-                    icon: Icon(
-                      Icons.clear_rounded,
-                      color: ColorsRes.mainTextColor,
-                    ))
-                : null,
-            border: InputBorder.none,
-            contentPadding: EdgeInsets.only(
-              bottom: 10,
-            ),
-            hintText: widget.hint,
-            hintStyle: TextStyle(color: Theme.of(context).hintColor)),
+          isCollapsed: false,
+          isDense: true,
+          suffixIcon: _queryTextController!.text.isNotEmpty
+              ? IconButton(
+                  onPressed: () {
+                    _queryTextController!.clear();
+                  },
+                  icon: Icon(
+                    Icons.clear_rounded,
+                    color: ColorsRes.mainTextColor,
+                  ),
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 12,
+            horizontal: 0,
+          ),
+          hintText: widget.hint,
+          hintStyle: TextStyle(
+            color: Theme.of(context).hintColor,
+            fontSize: 16,
+          ),
+        ),
       );
 }
 
