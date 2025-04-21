@@ -11,7 +11,7 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-
+       await LocalAwesomeNotification.setupFirebaseMessaging();
     await FirebaseMessaging.instance.setAutoInitEnabled(true);
   } catch (_) {}
 
@@ -24,73 +24,51 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<DeepLinkProvider>(
-          create: (context) => DeepLinkProvider(),
-        ),
+            create: (context) => DeepLinkProvider()),
         ChangeNotifierProvider<CartProvider>(
-          create: (context) => CartProvider(),
-        ),
+            create: (context) => CartProvider()),
         ChangeNotifierProvider<HomeMainScreenProvider>(
-          create: (context) => HomeMainScreenProvider(),
-        ),
+            create: (context) => HomeMainScreenProvider()),
         ChangeNotifierProvider<CategoryListProvider>(
-          create: (context) => CategoryListProvider(),
-        ),
+            create: (context) => CategoryListProvider()),
         ChangeNotifierProvider<CityByLatLongProvider>(
-          create: (context) => CityByLatLongProvider(),
-        ),
+            create: (context) => CityByLatLongProvider()),
         ChangeNotifierProvider<SelectedVariantItemProvider>(
-          create: (context) => SelectedVariantItemProvider(),
-        ),
+            create: (context) => SelectedVariantItemProvider()),
         ChangeNotifierProvider<RatingListProvider>(
-          create: (context) => RatingListProvider(),
-        ),
+            create: (context) => RatingListProvider()),
         ChangeNotifierProvider<ProductSearchProvider>(
-          create: (context) => ProductSearchProvider(),
-        ),
+            create: (context) => ProductSearchProvider()),
         ChangeNotifierProvider<HomeScreenProvider>(
-          create: (context) => HomeScreenProvider(),
-        ),
+            create: (context) => HomeScreenProvider()),
         ChangeNotifierProvider<ProductChangeListingTypeProvider>(
-          create: (context) => ProductChangeListingTypeProvider(),
-        ),
+            create: (context) => ProductChangeListingTypeProvider()),
         ChangeNotifierProvider<FaqProvider>(
-          create: (context) => FaqProvider(),
-        ),
+            create: (context) => FaqProvider()),
         ChangeNotifierProvider<ProductWishListProvider>(
-          create: (context) => ProductWishListProvider(),
-        ),
+            create: (context) => ProductWishListProvider()),
         ChangeNotifierProvider<ProductAddOrRemoveFavoriteProvider>(
-          create: (context) => ProductAddOrRemoveFavoriteProvider(),
-        ),
+            create: (context) => ProductAddOrRemoveFavoriteProvider()),
         ChangeNotifierProvider<UserProfileProvider>(
-          create: (context) => UserProfileProvider(),
-        ),
+            create: (context) => UserProfileProvider()),
         ChangeNotifierProvider<CartListProvider>(
-          create: (context) => CartListProvider(),
-        ),
+            create: (context) => CartListProvider()),
         ChangeNotifierProvider<LanguageProvider>(
-          create: (context) => LanguageProvider(),
-        ),
+            create: (context) => LanguageProvider()),
         ChangeNotifierProvider<ThemeProvider>(
-          create: (context) => ThemeProvider(),
-        ),
+            create: (context) => ThemeProvider()),
         ChangeNotifierProvider<AppSettingsProvider>(
-          create: (context) => AppSettingsProvider(),
-        ),
+            create: (context) => AppSettingsProvider()),
         ChangeNotifierProvider<PromoCodeProvider>(
-          create: (context) => PromoCodeProvider(),
-        ),
+            create: (context) => PromoCodeProvider()),
         ChangeNotifierProvider<CheckoutProvider>(
-          create: (context) => CheckoutProvider(),
-        ),
+            create: (context) => CheckoutProvider()),
         ChangeNotifierProvider<AddressProvider>(
-          create: (context) => AddressProvider(),
-        ),
+            create: (context) => AddressProvider()),
         ChangeNotifierProvider<NotificationProvider>(
-          create: (context) => NotificationProvider(),
-        ),
+            create: (context) => NotificationProvider()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
@@ -111,10 +89,11 @@ class GlobalScrollBehavior extends ScrollBehavior {
 
 class MyAppState extends State<MyApp> {
   final LocalAwesomeNotification localNotification = LocalAwesomeNotification();
+
   @override
   void initState() {
     super.initState();
-    localNotification.init(context);
+    localNotification.init(context); // ✅ Correct placement
   }
 
   @override
@@ -134,19 +113,16 @@ class MyAppState extends State<MyApp> {
                 SessionManager.appThemeName, Constant.themeList[0], false);
             Constant.session.setBoolData(
                 SessionManager.isDarkTheme,
-                PlatformDispatcher.instance.platformBrightness ==
-                    Brightness.dark,
+                PlatformDispatcher.instance.platformBrightness == Brightness.dark,
                 false);
           }
 
-          // This callback is called every time the brightness changes from the device.
           PlatformDispatcher.instance.onPlatformBrightnessChanged = () {
             if (Constant.session.getData(SessionManager.appThemeName) ==
                 Constant.themeList[0]) {
               Constant.session.setBoolData(
                   SessionManager.isDarkTheme,
-                  PlatformDispatcher.instance.platformBrightness ==
-                      Brightness.dark,
+                  PlatformDispatcher.instance.platformBrightness == Brightness.dark,
                   true);
             }
           };
@@ -189,11 +165,11 @@ class MyAppState extends State<MyApp> {
                       behavior: GlobalScrollBehavior(),
                       child: Center(
                         child: Directionality(
-                          textDirection: languageProvider.languageDirection
-                                      .toLowerCase() ==
-                                  "rtl"
-                              ? TextDirection.rtl
-                              : TextDirection.ltr,
+                          textDirection:
+                              languageProvider.languageDirection.toLowerCase() ==
+                                      "rtl"
+                                  ? TextDirection.rtl
+                                  : TextDirection.ltr,
                           child: child!,
                         ),
                       ),

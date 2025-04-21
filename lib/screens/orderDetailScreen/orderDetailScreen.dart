@@ -371,7 +371,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                                     .currency,
                                                 style: TextStyle(
                                                     color:
-                                                        ColorsRes.appColorBlack,
+                                                        ColorsRes.mainTextColor,
                                                     fontWeight:
                                                         FontWeight.w600),
                                               ),

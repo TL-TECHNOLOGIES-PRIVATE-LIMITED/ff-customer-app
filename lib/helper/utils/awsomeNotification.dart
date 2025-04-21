@@ -3,64 +3,47 @@
 import 'package:project/helper/utils/generalImports.dart';
 
 class LocalAwesomeNotification {
-  AwesomeNotifications? notification = AwesomeNotifications();
-  static FirebaseMessaging? messagingInstance = FirebaseMessaging.instance;
-
-  static LocalAwesomeNotification? localNotification =
-      LocalAwesomeNotification();
-
-  // static late StreamSubscription<RemoteMessage>? foregroundStream;
+  static final AwesomeNotifications notification = AwesomeNotifications();
+  static final FirebaseMessaging messagingInstance = FirebaseMessaging.instance;
   static late StreamSubscription<RemoteMessage>? onMessageOpen;
 
+  // Ensure main initializes Firebase Messaging
+  static Future<void> setupFirebaseMessaging() async {
+    // Register the background handler at the app level
+    FirebaseMessaging.onBackgroundMessage(_backgroundMessageHandler);
+    
+    // Set foreground notification presentation options
+    await messagingInstance.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    
+    // Get FCM token and store it if needed
+    String? token = await messagingInstance.getToken();
+    if (token != null) {
+      print("FCM Token: $token");
+      // Store token in your backend if needed
+    }
+    
+    // Listen for token refresh
+    FirebaseMessaging.instance.onTokenRefresh.listen((token) {
+      print("FCM Token refreshed: $token");
+      // Update token in your backend if needed
+    });
+  }
+
   Future<void> init(BuildContext context) async {
-    if (notification != null &&
-        messagingInstance != null &&
-        localNotification != null) {
-      disposeListeners().then((value) async {
-        await requestPermission(context: context);
-        notification = AwesomeNotifications();
-        messagingInstance = FirebaseMessaging.instance;
-        localNotification = LocalAwesomeNotification();
-
-        await registerListeners(context);
-
-        await listenTap(context);
-
-        await notification?.initialize(
-          // 'resource://drawable/ic_launcher',
-          null,
-          [
-            NotificationChannel(
-              channelKey: Constant.notificationChannel,
-              channelName: 'Basic notifications',
-              channelDescription: 'Notification channel',
-              playSound: true,
-              enableVibration: true,
-              importance: NotificationImportance.High,
-              ledColor: ColorsRes.appColor,
-            )
-          ],
-          channelGroups: [
-            NotificationChannelGroup(
-              channelGroupKey: "Basic notifications",
-              channelGroupName: 'Basic notifications',
-            )
-          ],
-          debug: kDebugMode,
-        );
-      });
-    } else {
+    try {
+      // Dispose any existing listeners to prevent duplicates
+      await disposeListeners();
+      
+      // Request notification permissions
       await requestPermission(context: context);
-      notification = AwesomeNotifications();
-      messagingInstance = FirebaseMessaging.instance;
-      localNotification = LocalAwesomeNotification();
-      await registerListeners(context);
-
-      await listenTap(context);
-
-      await notification?.initialize(
-        // 'resource://drawable/ic_launcher',
-        null,
+      
+      // Initialize AwesomeNotifications
+      await notification.initialize(
+        null, // 'resource://drawable/ic_launcher',
         [
           NotificationChannel(
             channelKey: Constant.notificationChannel,
@@ -74,72 +57,87 @@ class LocalAwesomeNotification {
         ],
         channelGroups: [
           NotificationChannelGroup(
-              channelGroupKey: "Basic notifications",
-              channelGroupName: 'Basic notifications')
+            channelGroupKey: "Basic notifications",
+            channelGroupName: 'Basic notifications',
+          )
         ],
         debug: kDebugMode,
       );
+      
+      // Set up notification listeners
+      await listenTap(context);
+      
+      // Register Firebase listeners
+      await registerListeners(context);
+      
+      // Check for initial notification if app was opened from terminated state
+      await terminatedStateNotificationHandler();
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint("Notification initialization ERROR: ${e.toString()}");
+      }
     }
   }
 
   @pragma('vm:entry-point')
   listenTap(BuildContext context) {
     try {
-      notification?.setListeners(
-          onDismissActionReceivedMethod: (receivedAction) async {},
-          onNotificationDisplayedMethod: (receivedNotification) async {},
-          onNotificationCreatedMethod: (receivedNotification) async {},
-          onActionReceivedMethod: (ReceivedAction data) async {
-            String notificationTypeId = data.payload!["id"].toString();
-            String notificationType = data.payload!["type"].toString();
+      notification.setListeners(
+        onDismissActionReceivedMethod: (receivedAction) async {},
+        onNotificationDisplayedMethod: (receivedNotification) async {},
+        onNotificationCreatedMethod: (receivedNotification) async {},
+        onActionReceivedMethod: (ReceivedAction data) async {
+          String notificationTypeId = data.payload!["id"].toString();
+          String notificationType = data.payload!["type"].toString();
 
-            Future.delayed(
-              Duration.zero,
-              () {
-                if (notificationType == "default" ||
-                    notificationType == "user") {
-                  if (currentRoute != notificationListScreen) {
-                    Navigator.pushNamed(
-                      Constant.navigatorKay.currentContext!,
-                      notificationListScreen,
-                    );
-                  }
-                } else if (notificationType == "category") {
+          Future.delayed(
+            Duration.zero,
+            () {
+              if (notificationType == "default" ||
+                  notificationType == "user") {
+                if (currentRoute != notificationListScreen) {
                   Navigator.pushNamed(
                     Constant.navigatorKay.currentContext!,
-                    productListScreen,
-                    arguments: [
-                      "category",
-                      notificationTypeId.toString(),
-                      getTranslatedValue(
-                          Constant.navigatorKay.currentContext!, "app_name")
-                    ],
-                  );
-                } else if (notificationType == "product") {
-                  Navigator.pushNamed(
-                    Constant.navigatorKay.currentContext!,
-                    productDetailScreen,
-                    arguments: [
-                      notificationTypeId.toString(),
-                      getTranslatedValue(
-                          Constant.navigatorKay.currentContext!, "app_name"),
-                      null
-                    ],
-                  );
-                } else if (notificationType == "url") {
-                  launchUrl(
-                    Uri.parse(
-                      notificationTypeId.toString(),
-                    ),
-                    mode: LaunchMode.externalApplication,
+                    notificationListScreen,
                   );
                 }
-              },
-            );
-          });
+              } else if (notificationType == "category") {
+                Navigator.pushNamed(
+                  Constant.navigatorKay.currentContext!,
+                  productListScreen,
+                  arguments: [
+                    "category",
+                    notificationTypeId.toString(),
+                    getTranslatedValue(
+                        Constant.navigatorKay.currentContext!, "app_name")
+                  ],
+                );
+              } else if (notificationType == "product") {
+                Navigator.pushNamed(
+                  Constant.navigatorKay.currentContext!,
+                  productDetailScreen,
+                  arguments: [
+                    notificationTypeId.toString(),
+                    getTranslatedValue(
+                        Constant.navigatorKay.currentContext!, "app_name"),
+                    null
+                  ],
+                );
+              } else if (notificationType == "url") {
+                launchUrl(
+                  Uri.parse(
+                    notificationTypeId.toString(),
+                  ),
+                  mode: LaunchMode.externalApplication,
+                );
+              }
+            },
+          );
+        },
+      );
     } catch (e) {
       if (kDebugMode) {
-        debugPrint("ERROR IS ${e.toString()}");
+        debugPrint("ERROR IN LISTEN TAP: ${e.toString()}");
       }
     }
   }
@@ -154,9 +152,9 @@ class LocalAwesomeNotification {
           .setIntData(SessionManager.notificationTotalCount, currentCount + 1);
       print(
           'new notification image value is -----------------> ${Constant.session.getIntData(SessionManager.notificationTotalCount)}');
-             notificationCount.value = currentCount + 1;
+      notificationCount.value = currentCount + 1;
       print('count is --------image notification count----> ${notificationCount.value}');
-      await notification?.createNotification(
+      await notification.createNotification(
         content: NotificationContent(
           id: Random().nextInt(5000),
           color: ColorsRes.appColor,
@@ -175,7 +173,7 @@ class LocalAwesomeNotification {
       );
     } catch (e) {
       if (kDebugMode) {
-        debugPrint("ERROR IS ${e.toString()}");
+        debugPrint("ERROR IN CREATE IMAGE NOTIFICATION: ${e.toString()}");
       }
     }
   }
@@ -192,7 +190,7 @@ class LocalAwesomeNotification {
           'new notification value is -----------------> ${Constant.session.getIntData(SessionManager.notificationTotalCount)}');
       notificationCount.value = currentCount + 1;
       print('count is ------------> ${notificationCount.value}');
-      await notification?.createNotification(
+      await notification.createNotification(
         content: NotificationContent(
           id: Random().nextInt(5000),
           color: ColorsRes.appColor,
@@ -209,7 +207,7 @@ class LocalAwesomeNotification {
       );
     } catch (e) {
       if (kDebugMode) {
-        debugPrint("ERROR IS ${e.toString()}");
+        debugPrint("ERROR IN CREATE NOTIFICATION: ${e.toString()}");
       }
     }
   }
@@ -240,7 +238,7 @@ class LocalAwesomeNotification {
           );
         }
       } else if (notificationPermissionStatus.isDenied) {
-        await messagingInstance?.requestPermission(
+        await messagingInstance.requestPermission(
           alert: true,
           announcement: false,
           badge: true,
@@ -254,97 +252,166 @@ class LocalAwesomeNotification {
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint("ERROR IS ${e.toString()}");
+        debugPrint("ERROR IN REQUEST PERMISSION: ${e.toString()}");
       }
     }
   }
 
+  // This MUST be a top-level function, NOT a class method
   @pragma('vm:entry-point')
-  static Future<void> onBackgroundMessageHandler(RemoteMessage data) async {
+  static Future<void> _backgroundMessageHandler(RemoteMessage message) async {
     try {
-      debugPrint("background notification handler invoked.");
-
+      print("Background message received: ${message.data}");
+      
       if (Platform.isAndroid) {
-        if (data.data["image"] == "" || data.data["image"] == null) {
-          localNotification?.createNotification(isLocked: false, data: data);
+        if (message.data["image"] == "" || message.data["image"] == null) {
+          await _showDefaultNotification(message);
         } else {
-          localNotification?.createImageNotification(
-              isLocked: false, data: data);
+          await _showImageNotification(message);
         }
       }
     } catch (e) {
-      if (kDebugMode) {
-        debugPrint("ISSUE ${e.toString()}");
-      }
+      print("Error in background handler: ${e.toString()}");
     }
   }
+  
+  // Helper methods for background handler
+  static Future<void> _showDefaultNotification(RemoteMessage message) async {
+    await notification.createNotification(
+      content: NotificationContent(
+        id: Random().nextInt(5000),
+        color: ColorsRes.appColor,
+        title: message.data["title"],
+        locked: false,
+        payload: Map.from(message.data),
+        autoDismissible: true,
+        showWhen: true,
+        notificationLayout: NotificationLayout.Default,
+        body: message.data["message"],
+        wakeUpScreen: true,
+        channelKey: Constant.notificationChannel,
+      ),
+    );
+  }
+  
+  static Future<void> _showImageNotification(RemoteMessage message) async {
+    await notification.createNotification(
+      content: NotificationContent(
+        id: Random().nextInt(5000),
+        color: ColorsRes.appColor,
+        title: message.data["title"],
+        locked: false,
+        payload: Map.from(message.data),
+        autoDismissible: true,
+        showWhen: true,
+        notificationLayout: NotificationLayout.BigPicture,
+        body: message.data["message"],
+        wakeUpScreen: true,
+        largeIcon: message.data["image"],
+        bigPicture: message.data["image"],
+        channelKey: Constant.notificationChannel,
+      ),
+    );
+  }
 
-  @pragma('vm:entry-point')
-  static foregroundNotificationHandler() async {
+  // Handle foreground messages
+  static Future<void> foregroundNotificationHandler() async {
     try {
-      onMessageOpen =
-          FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        debugPrint("Foreground notification handler invoked.");
-
+      onMessageOpen = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        print("Foreground message received: ${message.data}");
+        
         if (Platform.isAndroid) {
+          LocalAwesomeNotification localNotification = LocalAwesomeNotification();
           if (message.data["image"] == "" || message.data["image"] == null) {
-            localNotification?.createNotification(
-                isLocked: false, data: message);
+            localNotification.createNotification(isLocked: false, data: message);
           } else {
-            localNotification?.createImageNotification(
-                isLocked: false, data: message);
+            localNotification.createImageNotification(isLocked: false, data: message);
           }
         }
       });
     } catch (e) {
       if (kDebugMode) {
-        debugPrint("ISSUE ${e.toString()}");
+        debugPrint("FOREGROUND HANDLER ERROR: ${e.toString()}");
       }
     }
   }
 
-  @pragma('vm:entry-point')
-  static terminatedStateNotificationHandler() {
-    messagingInstance?.getInitialMessage().then(
-      (RemoteMessage? message) {
-        if (message == null) {
-          return;
-        }
-
-        if (message.data["image"] == "" || message.data["image"] == null) {
-          localNotification?.createNotification(isLocked: false, data: message);
-        } else {
-          localNotification?.createImageNotification(
-              isLocked: false, data: message);
-        }
-      },
-    );
-  }
-
-  @pragma('vm:entry-point')
-  static registerListeners(context) async {
+  // Handle notifications when app was terminated
+  static Future<void> terminatedStateNotificationHandler() async {
     try {
-      print('hey budhuuuu');
-      FirebaseMessaging.onBackgroundMessage(onBackgroundMessageHandler);
-      messagingInstance?.setForegroundNotificationPresentationOptions(
-          alert: true, badge: true, sound: true);
-      await foregroundNotificationHandler();
-      await terminatedStateNotificationHandler();
+      RemoteMessage? message = await messagingInstance.getInitialMessage();
+      if (message != null) {
+        print("App opened from terminated state with notification: ${message.data}");
+        
+        LocalAwesomeNotification localNotification = LocalAwesomeNotification();
+        if (message.data["image"] == "" || message.data["image"] == null) {
+          localNotification.createNotification(isLocked: false, data: message);
+        } else {
+          localNotification.createImageNotification(isLocked: false, data: message);
+        }
+      }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint("ERROR IS ${e.toString()}");
+        debugPrint("TERMINATED STATE HANDLER ERROR: ${e.toString()}");
       }
     }
   }
 
-  @pragma('vm:entry-point')
-  Future disposeListeners() async {
+  static Future<void> registerListeners(BuildContext context) async {
+    try {
+      await foregroundNotificationHandler();
+      
+      // Handle when app is in background but not terminated
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        print("onMessageOpenedApp: ${message.data}");
+        
+        String notificationType = message.data["type"]?.toString() ?? "default";
+        String notificationTypeId = message.data["id"]?.toString() ?? "";
+        
+        if (notificationType == "default" || notificationType == "user") {
+          if (currentRoute != notificationListScreen) {
+            Navigator.pushNamed(context, notificationListScreen);
+          }
+        } else if (notificationType == "category") {
+          Navigator.pushNamed(
+            context,
+            productListScreen,
+            arguments: [
+              "category",
+              notificationTypeId,
+              getTranslatedValue(context, "app_name")
+            ],
+          );
+        } else if (notificationType == "product") {
+          Navigator.pushNamed(
+            context,
+            productDetailScreen,
+            arguments: [
+              notificationTypeId,
+              getTranslatedValue(context, "app_name"),
+              null
+            ],
+          );
+        } else if (notificationType == "url") {
+          launchUrl(
+            Uri.parse(notificationTypeId),
+            mode: LaunchMode.externalApplication,
+          );
+        }
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint("REGISTER LISTENERS ERROR: ${e.toString()}");
+      }
+    }
+  }
+
+  Future<void> disposeListeners() async {
     try {
       onMessageOpen?.cancel();
-      // foregroundStream?.cancel();
     } catch (e) {
       if (kDebugMode) {
-        debugPrint("ERROR IS ${e.toString()}");
+        debugPrint("DISPOSE LISTENERS ERROR: ${e.toString()}");
       }
     }
   }
