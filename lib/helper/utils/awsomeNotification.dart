@@ -189,38 +189,52 @@ class LocalAwesomeNotification {
     }
   }
 
-  @pragma('vm:entry-point')
-  createNotification(
-      {required RemoteMessage data, required bool isLocked}) async {
-    try {
-      debugPrint("Creating notification...");
-      int currentCount =
-          Constant.session.getIntData(SessionManager.notificationTotalCount);
-      Constant.session
-          .setIntData(SessionManager.notificationTotalCount, currentCount + 1);
-      debugPrint(
-          'New notification value is -----------------> ${Constant.session.getIntData(SessionManager.notificationTotalCount)}');
+@pragma('vm:entry-point')
+createNotification({
+  required RemoteMessage data,
+  required bool isLocked,
+}) async {
+  try {
+    debugPrint("Creating notification...");
+
+    int currentCount =
+        Constant.session.getIntData(SessionManager.notificationTotalCount);
+    Constant.session
+        .setIntData(SessionManager.notificationTotalCount, currentCount + 1);
+    notificationCount.value = currentCount + 1;
+ print(
+          'New notification image value is -----------------> ${Constant.session.getIntData(SessionManager.notificationTotalCount)}');
       notificationCount.value = currentCount + 1;
-      debugPrint('Notification count is ------------> ${notificationCount.value}');
-      await notification?.createNotification(
-        content: NotificationContent(
-          id: Random().nextInt(5000),
-          color: ColorsRes.appColor,
-          title: data.data["title"],
-          locked: isLocked,
-          payload: Map.from(data.data),
-          autoDismissible: true,
-          showWhen: true,
-          notificationLayout: NotificationLayout.Default,
-          body: data.data["message"],
-          wakeUpScreen: true,
-          channelKey: Constant.notificationChannel,
-        ),
+      print('Image notification count is --------> ${notificationCount.value}');
+    Map<String, String> payload = {};
+    try {
+      payload = Map<String, String>.from(
+        data.data.map((key, value) => MapEntry(key, value.toString())),
       );
     } catch (e) {
-      debugPrint("Error in createNotification: ${e.toString()}");
+      debugPrint("Payload conversion error: $e");
     }
+
+    await notification?.createNotification(
+      content: NotificationContent(
+        id: Random().nextInt(5000),
+        color: ColorsRes.appColor,
+        title: data.data["title"]?.toString() ?? 'New Notification',
+        locked: isLocked,
+        payload: payload,
+        autoDismissible: true,
+        showWhen: true,
+        notificationLayout: NotificationLayout.Default,
+        body: data.data["message"]?.toString() ?? '',
+        wakeUpScreen: true,
+        channelKey: Constant.notificationChannel,
+      ),
+    );
+  } catch (e, stack) {
+    debugPrint("CreateNotification error: $e\n$stack");
   }
+}
+
 
   @pragma('vm:entry-point')
   requestPermission({required BuildContext context}) async {

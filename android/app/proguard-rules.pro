@@ -9,6 +9,10 @@
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;
 }
+# AwesomeNotifications
+-keep class me.carda.awesome_notifications.** { *; }
+-keep class me.carda.awesome_notifications.core.exceptions.** { *; }
+-keep class me.carda.awesome_notifications.firebase.** { *; }
 
 -keepattributes JavascriptInterface
 -keepattributes *Annotation*

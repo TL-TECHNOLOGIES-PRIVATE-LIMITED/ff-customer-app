@@ -110,6 +110,13 @@
                 android:name="com.google.firebase.messaging.default_notification_icon"
                 android:resource="@mipmap/ic_launcher" />
         </activity>
+   <!-- <service
+    android:name="me.carda.awesome_notifications.firebase.AwesomeFirebaseMessagingService"
+    android:exported="true">
+    <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+    </intent-filter>
+</service> -->
 
         <!-- file Image Cropper Activity-->
         <activity
