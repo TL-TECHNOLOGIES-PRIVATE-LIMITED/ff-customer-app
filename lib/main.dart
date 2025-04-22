@@ -11,7 +11,7 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-       await LocalAwesomeNotification.setupFirebaseMessaging();
+     
     await FirebaseMessaging.instance.setAutoInitEnabled(true);
   } catch (_) {}
 

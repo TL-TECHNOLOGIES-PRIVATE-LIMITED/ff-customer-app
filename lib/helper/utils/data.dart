@@ -50,7 +50,7 @@ class LocalAwesomeNotification {
           ],
           debug: kDebugMode,
         );
-      } else { 
+      } else {
         debugPrint("One or more instances are null, requesting permission...");
         await requestPermission(context: context);
         notification = AwesomeNotifications();
