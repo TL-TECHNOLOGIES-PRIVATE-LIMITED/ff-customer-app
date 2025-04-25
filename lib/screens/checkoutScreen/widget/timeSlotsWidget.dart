@@ -408,15 +408,46 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
           int.parse(timeSlotsData?.estimateDeliveryDays.toString() ?? "0") - 1;
       DateTime dateTime = DateTime.now().add(Duration(days: daysStartFrom));
 
-      // Check if today's slots are finished
+      // Check if all today's slots are finished using new 10-minute buffer logic
+      var now = DateTime.now();
       bool areAllSlotsFinished = timeSlotsData?.timeSlots.every((slot) {
-            var now = DateTime.now();
-            String time = slot.lastOrderTime.toString();
-            DateTime slotTime = now.copyWith(
-                hour: int.parse(time.split(":")[0]),
-                minute: int.parse(time.split(":")[1]),
-                second: int.parse(time.split(":")[2]));
-            return now.isAfter(slotTime);
+            // Extract end time from title (assuming format like "8 am to 10 am")
+            String title = slot.title ?? "";
+            List<String> parts = title.split(" to ");
+            if (parts.length >= 2) {
+              String endTimeStr = parts[1].trim();
+
+              // Parse the end time
+              int endHour = 0;
+              if (endTimeStr.contains("am")) {
+                endHour = int.parse(endTimeStr.split(" ")[0]);
+              } else if (endTimeStr.contains("pm")) {
+                endHour = int.parse(endTimeStr.split(" ")[0]);
+                if (endHour != 12) {
+                  endHour += 12; // Convert to 24-hour format
+                }
+              }
+
+              // Create DateTime for the end time minus 10 minutes
+              DateTime cutoffTime = now
+                  .copyWith(
+                    hour: endHour,
+                    minute: 0,
+                    second: 0,
+                  )
+                  .subtract(const Duration(minutes: 10));
+
+              // Check if current time is after the cutoff time
+              return now.isAfter(cutoffTime);
+            } else {
+              // Fallback to original logic
+              String time = slot.lastOrderTime.toString();
+              DateTime slotTime = now.copyWith(
+                  hour: int.parse(time.split(":")[0]),
+                  minute: int.parse(time.split(":")[1]),
+                  second: int.parse(time.split(":")[2]));
+              return now.isAfter(slotTime);
+            }
           }) ??
           false;
 
@@ -439,15 +470,48 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
       // Automatically select the first available slot for today
       if (!areAllSlotsFinished) {
         for (int i = 0; i < timeSlotsData!.timeSlots.length; i++) {
-          var now = DateTime.now();
-          String time = timeSlotsData.timeSlots[i].lastOrderTime.toString();
-          DateTime slotTime = now.copyWith(
-            hour: int.parse(time.split(":")[0]),
-            minute: int.parse(time.split(":")[1]),
-            second: int.parse(time.split(":")[2]),
-          );
+          // Extract end time from title
+          String title = timeSlotsData.timeSlots[i].title ?? "";
+          List<String> parts = title.split(" to ");
+          bool slotAvailable = false;
 
-          if (now.isBefore(slotTime)) {
+          if (parts.length >= 2) {
+            String endTimeStr = parts[1].trim();
+
+            // Parse the end time
+            int endHour = 0;
+            if (endTimeStr.contains("am")) {
+              endHour = int.parse(endTimeStr.split(" ")[0]);
+            } else if (endTimeStr.contains("pm")) {
+              endHour = int.parse(endTimeStr.split(" ")[0]);
+              if (endHour != 12) {
+                endHour += 12; // Convert to 24-hour format
+              }
+            }
+
+            // Create DateTime for the end time minus 10 minutes
+            DateTime cutoffTime = now
+                .copyWith(
+                  hour: endHour,
+                  minute: 0,
+                  second: 0,
+                )
+                .subtract(const Duration(minutes: 10));
+
+            // Check if current time is before the cutoff time
+            slotAvailable = now.isBefore(cutoffTime);
+          } else {
+            // Fallback to original logic
+            String time = timeSlotsData.timeSlots[i].lastOrderTime.toString();
+            DateTime slotTime = now.copyWith(
+              hour: int.parse(time.split(":")[0]),
+              minute: int.parse(time.split(":")[1]),
+              second: int.parse(time.split(":")[2]),
+            );
+            slotAvailable = now.isBefore(slotTime);
+          }
+
+          if (slotAvailable) {
             checkoutProvider.setSelectedTime(i); // Select this time slot
             break; // Exit the loop once the first available slot is found
           }
@@ -512,16 +576,46 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
         int.parse(timeSlotsData.estimateDeliveryDays.toString() ?? "0") - 1;
     DateTime dateTime = DateTime.now().add(Duration(days: daysStartFrom));
 
-    // Check if today's slots are finished
+    // Check if today's slots are finished using the 10-minute buffer logic
     bool areAllSlotsFinished = timeSlotsData.timeSlots.every((slot) {
       var now = DateTime.now();
-      String time = slot.lastOrderTime.toString();
-      DateTime slotTime = now.copyWith(
-        hour: int.parse(time.split(":")[0]),
-        minute: int.parse(time.split(":")[1]),
-        second: int.parse(time.split(":")[2]),
-      );
-      return now.isAfter(slotTime);
+
+      // Extract end time from title
+      String title = slot.title ?? "";
+      List<String> parts = title.split(" to ");
+      if (parts.length >= 2) {
+        String endTimeStr = parts[1].trim();
+
+        // Parse the end time
+        int endHour = 0;
+        if (endTimeStr.contains("am")) {
+          endHour = int.parse(endTimeStr.split(" ")[0]);
+        } else if (endTimeStr.contains("pm")) {
+          endHour = int.parse(endTimeStr.split(" ")[0]);
+          if (endHour != 12) {
+            endHour += 12; // Convert to 24-hour format
+          }
+        }
+
+        // Create DateTime for the end time minus 10 minutes
+        DateTime cutoffTime = now
+            .copyWith(
+              hour: endHour,
+              minute: 0,
+              second: 0,
+            )
+            .subtract(const Duration(minutes: 10));
+
+        return now.isAfter(cutoffTime);
+      } else {
+        // Fallback to original logic
+        String time = slot.lastOrderTime.toString();
+        DateTime slotTime = now.copyWith(
+            hour: int.parse(time.split(":")[0]),
+            minute: int.parse(time.split(":")[1]),
+            second: int.parse(time.split(":")[2]));
+        return now.isAfter(slotTime);
+      }
     });
 
     // Start index (skip today if all slots are finished)
@@ -546,30 +640,104 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
                   checkoutProvider.selectedDate =
                       "${currentDate.day}-${currentDate.month}-${currentDate.year}";
 
-                  for (int i = 0; i < timeSlotsData.timeSlots.length; i++) {
-                    var now = DateTime.now();
-                    String time =
-                        timeSlotsData.timeSlots[i].lastOrderTime.toString();
-                    DateTime slotTime = now.copyWith(
-                      hour: int.parse(time.split(":")[0]),
-                      minute: int.parse(time.split(":")[1]),
-                      second: int.parse(time.split(":")[2]),
-                    );
+                  // Find the current applicable time slot for today
+                  var now = DateTime.now();
+                  bool slotSelected = false;
 
-                    if (now.isBefore(slotTime)) {
-                      print('id is $i');
-                      checkoutProvider
-                          .setSelectedTime(i); // Select this time slot
-                      break; // Exit the loop once the first available slot is found
+                  // First pass: Find the time slot we're currently in
+                  for (int i = 0; i < timeSlotsData.timeSlots.length; i++) {
+                    String title = timeSlotsData.timeSlots[i].title ?? "";
+                    List<String> parts = title.split(" to ");
+
+                    if (parts.length >= 2) {
+                      // Extract start and end times
+                      String startTimeStr = parts[0].trim();
+                      String endTimeStr = parts[1].trim();
+
+                      // Parse start time
+                      int startHour = 0;
+                      if (startTimeStr.contains("am")) {
+                        startHour = int.parse(startTimeStr.split(" ")[0]);
+                      } else if (startTimeStr.contains("pm")) {
+                        startHour = int.parse(startTimeStr.split(" ")[0]);
+                        if (startHour != 12) {
+                          startHour += 12;
+                        }
+                      }
+
+                      // Parse end time
+                      int endHour = 0;
+                      if (endTimeStr.contains("am")) {
+                        endHour = int.parse(endTimeStr.split(" ")[0]);
+                      } else if (endTimeStr.contains("pm")) {
+                        endHour = int.parse(endTimeStr.split(" ")[0]);
+                        if (endHour != 12) {
+                          endHour += 12;
+                        }
+                      }
+
+                      // Check if current time is between start and end (minus 10 min buffer)
+                      DateTime startTime = now.copyWith(
+                        hour: startHour,
+                        minute: 0,
+                        second: 0,
+                      );
+
+                      DateTime endTime = now.copyWith(
+                        hour: endHour,
+                        minute: 0,
+                        second: 0,
+                      );
+
+                      DateTime cutoffTime =
+                          endTime.subtract(const Duration(minutes: 10));
+
+                      if (now.isAfter(startTime) && now.isBefore(cutoffTime)) {
+                        checkoutProvider.setSelectedTime(i);
+                        slotSelected = true;
+                        break;
+                      }
                     }
                   }
-                  print(
-                      'if condition is working || ${checkoutProvider.selectedTime}');
 
-                  print('it is today');
+                  // If no current slot found, find the next available slot
+                  if (!slotSelected) {
+                    for (int i = 0; i < timeSlotsData.timeSlots.length; i++) {
+                      String title = timeSlotsData.timeSlots[i].title ?? "";
+                      List<String> parts = title.split(" to ");
+
+                      if (parts.length >= 2) {
+                        String endTimeStr = parts[1].trim();
+
+                        // Parse end time
+                        int endHour = 0;
+                        if (endTimeStr.contains("am")) {
+                          endHour = int.parse(endTimeStr.split(" ")[0]);
+                        } else if (endTimeStr.contains("pm")) {
+                          endHour = int.parse(endTimeStr.split(" ")[0]);
+                          if (endHour != 12) {
+                            endHour += 12;
+                          }
+                        }
+
+                        // Create cutoff time
+                        DateTime cutoffTime = now
+                            .copyWith(
+                              hour: endHour,
+                              minute: 0,
+                              second: 0,
+                            )
+                            .subtract(const Duration(minutes: 10));
+
+                        if (now.isBefore(cutoffTime)) {
+                          checkoutProvider.setSelectedTime(i);
+                          break;
+                        }
+                      }
+                    }
+                  }
                 } else {
-                  print("It is not today");
-
+                  // For future dates, just reset the selected time
                   checkoutProvider.setSelectedTime(-1);
                   checkoutProvider.setSelectedDate(actualIndex);
                   checkoutProvider.selectedDate =
@@ -669,20 +837,59 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
                       "1" &&
                   checkoutProvider.selectedDateId == 0;
 
-          String time = checkoutProvider
-                  .timeSlotsData?.timeSlots[index].lastOrderTime
-                  .toString() ??
-              "";
+          // Get the time slot title to extract end time
+          String title =
+              checkoutProvider.timeSlotsData?.timeSlots[index].title ?? "";
 
-          DateTime dateTime = now.copyWith(
-              hour: int.parse(time.split(":")[0]),
-              minute: int.parse(time.split(":")[1]),
-              second: int.parse(time.split(":")[2]));
+          // Extract end time from title (assuming format like "8 am to 10 am")
+          // This is a simplified approach - you might need to adapt based on your actual title format
+          List<String> parts = title.split(" to ");
+          if (parts.length >= 2) {
+            String endTimeStr = parts[1].trim();
 
-          if (now.isAfter(dateTime)) {
-            isActive = !isToday;
+            // Parse the end time
+            int endHour = 0;
+            if (endTimeStr.contains("am")) {
+              endHour = int.parse(endTimeStr.split(" ")[0]);
+            } else if (endTimeStr.contains("pm")) {
+              endHour = int.parse(endTimeStr.split(" ")[0]);
+              if (endHour != 12) {
+                endHour += 12; // Convert to 24-hour format
+              }
+            }
+
+            // Create DateTime for the end time minus 10 minutes
+            DateTime cutoffTime = now
+                .copyWith(
+                  hour: endHour,
+                  minute: 0,
+                  second: 0,
+                )
+                .subtract(const Duration(minutes: 10));
+
+            // Check if current time is before the cutoff time
+            if (now.isBefore(cutoffTime) || !isToday) {
+              isActive = true;
+            } else {
+              isActive = false;
+            }
           } else {
-            isActive = true;
+            // Fallback to original logic if title format doesn't match expected
+            String time = checkoutProvider
+                    .timeSlotsData?.timeSlots[index].lastOrderTime
+                    .toString() ??
+                "";
+
+            DateTime dateTime = now.copyWith(
+                hour: int.parse(time.split(":")[0]),
+                minute: int.parse(time.split(":")[1]),
+                second: int.parse(time.split(":")[2]));
+
+            if (now.isAfter(dateTime)) {
+              isActive = !isToday;
+            } else {
+              isActive = true;
+            }
           }
 
           if (index == 0) {
@@ -714,9 +921,7 @@ class _GetTimeSlotsState extends State<GetTimeSlots> {
               child: Row(
                 children: [
                   CustomTextLabel(
-                    text: checkoutProvider
-                            .timeSlotsData?.timeSlots[index].title ??
-                        "",
+                    text: title,
                     style: TextStyle(
                       color: ColorsRes.mainTextColor,
                     ),
