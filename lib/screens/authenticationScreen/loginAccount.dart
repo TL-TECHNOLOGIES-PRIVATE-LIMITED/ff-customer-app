@@ -149,27 +149,35 @@ class _LoginAccountState extends State<LoginAccount> {
       child: Scaffold(
         body: Stack(
           children: [
-            Column(mainAxisAlignment: MainAxisAlignment.center,
+            ListView(
               children: [
-                Image.asset(
-                  filterQuality: FilterQuality.high,
-                  Constant.getAssetsPath(0, "logo.png"),
-                  height: 200,
-                ),
-                CustomTextLabel(
-                  text: "Bite into Premium",
-                  style: TextStyle(
-                    fontSize: 25,
-                    color: Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.75,
-                  ),
-                ),SizedBox(height: 40,),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    child: hasCodeSent ? otpWidgets() : loginWidgets(),
-                  ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      filterQuality: FilterQuality.high,
+                      Constant.getAssetsPath(0, "logo.png"),
+                      height: 200,
+                    ),
+                    CustomTextLabel(
+                      text: "Bite into Premium",
+                      style: TextStyle(
+                        fontSize: 25,
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.75,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 40,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        child: hasCodeSent ? otpWidgets() : loginWidgets(),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -231,9 +239,8 @@ class _LoginAccountState extends State<LoginAccount> {
   Widget loginWidgets() {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius:BorderRadius.circular(30)
-      ),
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(30)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -385,7 +392,8 @@ class _LoginAccountState extends State<LoginAccount> {
                   )}\t",
                   children: <TextSpan>[
                     TextSpan(
-                        text: getTranslatedValue(context, "terms_and_conditions"),
+                        text:
+                            getTranslatedValue(context, "terms_and_conditions"),
                         style: TextStyle(
                           color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.w500,
@@ -716,9 +724,8 @@ class _LoginAccountState extends State<LoginAccount> {
   otpWidgets() {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(30)
-      ),
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(30)),
       child: Padding(
         padding: EdgeInsetsDirectional.only(start: 20, end: 20, top: 20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

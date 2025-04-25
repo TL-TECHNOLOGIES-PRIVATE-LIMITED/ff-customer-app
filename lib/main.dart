@@ -11,7 +11,7 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-     
+
     await FirebaseMessaging.instance.setAutoInitEnabled(true);
   } catch (_) {}
 
@@ -43,8 +43,7 @@ Future<void> main() async {
             create: (context) => HomeScreenProvider()),
         ChangeNotifierProvider<ProductChangeListingTypeProvider>(
             create: (context) => ProductChangeListingTypeProvider()),
-        ChangeNotifierProvider<FaqProvider>(
-            create: (context) => FaqProvider()),
+        ChangeNotifierProvider<FaqProvider>(create: (context) => FaqProvider()),
         ChangeNotifierProvider<ProductWishListProvider>(
             create: (context) => ProductWishListProvider()),
         ChangeNotifierProvider<ProductAddOrRemoveFavoriteProvider>(
@@ -93,7 +92,9 @@ class MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    print('================= local notification initState start==============');
     localNotification.init(context); // ✅ Correct placement
+    print('================= local notification initState end==============');
   }
 
   @override
@@ -113,7 +114,8 @@ class MyAppState extends State<MyApp> {
                 SessionManager.appThemeName, Constant.themeList[0], false);
             Constant.session.setBoolData(
                 SessionManager.isDarkTheme,
-                PlatformDispatcher.instance.platformBrightness == Brightness.dark,
+                PlatformDispatcher.instance.platformBrightness ==
+                    Brightness.dark,
                 false);
           }
 
@@ -122,7 +124,8 @@ class MyAppState extends State<MyApp> {
                 Constant.themeList[0]) {
               Constant.session.setBoolData(
                   SessionManager.isDarkTheme,
-                  PlatformDispatcher.instance.platformBrightness == Brightness.dark,
+                  PlatformDispatcher.instance.platformBrightness ==
+                      Brightness.dark,
                   true);
             }
           };
@@ -165,11 +168,11 @@ class MyAppState extends State<MyApp> {
                       behavior: GlobalScrollBehavior(),
                       child: Center(
                         child: Directionality(
-                          textDirection:
-                              languageProvider.languageDirection.toLowerCase() ==
-                                      "rtl"
-                                  ? TextDirection.rtl
-                                  : TextDirection.ltr,
+                          textDirection: languageProvider.languageDirection
+                                      .toLowerCase() ==
+                                  "rtl"
+                              ? TextDirection.rtl
+                              : TextDirection.ltr,
                           child: child!,
                         ),
                       ),
