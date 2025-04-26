@@ -94,6 +94,7 @@ class MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    print('-----------------------notif------------------------------');
     localNotification.init(context); // ✅ Correct placement
   }
 

@@ -10,7 +10,7 @@ class LocalAwesomeNotification {
       LocalAwesomeNotification();
 
   // static late StreamSubscription<RemoteMessage>? foregroundStream;
-  static late StreamSubscription<RemoteMessage>? onMessageOpen;
+  static StreamSubscription<RemoteMessage>? onMessageOpen;
 
   Future<void> init(BuildContext context) async {
     if (notification != null &&
@@ -185,6 +185,7 @@ class LocalAwesomeNotification {
   createNotification(
       {required RemoteMessage data, required bool isLocked}) async {
     try {
+      print('------------------------createNotification----------------------------');
       int currentCount =
           Constant.session.getIntData(SessionManager.notificationTotalCount);
       Constant.session
@@ -268,8 +269,10 @@ class LocalAwesomeNotification {
   @pragma('vm:entry-point')
   static Future<void> onBackgroundMessageHandler(RemoteMessage data) async {
     try {
+    
       debugPrint("background notification handler invoked.");
-
+ final prefs = await SharedPreferences.getInstance();
+Constant.session = SessionManager(prefs: prefs);
       if (Platform.isAndroid) {
         if (data.data["image"] == "" || data.data["image"] == null) {
 print('------------------------onBackgroundMessageHandler-1-------------------------');
@@ -334,7 +337,7 @@ print('------------------------onBackgroundMessageHandler-1---------------------
   @pragma('vm:entry-point')
   static registerListeners(context) async {
     try {
-      print('hey budhuuuu');
+   
       FirebaseMessaging.onBackgroundMessage(onBackgroundMessageHandler);
       messagingInstance?.setForegroundNotificationPresentationOptions(
           alert: true, badge: true, sound: true);
