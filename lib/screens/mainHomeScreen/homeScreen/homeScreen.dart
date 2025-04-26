@@ -533,8 +533,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             HomeScreenState.loaded) {
 
 
-                              print('-------------------------${homeScreenProvider
-                                      .homeScreenData.sliders?.first.imageUrl}------------slider image---------------');
                           for (int i = 0;
                               i <
                                   homeScreenProvider

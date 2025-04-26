@@ -4,6 +4,7 @@ import 'package:project/helper/utils/generalImports.dart';
 late final SharedPreferences prefs;
 
 Future<void> main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
 
   prefs = await SharedPreferences.getInstance();

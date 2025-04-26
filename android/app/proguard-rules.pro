@@ -9,11 +9,11 @@
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;
 }
-# AwesomeNotifications
+# Awesome Notifications
 -keep class me.carda.awesome_notifications.** { *; }
--keep class me.carda.awesome_notifications.core.exceptions.** { *; }
--keep class me.carda.awesome_notifications.firebase.** { *; }
-
+-keep class br.com.awesome.** { *; }
+-dontwarn me.carda.awesome_notifications.**
+-keep class com.awesome.notifications.** { *; }
 -keepattributes JavascriptInterface
 -keepattributes *Annotation*
 
@@ -25,6 +25,7 @@
 -keepclasseswithmembers class * {
   public void onPayment*(...);
 }
+
 
 -dontwarn com.google.android.play.core.splitcompat.SplitCompatApplication
 -dontwarn com.google.android.play.core.splitinstall.SplitInstallException

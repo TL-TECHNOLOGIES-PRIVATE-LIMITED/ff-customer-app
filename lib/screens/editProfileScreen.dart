@@ -237,46 +237,51 @@ class _EditProfileState extends State<EditProfile> {
                                 params: widget.loginParams ?? {})
                             .then(
                           (value) async {
-                            if (context
-                                .read<CartListProvider>()
-                                .cartList
-                                .isNotEmpty) {
-                              addGuestCartBulkToCartWhileLogin(
-                                context: context,
-                                params: Constant.setGuestCartParams(
-                                  cartList:
-                                      context.read<CartListProvider>().cartList,
-                                ),
-                              ).then(
-                                (value) {
-                                  if (widget.from == "add_to_cart_register") {
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                  } else {
-                                    return Navigator.of(context)
-                                        .pushNamedAndRemoveUntil(mainHomeScreen,
-                                            (Route<dynamic> route) => false);
-                                  }
-                                },
-                              );
-                            } else {
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                  mainHomeScreen,
-                                  (Route<dynamic> route) => false);
-                            }
-
-                            if (Constant.session.isUserLoggedIn()) {
-                              await context
-                                  .read<CartProvider>()
-                                  .getCartListProvider(context: context);
-                            } else {
+                            if (value == "1") {
                               if (context
                                   .read<CartListProvider>()
                                   .cartList
                                   .isNotEmpty) {
+                                addGuestCartBulkToCartWhileLogin(
+                                  context: context,
+                                  params: Constant.setGuestCartParams(
+                                    cartList: context
+                                        .read<CartListProvider>()
+                                        .cartList,
+                                  ),
+                                ).then(
+                                  (value) {
+                                    if (widget.from == "add_to_cart_register") {
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                    } else {
+                                      return Navigator.of(context)
+                                          .pushNamedAndRemoveUntil(
+                                              mainHomeScreen,
+                                              (Route<dynamic> route) => false);
+                                    }
+                                  },
+                                );
+                              } else {
+                                Navigator.of(context).pushNamedAndRemoveUntil(
+                                    mainHomeScreen,
+                                    (Route<dynamic> route) => false);
+                              }
+
+                              if (Constant.session.isUserLoggedIn()) {
                                 await context
                                     .read<CartProvider>()
-                                    .getGuestCartListProvider(context: context);
+                                    .getCartListProvider(context: context);
+                              } else {
+                                if (context
+                                    .read<CartListProvider>()
+                                    .cartList
+                                    .isNotEmpty) {
+                                  await context
+                                      .read<CartProvider>()
+                                      .getGuestCartListProvider(
+                                          context: context);
+                                }
                               }
                             }
                           },
