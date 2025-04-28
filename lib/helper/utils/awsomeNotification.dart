@@ -149,14 +149,11 @@ class LocalAwesomeNotification {
   createImageNotification(
       {required RemoteMessage data, required bool isLocked}) async {
     try {
-      int currentCount =
-          Constant.session.getIntData(SessionManager.notificationTotalCount);
-      Constant.session
-          .setIntData(SessionManager.notificationTotalCount, currentCount + 1);
-      print(
-          'new notification image value is -----------------> ${Constant.session.getIntData(SessionManager.notificationTotalCount)}');
-                notificationCount.value = currentCount + 1;
-      print('count is ------------> ${notificationCount.value}');
+  debugPrint("[Notification] Creating image notification with data: ${data.data}");
+    int currentCount = Constant.session.getIntData(SessionManager.notificationTotalCount);
+    Constant.session.setIntData(SessionManager.notificationTotalCount, currentCount + 1);
+    notificationCount.value = currentCount + 1;
+    debugPrint("[Notification] New notification count: ${notificationCount.value}");
       await notification?.createNotification(
         content: NotificationContent(
           id: Random().nextInt(5000),
@@ -185,15 +182,11 @@ class LocalAwesomeNotification {
   createNotification(
       {required RemoteMessage data, required bool isLocked}) async {
     try {
-      print('------------------------createNotification----------------------------');
-      int currentCount =
-          Constant.session.getIntData(SessionManager.notificationTotalCount);
-      Constant.session
-          .setIntData(SessionManager.notificationTotalCount, currentCount + 1);
-      print(
-          'new notification value is -----------------> ${Constant.session.getIntData(SessionManager.notificationTotalCount)}');
-      notificationCount.value = currentCount + 1;
-      print('count is ------------> ${notificationCount.value}');
+     debugPrint("[Notification] Creating simple notification with data: ${data.data}");
+    int currentCount = Constant.session.getIntData(SessionManager.notificationTotalCount);
+    Constant.session.setIntData(SessionManager.notificationTotalCount, currentCount + 1);
+    notificationCount.value = currentCount + 1;
+    debugPrint("[Notification] New notification count: ${notificationCount.value}");
       await notification?.createNotification(
         content: NotificationContent(
           id: Random().nextInt(5000),
@@ -220,101 +213,88 @@ class LocalAwesomeNotification {
       }
     }
   }
+requestPermission({required BuildContext context}) async {
+  try {
+    debugPrint("[Permission] Checking notification permission status...");
+    PermissionStatus notificationPermissionStatus = await Permission.notification.status;
 
-  @pragma('vm:entry-point')
-  requestPermission({required BuildContext context}) async {
-    try {
-      PermissionStatus notificationPermissionStatus =
-          await Permission.notification.status;
-
-      if (notificationPermissionStatus.isPermanentlyDenied) {
-        if (!Constant.session.getBoolData(
-            SessionManager.keyPermissionNotificationHidePromptPermanently)) {
-          showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return Wrap(
-                children: [
-                  PermissionHandlerBottomSheet(
-                    titleJsonKey: "notification_permission_title",
-                    messageJsonKey: "notification_permission_message",
-                    sessionKeyForAskNeverShowAgain: SessionManager
-                        .keyPermissionNotificationHidePromptPermanently,
-                  ),
-                ],
-              );
-            },
-          );
-        }
-      } else if (notificationPermissionStatus.isDenied) {
-        await messagingInstance?.requestPermission(
-          alert: true,
-          announcement: false,
-          badge: true,
-          carPlay: false,
-          criticalAlert: false,
-          provisional: false,
-          sound: true,
+    if (notificationPermissionStatus.isPermanentlyDenied) {
+      debugPrint("[Permission] Notification permission permanently denied.");
+      if (!Constant.session.getBoolData(
+          SessionManager.keyPermissionNotificationHidePromptPermanently)) {
+        showModalBottomSheet(
+          context: context,
+          builder: (context) {
+            return Wrap(
+              children: [
+                PermissionHandlerBottomSheet(
+                  titleJsonKey: "notification_permission_title",
+                  messageJsonKey: "notification_permission_message",
+                  sessionKeyForAskNeverShowAgain:
+                      SessionManager.keyPermissionNotificationHidePromptPermanently,
+                ),
+              ],
+            );
+          },
         );
-
-        Permission.notification.request();
       }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint("ERROR IS ${e.toString()}");
+    } else if (notificationPermissionStatus.isDenied) {
+      debugPrint("[Permission] Notification permission denied, requesting...");
+      await messagingInstance?.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      Permission.notification.request();
+    } else {
+      debugPrint("[Permission] Notification permission already granted.");
+    }
+  } catch (e) {
+    debugPrint("ERROR in requestPermission: ${e.toString()}");
+  }
+}
+
+
+static Future<void> onBackgroundMessageHandler(RemoteMessage data) async {
+  try {
+    debugPrint("[Notification] Background message received: ${data.data}");
+    final prefs = await SharedPreferences.getInstance();
+    Constant.session = SessionManager(prefs: prefs);
+
+    if (Platform.isAndroid) {
+      if (data.data["image"] == "" || data.data["image"] == null) {
+        debugPrint("[Notification] Creating default background notification (no image).");
+        localNotification?.createNotification(isLocked: false, data: data);
+      } else {
+        debugPrint("[Notification] Creating image background notification.");
+        localNotification?.createImageNotification(isLocked: false, data: data);
       }
     }
+  } catch (e) {
+    debugPrint("ISSUE in onBackgroundMessageHandler: ${e.toString()}");
   }
+}
 
-  @pragma('vm:entry-point')
-  static Future<void> onBackgroundMessageHandler(RemoteMessage data) async {
-    try {
-    
-      debugPrint("background notification handler invoked.");
- final prefs = await SharedPreferences.getInstance();
-Constant.session = SessionManager(prefs: prefs);
+static foregroundNotificationHandler() async {
+  try {
+    debugPrint("[Notification] Foreground handler setup started.");
+    onMessageOpen = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      debugPrint("[Notification] Foreground message received: ${message.data}");
+
       if (Platform.isAndroid) {
-        if (data.data["image"] == "" || data.data["image"] == null) {
-print('------------------------onBackgroundMessageHandler-1-------------------------');
-          localNotification?.createNotification(isLocked: false, data: data);
+        if (message.data["image"] == "" || message.data["image"] == null) {
+          debugPrint("[Notification] Creating default notification (no image).");
+          localNotification?.createNotification(isLocked: false, data: message);
         } else {
-          print('------------------------onBackgroundMessageHandler-2-------------------------');
-          localNotification?.createImageNotification(
-              isLocked: false, data: data);
+          debugPrint("[Notification] Creating image notification.");
+          localNotification?.createImageNotification(isLocked: false, data: message);
         }
       }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint("ISSUE ${e.toString()}");
-      }
-    }
+    });
+  } catch (e) {
+    debugPrint("ISSUE in foregroundNotificationHandler: ${e.toString()}");
   }
-
-  @pragma('vm:entry-point')
-  static foregroundNotificationHandler() async {
-    try {
-      onMessageOpen =
-          FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        debugPrint("Foreground notification handler invoked.");
-
-        if (Platform.isAndroid) {
-          if (message.data["image"] == "" || message.data["image"] == null) {
-            print(
-                '------------------------foregroundNotificationHandler--------------------------');
-            localNotification?.createNotification(
-                isLocked: false, data: message);
-          } else {
-            localNotification?.createImageNotification(
-                isLocked: false, data: message);
-          }
-        }
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint("ISSUE ${e.toString()}");
-      }
-    }
-  }
+}
 
   @pragma('vm:entry-point')
   static terminatedStateNotificationHandler() {
@@ -334,21 +314,28 @@ print('------------------------onBackgroundMessageHandler-1---------------------
     );
   }
 
-  @pragma('vm:entry-point')
-  static registerListeners(context) async {
-    try {
-   
-      FirebaseMessaging.onBackgroundMessage(onBackgroundMessageHandler);
-      messagingInstance?.setForegroundNotificationPresentationOptions(
-          alert: true, badge: true, sound: true);
-      await foregroundNotificationHandler();
-      await terminatedStateNotificationHandler();
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint("ERROR IS ${e.toString()}");
-      }
+// Declare a static counter
+static int registerListenersCallCount = 0;
+
+@pragma('vm:entry-point')
+static registerListeners(context) async {
+  try {
+    // Increment the counter each time this method is called
+    registerListenersCallCount++;
+    print("registerListeners called $registerListenersCallCount times");
+
+    FirebaseMessaging.onBackgroundMessage(onBackgroundMessageHandler);
+    messagingInstance?.setForegroundNotificationPresentationOptions(
+      alert: true, badge: true, sound: true,
+    );
+    await foregroundNotificationHandler();
+    await terminatedStateNotificationHandler();
+  } catch (e) {
+    if (kDebugMode) {
+      debugPrint("ERROR IS ${e.toString()}");
     }
   }
+}
 
   @pragma('vm:entry-point')
   Future disposeListeners() async {

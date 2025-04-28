@@ -5,6 +5,7 @@ late final SharedPreferences prefs;
 
 Future<void> main() async {
 
+
   WidgetsFlutterBinding.ensureInitialized();
 
   prefs = await SharedPreferences.getInstance();
@@ -18,7 +19,7 @@ Future<void> main() async {
 
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
-
+// FirebaseMessaging.onBackgroundMessage(LocalAwesomeNotification.onBackgroundMessageHandler);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   runApp(
@@ -91,9 +92,12 @@ class GlobalScrollBehavior extends ScrollBehavior {
 class MyAppState extends State<MyApp> {
   final LocalAwesomeNotification localNotification = LocalAwesomeNotification();
 
+
   @override
   void initState() {
     super.initState();
+
+
     print('-----------------------notif------------------------------');
     localNotification.init(context); // ✅ Correct placement
   }
