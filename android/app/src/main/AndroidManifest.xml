@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -20,7 +19,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <!-- <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -32,8 +31,6 @@
         </intent>
     </queries>
 
-
-    <!--TODO REPLACE ANDROID APP NAME HERE-->
     <application
         android:name="${applicationName}"
         android:enableOnBackInvokedCallback="true"
@@ -45,7 +42,6 @@
         tools:replace="android:label, android:usesCleartextTraffic"
         tools:ignore="UnusedAttribute">
 
-        <!--TODO REPLACE ANDROID KEY HERE-->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyC-iiP6Hf6wjQpNm8LEO3nQYmDcHFgYbdA" />
@@ -60,10 +56,7 @@
             android:theme="@style/LaunchTheme"
             android:windowSoftInputMode="adjustResize"
             tools:ignore="LockedOrientationActivity">
-            <!-- Specifies an Android theme to apply to this Activity as soon as
-                 the Android process has started. This theme is visible to the user
-                 while the Flutter UI initializes. After that, this theme continues
-                 to determine the Window background behind the Flutter UI. -->
+
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
@@ -82,25 +75,23 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
             <intent-filter>
                 <action android:name="FLUTTER_NOTIFICATION_CLICK" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+
             <!-- Deep Links -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data android:scheme="https" />
-                <!-- Add here admin panel domain-->
                 <data android:host="myfrostyfoods.com" />
                 <data android:pathPrefix="/product" />
-                
             </intent-filter>
-            <!-- Deep Links Ends-->
-            
+            <!-- Deep Links Ends -->
+
             <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
 
             <meta-data
@@ -111,13 +102,14 @@
                 android:name="com.google.firebase.messaging.default_notification_icon"
                 android:resource="@mipmap/ic_launcher" />
         </activity>
-   <service
-    android:name="me.carda.awesome_notifications.firebase.AwesomeFirebaseMessagingService"
-    android:exported="true">
-    <intent-filter>
-        <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-    </intent-filter>
-</service>
+
+        <!-- <service
+            android:name="me.carda.awesome_notifications.firebase.AwesomeFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service> -->
 
         <!-- file Image Cropper Activity-->
         <activity

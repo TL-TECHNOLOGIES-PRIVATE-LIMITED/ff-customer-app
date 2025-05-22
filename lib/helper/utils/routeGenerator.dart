@@ -67,17 +67,17 @@ class RouteGenerator {
           builder: (_) => LoginAccount(from: settings.arguments as String?),
         );
 
-      case otpScreen:
-        List<dynamic> firebaseArguments = settings.arguments as List<dynamic>;
-        return CupertinoPageRoute(
-          builder: (_) => OtpVerificationScreen(
-            firebaseAuth: firebaseArguments[0] as FirebaseAuth,
-        //    otpVerificationId: firebaseArguments[1] as String,
-            phoneNumber: firebaseArguments[1] as String,
-            selectedCountryCode: firebaseArguments[2] as String,
-            from: firebaseArguments[3] as String?,
-          ),
-        );
+      // case otpScreen:
+      //   List<dynamic> firebaseArguments = settings.arguments as List<dynamic>;
+      //   return CupertinoPageRoute(
+      //     builder: (_) => OtpVerificationScreen(
+      //       firebaseAuth: firebaseArguments[0] as FirebaseAuth,
+      //   //    otpVerificationId: firebaseArguments[1] as String,
+      //       phoneNumber: firebaseArguments[1] as String,
+      //       selectedCountryCode: firebaseArguments[2] as String,
+      //       from: firebaseArguments[3] as String?,
+      //     ),
+      //   );
 
       case webViewScreen:
         return CupertinoPageRoute(
