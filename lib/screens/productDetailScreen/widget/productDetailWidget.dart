@@ -11,42 +11,56 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 class ProductDetailWidget extends StatefulWidget {
   final BuildContext context;
   final ProductData product;
-   // final ProductListItem? productListItem;
+  // final ProductListItem? productListItem;
 
-  ProductDetailWidget(
-      {super.key, required this.context, required this.product,
-   //   required this.productListItem
-      });
+  ProductDetailWidget({
+    super.key,
+    required this.context,
+    required this.product,
+    //   required this.productListItem
+  });
 
   @override
   State<ProductDetailWidget> createState() => _ProductDetailWidgetState();
 }
 
 class _ProductDetailWidgetState extends State<ProductDetailWidget> {
-
-
-  @override
-  void initState() {
-    super.initState();
-
+  int getAvailableVariantIndex(List<ProductDetailVariants> variant) {
+    for (int i = 0; i < variant.length; i++) {
+      if (variant[i].stock != "0" && variant[i].status != "0") {
+        return i;
+      }
+    }
+    return 0; // Return 0 if all variants have stock "0"
   }
+
+@override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    context.read<SelectedVariantItemProvider>().setSelectedIndex(
+      getAvailableVariantIndex(widget.product.variants),
+    );
+  });
+}
+
+
   int currentIndex = 0;
- 
+
   @override
   Widget build(BuildContext context) {
-       final productDetailProvider = context.read<ProductDetailProvider>();
-       final images = productDetailProvider.images;
+    final productDetailProvider = context.read<ProductDetailProvider>();
+    final images = productDetailProvider.images;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-      LayoutBuilder(
+        LayoutBuilder(
           builder: (context, constraints) {
             double imageSize = constraints.maxWidth * 1;
 
             return Column(
               children: [
                 CarouselSlider.builder(
-               
                   itemCount: images.length,
                   itemBuilder: (context, index, realIndex) {
                     return GestureDetector(
@@ -54,7 +68,10 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                         Navigator.pushNamed(
                           context,
                           fullScreenProductImageScreen,
-                          arguments: [productDetailProvider.currentImage, images],
+                          arguments: [
+                            productDetailProvider.currentImage,
+                            images
+                          ],
                         );
                       },
                       child: ClipRRect(
@@ -90,7 +107,6 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                     activeDotColor: Colors.blue,
                     dotColor: Colors.grey,
                   ),
-          
                 ),
               ],
             );
@@ -108,6 +124,8 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
               DesignConfig.boxDecoration(Theme.of(context).cardColor, 5),
           child: Consumer<SelectedVariantItemProvider>(
             builder: (context, selectedVariantItemProvider, _) {
+              // selectedVariantItemProvider.setSelectedIndex(
+              //     getAvailableVariantIndex(widget.product.variants));
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -402,7 +420,6 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                   end: 5,
                 ),
                 child: Container(
-             
                   child: Html(
                     style: {
                       "*": Style(

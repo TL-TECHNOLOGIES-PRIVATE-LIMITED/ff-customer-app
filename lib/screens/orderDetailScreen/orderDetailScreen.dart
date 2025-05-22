@@ -209,7 +209,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                             ? (await ExternalPath
                                                 .getExternalStoragePublicDirectory(
                                                     ExternalPath
-                                                        .DIRECTORY_DOWNLOAD))
+                                                        .DIRECTORY_DOWNLOADS))
                                             : (await getApplicationDocumentsDirectory())
                                                 .path;
 

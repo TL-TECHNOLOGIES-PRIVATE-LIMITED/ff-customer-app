@@ -36,6 +36,7 @@ class _ProductVariantDropDownMenuListState
       builder: (context, selectedVariantItemProvider, _) {
         if (widget.variants.isNotEmpty) {
           int availableIndex = getAvailableVariantIndex(widget.variants);
+          
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
