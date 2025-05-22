@@ -1,6 +1,11 @@
+
+
+
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:project/helper/utils/generalImports.dart';
+
+
 
 class HomeScreen extends StatefulWidget {
   final ScrollController scrollController;
@@ -20,8 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    print(
-        "===============fcm token is || ${Constant.session.getData(SessionManager.keyFCMToken)} || ===================");
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       Map<String, String> params = await Constant.getProductsDefaultParams();
       context.read<HomeScreenProvider>().getHomeScreenApiProvider(
@@ -32,278 +36,269 @@ class _HomeScreenState extends State<HomeScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (Constant.session.getBoolData(SessionManager.isLocation) == false) {
-        showModalBottomSheet(
-          isDismissible: false, // Prevent dismissing by tapping outside
-          backgroundColor: Theme.of(context).cardColor,
-          shape: DesignConfig.setRoundedBorderSpecific(20, istop: true),
-          context: context,
-          builder: (BuildContext context) {
-            return WillPopScope(
-              onWillPop: () async {
-                // Return false to prevent the bottom sheet from closing
-                return false;
-              },
-              child: Container(
-                padding: EdgeInsetsDirectional.only(
-                  start: Constant.size15,
-                  end: Constant.size15,
-                  top: Constant.size30,
-                  bottom: Constant.size15,
-                ),
-                child: Wrap(
-                  runSpacing: Constant.size30,
-                  children: [
-                    Row(
+  showModalBottomSheet(
+    isDismissible: false, // Prevent dismissing by tapping outside
+    backgroundColor: Theme.of(context).cardColor,
+    shape: DesignConfig.setRoundedBorderSpecific(20, istop: true),
+    context: context,
+    builder: (BuildContext context) {
+      return WillPopScope(
+        onWillPop: () async {
+          // Return false to prevent the bottom sheet from closing
+          return false;
+        },
+        child: Container(
+          padding: EdgeInsetsDirectional.only(
+            start: Constant.size15,
+            end: Constant.size15,
+            top: Constant.size30,
+            bottom: Constant.size15,
+          ),
+          child: Wrap(
+            runSpacing: Constant.size30,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    flex: 7,
+                    child: Wrap(
+                      runSpacing: Constant.size7,
                       children: [
-                        Expanded(
-                          flex: 7,
-                          child: Wrap(
-                            runSpacing: Constant.size7,
-                            children: [
-                              CustomTextLabel(
-                                text: "Where should we\ndeliver your order?",
-                                softWrap: true,
-                                style: TextStyle(
-                                  height: 1.2,
-                                  fontSize: 20,
-                                  color: ColorsRes.mainTextColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              CustomTextLabel(
-                                text: getTranslatedValue(
-                                    context, "Enable_location_description"),
-                                softWrap: true,
-                                style: TextStyle(
-                                  height: 1,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: ColorsRes.subTitleMainTextColor,
-                                ),
-                              ),
-                            ],
+                        CustomTextLabel(
+                          text: "Where should we\ndeliver your order?",
+                          softWrap: true,
+                          style: TextStyle(
+                            height: 1.2,
+                            fontSize: 20,
+                            color: ColorsRes.mainTextColor,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Expanded(flex: 1, child: SizedBox.shrink()),
-                        Expanded(
-                          flex: 2,
-                          child: defaultImg(
-                              image: 'location.png', height: 10, width: 10),
+                        CustomTextLabel(
+                          text: getTranslatedValue(
+                              context, "Enable_location_description"),
+                          softWrap: true,
+                          style: TextStyle(
+                            height: 1,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: ColorsRes.subTitleMainTextColor,
+                          ),
                         ),
                       ],
                     ),
-                    Wrap(
-                      runSpacing: Constant.size15,
-                      children: [
-                        GestureDetector(
-                          onTap: () async {
-                            await hasLocationPermissionGiven()
-                                .then((value) async {
-                              if (value is PermissionStatus) {
-                                if (value.isGranted) {
-                                  setState(() {
-                                    isLoad = false;
-                                  });
-                                  if (!mounted) return;
-                                  await Geolocator.getCurrentPosition()
-                                      .then((position) async {
-                                    if (!mounted) return;
-                                    LatLng kMapCenter = LatLng(
-                                        position.latitude, position.longitude);
-                                    Constant.cityAddressMap =
-                                        await getCityNameAndAddress(
-                                            kMapCenter, context);
-                                    Constant.session.setData(
-                                      SessionManager.keyAddress,
-                                      Constant.cityAddressMap["address"],
-                                      true,
-                                    );
-                                    Map<String, dynamic> params = {
-                                      ApiAndParams.longitude:
-                                          kMapCenter.longitude.toString(),
-                                      ApiAndParams.latitude:
-                                          kMapCenter.latitude.toString(),
-                                    };
-                                    await context
-                                        .read<CityByLatLongProvider>()
-                                        .getCityByLatLongApiProvider(
-                                            context: context, params: params);
-                                    if (mounted) {
-                                      setState(() {});
+                  ),
+                  Expanded(flex: 1, child: SizedBox.shrink()),
+                  Expanded(
+                    flex: 2,
+                    child: defaultImg(
+                        image: 'location.png', height: 10, width: 10),
+                  ),
+                ],
+              ),
+              Wrap(
+                runSpacing: Constant.size15,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      await hasLocationPermissionGiven().then((value) async {
+                        if (value is PermissionStatus) {
+                          if (value.isGranted) {
+                            setState(() {
+                              isLoad = false;
+                            });
+                            if (!mounted) return;
+                            await Geolocator.getCurrentPosition()
+                                .then((position) async {
+                              if (!mounted) return;
+                              LatLng kMapCenter = LatLng(
+                                  position.latitude, position.longitude);
+                              Constant.cityAddressMap =
+                                  await getCityNameAndAddress(
+                                      kMapCenter, context);
+                              Constant.session.setData(
+                                SessionManager.keyAddress,
+                                Constant.cityAddressMap["address"],
+                                true,
+                              );
+                              Map<String, dynamic> params = {
+                                ApiAndParams.longitude:
+                                    kMapCenter.longitude.toString(),
+                                ApiAndParams.latitude:
+                                    kMapCenter.latitude.toString(),
+                              };
+                              await context
+                                  .read<CityByLatLongProvider>()
+                                  .getCityByLatLongApiProvider(
+                                      context: context, params: params);
+                              if (mounted) {
+                                setState(() {});
 
-                                      Navigator.pop(context);
-                                      setState(() {
-                                        isLoad = true;
-                                      });
-                                      if (context
-                                          .read<CityByLatLongProvider>()
-                                          .isDeliverable) {
-                                        Navigator.of(context)
-                                            .pushNamedAndRemoveUntil(
-                                          mainHomeScreen,
-                                          (Route<dynamic> route) => false,
-                                        );
-                                      } else {
-                                        showDialog(
-                                            barrierDismissible: false,
-                                            context: context,
-                                            builder: (BuildContext context) =>
-                                                CupertinoAlertDialog(
-                                                  title: CustomTextLabel(
-                                                    jsonKey: "exciting_news",
-                                                  ),
-                                                  content: CustomTextLabel(
-                                                    jsonKey:
-                                                        "does_not_delivery_long_message_2",
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                        Navigator.pushNamed(
-                                                            context,
-                                                            confirmLocationScreen,
-                                                            arguments: [
-                                                              null,
-                                                              null,
-                                                              "bottom_sheet"
-                                                            ]).then(
-                                                            (value) async {
-                                                          if (value == null) {
-                                                            Map<String, String>
-                                                                params =
-                                                                await Constant
-                                                                    .getProductsDefaultParams();
-                                                            if (!mounted)
-                                                              return;
-                                                            await context
-                                                                .read<
-                                                                    HomeScreenProvider>()
-                                                                .getHomeScreenApiProvider(
-                                                                    context:
-                                                                        context,
-                                                                    params:
-                                                                        params);
-                                                          }
-                                                        });
-                                                        Constant.session
-                                                            .setBoolData(
-                                                                SessionManager
-                                                                    .isLocation,
-                                                                true,
-                                                                false);
-                                                      },
-                                                      child: Text(
-                                                          'Change Location'),
-                                                    )
-                                                  ],
-                                                ));
-                                      }
-                                    }
-                                    Constant.session.setBoolData(
-                                        SessionManager.isLocation, true, false);
-                                  });
-                                } else if (value.isDenied) {
-                                  await Permission.location.request();
-                                } else if (value.isPermanentlyDenied) {
-                                  if (!Constant.session.getBoolData(SessionManager
-                                      .keyPermissionLocationHidePromptPermanently)) {
-                                    if (!mounted) return;
-                                    showModalBottomSheet(
+                                Navigator.pop(context);
+                                setState(() {
+                                  isLoad = true;
+                                });
+                                if (context
+                                    .read<CityByLatLongProvider>()
+                                    .isDeliverable) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(
+                                    mainHomeScreen,
+                                    (Route<dynamic> route) => false,
+                                  );
+                                } else {
+                                  showDialog(
+                                      barrierDismissible: false,
                                       context: context,
-                                      builder: (context) {
-                                        return Wrap(
-                                          children: [
-                                            PermissionHandlerBottomSheet(
-                                              titleJsonKey:
-                                                  "location_permission_title",
-                                              messageJsonKey:
-                                                  "location_permission_message",
-                                              sessionKeyForAskNeverShowAgain:
-                                                  SessionManager
-                                                      .keyPermissionLocationHidePromptPermanently,
+                                      builder: (BuildContext context) =>
+                                          CupertinoAlertDialog(
+                                            title: CustomTextLabel(
+                                              jsonKey: "exciting_news",
                                             ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  }
+                                            content: CustomTextLabel(
+                                              jsonKey:
+                                                  "does_not_delivery_long_message_2",
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                  Navigator.pushNamed(
+                                                      context,
+                                                      confirmLocationScreen,
+                                                      arguments: [
+                                                        null,
+                                                        null,
+                                                        "bottom_sheet"
+                                                      ]).then((value) async {
+                                                    if (value == null) {
+                                                      Map<String, String>
+                                                          params =
+                                                          await Constant
+                                                              .getProductsDefaultParams();
+                                                      if (!mounted) return;
+                                                      await context
+                                                          .read<
+                                                              HomeScreenProvider>()
+                                                          .getHomeScreenApiProvider(
+                                                              context: context,
+                                                              params: params);
+                                                    }
+                                                  });
+                                                  Constant.session.setBoolData(
+                                                      SessionManager.isLocation,
+                                                      true,
+                                                      false);
+                                                },
+                                                child: Text('Change Location'),
+                                              )
+                                            ],
+                                          ));
                                 }
                               }
+                              Constant.session.setBoolData(
+                                  SessionManager.isLocation, true, false);
                             });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            padding:
-                                EdgeInsets.symmetric(vertical: Constant.size10),
-                            child: Center(
-                              child: isLoad
-                                  ? CustomTextLabel(
-                                      text: "Use Current Location",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        fontSize: 16,
+                          } else if (value.isDenied) {
+                            await Permission.location.request();
+                          } else if (value.isPermanentlyDenied) {
+                            if (!Constant.session.getBoolData(SessionManager
+                                .keyPermissionLocationHidePromptPermanently)) {
+                              if (!mounted) return;
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return Wrap(
+                                    children: [
+                                      PermissionHandlerBottomSheet(
+                                        titleJsonKey:
+                                            "location_permission_title",
+                                        messageJsonKey:
+                                            "location_permission_message",
+                                        sessionKeyForAskNeverShowAgain:
+                                            SessionManager
+                                                .keyPermissionLocationHidePromptPermanently,
                                       ),
-                                    )
-                                  : CircularProgressIndicator(
-                                      color: Colors.white,
-                                    ),
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                            Navigator.pushNamed(context, confirmLocationScreen,
-                                    arguments: [null, null, "bottom_sheet"])
-                                .then((value) async {
-                              if (value == null) {
-                                Map<String, String> params =
-                                    await Constant.getProductsDefaultParams();
-                                if (!mounted) return;
-                                await context
-                                    .read<HomeScreenProvider>()
-                                    .getHomeScreenApiProvider(
-                                        context: context, params: params);
-                              }
-                            });
-                            Constant.session.setBoolData(
-                                SessionManager.isLocation, true, false);
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                  color: ColorsRes.subTitleMainTextColor),
-                            ),
-                            padding:
-                                EdgeInsets.symmetric(vertical: Constant.size10),
-                            child: Center(
-                              child: CustomTextLabel(
-                                text: "Search Your Location",
+                                    ],
+                                  );
+                                },
+                              );
+                            }
+                          }
+                        }
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(vertical: Constant.size10),
+                      child: Center(
+                        child: isLoad
+                            ? CustomTextLabel(
+                                text: "Use Current Location",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).primaryColor,
+                                  color: Colors.white,
                                   fontSize: 16,
                                 ),
+                              )
+                            : CircularProgressIndicator(
+                                color: Colors.white,
                               ),
-                            ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, confirmLocationScreen,
+                              arguments: [null, null, "bottom_sheet"])
+                          .then((value) async {
+                        if (value == null) {
+                          Map<String, String> params =
+                              await Constant.getProductsDefaultParams();
+                          if (!mounted) return;
+                          await context
+                              .read<HomeScreenProvider>()
+                              .getHomeScreenApiProvider(
+                                  context: context, params: params);
+                        }
+                      });
+                      Constant.session.setBoolData(
+                          SessionManager.isLocation, true, false);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: ColorsRes.subTitleMainTextColor),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(vertical: Constant.size10),
+                      child: Center(
+                        child: CustomTextLabel(
+                          text: "Search Your Location",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 16,
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            );
-          },
-        );
-        Constant.session.setBoolData(SessionManager.isFetched, true, false);
-      } else if (Constant.session.getBoolData(SessionManager.isFetched) ==
+            ],
+          ),
+        ),
+      );
+    },
+  );
+  Constant.session.setBoolData(SessionManager.isFetched, true, false);
+} else if (Constant.session.getBoolData(SessionManager.isFetched) ==
           false) {
         hasLocationPermissionGiven().then((value) async {
           if (value is PermissionStatus) {
@@ -536,8 +531,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         map = homeScreenProvider.homeOfferImagesMap;
                         if (homeScreenProvider.homeScreenState ==
                             HomeScreenState.loaded) {
-                          print(
-                              '-------------------------${homeScreenProvider.homeScreenData.sliders?.first.imageUrl}------------slider image---------------');
+
+
                           for (int i = 0;
                               i <
                                   homeScreenProvider
@@ -552,7 +547,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                           return Column(
                             children: [
-                              //   Image.network('https://admin.myfrostyfoods.com/storage/sliders/1737432637_86260.png'),
+                           //   Image.network('https://admin.myfrostyfoods.com/storage/sliders/1737432637_86260.png'),
                               // Top Sections
                               SectionWidget(position: 'top'),
                               //top offer images

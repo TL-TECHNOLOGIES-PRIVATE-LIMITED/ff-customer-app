@@ -118,65 +118,65 @@ class _ProductListScreenState extends State<ProductSearchScreen> {
                   padding: EdgeInsets.symmetric(horizontal: Constant.size5),
                   child: Row(
                     children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () async {
-                            Navigator.pushNamed(
-                              context,
-                              productListFilterScreen,
-                              arguments: [
-                                context
-                                    .read<ProductSearchProvider>()
-                                    .productList
-                                    .brands,
-                                double.parse(context
-                                    .read<ProductSearchProvider>()
-                                    .productList
-                                    .totalMaxPrice),
-                                double.parse(context
-                                    .read<ProductSearchProvider>()
-                                    .productList
-                                    .totalMinPrice),
-                                context
-                                    .read<ProductSearchProvider>()
-                                    .productList
-                                    .sizes,
-                                Constant.selectedCategories,
-                              ],
-                            ).then((value) async {
-                              if (value == true) {
-                                context.read<ProductSearchProvider>().offset =
-                                    0;
-                                context.read<ProductSearchProvider>().products =
-                                    [];
+                      // Expanded(
+                      //   child: GestureDetector(
+                      //     onTap: () async {
+                      //       Navigator.pushNamed(
+                      //         context,
+                      //         productListFilterScreen,
+                      //         arguments: [
+                      //           context
+                      //               .read<ProductSearchProvider>()
+                      //               .productList
+                      //               .brands,
+                      //           double.parse(context
+                      //               .read<ProductSearchProvider>()
+                      //               .productList
+                      //               .totalMaxPrice),
+                      //           double.parse(context
+                      //               .read<ProductSearchProvider>()
+                      //               .productList
+                      //               .totalMinPrice),
+                      //           context
+                      //               .read<ProductSearchProvider>()
+                      //               .productList
+                      //               .sizes,
+                      //           Constant.selectedCategories,
+                      //         ],
+                      //       ).then((value) async {
+                      //         if (value == true) {
+                      //           context.read<ProductSearchProvider>().offset =
+                      //               0;
+                      //           context.read<ProductSearchProvider>().products =
+                      //               [];
 
-                                callApi(isReset: true);
-                              }
-                            });
-                          },
-                          child: Card(
-                              color: Theme.of(context).cardColor,
-                              surfaceTintColor: Theme.of(context).cardColor,
-                              elevation: 0,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  defaultImg(
-                                      image: "filter_icon",
-                                      height: 17,
-                                      width: 17,
-                                      padding: const EdgeInsetsDirectional.only(
-                                          top: 7, bottom: 7, end: 7),
-                                      iconColor:
-                                          Theme.of(context).primaryColor),
-                                  CustomTextLabel(
-                                    jsonKey: "filter",
-                                    softWrap: true,
-                                  )
-                                ],
-                              )),
-                        ),
-                      ),
+                      //           callApi(isReset: true);
+                      //         }
+                      //       });
+                      //     },
+                      //     child: Card(
+                      //         color: Theme.of(context).cardColor,
+                      //         surfaceTintColor: Theme.of(context).cardColor,
+                      //         elevation: 0,
+                      //         child: Row(
+                      //           mainAxisAlignment: MainAxisAlignment.center,
+                      //           children: [
+                      //             defaultImg(
+                      //                 image: "filter_icon",
+                      //                 height: 17,
+                      //                 width: 17,
+                      //                 padding: const EdgeInsetsDirectional.only(
+                      //                     top: 7, bottom: 7, end: 7),
+                      //                 iconColor:
+                      //                     Theme.of(context).primaryColor),
+                      //             CustomTextLabel(
+                      //               jsonKey: "filter",
+                      //               softWrap: true,
+                      //             )
+                      //           ],
+                      //         )),
+                      //   ),
+                      // ),
                       Expanded(
                         child: GestureDetector(
                           onTap: () {

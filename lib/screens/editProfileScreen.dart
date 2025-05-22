@@ -204,276 +204,201 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  proceedBtn() {
-    return Consumer<UserProfileProvider>(
-      builder: (context, userProfileProvider, _) {
-        return userProfileProvider.profileState == ProfileState.loading
-            ? const Center(child: CircularProgressIndicator())
-            : gradientBtnWidget(
+  bool isBtnLoading = false; // Add this variable at the top of your widget (inside your State class)
+
+Widget proceedBtn() {
+  return Consumer<UserProfileProvider>(
+    builder: (context, userProfileProvider, _) {
+      return isBtnLoading
+          ? const Center(child: CircularProgressIndicator())
+          : gradientBtnWidget(
+              context,
+              10,
+              title: getTranslatedValue(
                 context,
-                10,
-                title: getTranslatedValue(
-                  context,
-                  widget.from == "register" ? "register" : "update",
-                ),
-                callback: () async {
-                  try {
-                    _formKey.currentState!.save();
-                    if (_formKey.currentState!.validate()) {
-                      print('validated');
-                      widget.loginParams?[ApiAndParams.name] =
-                          edtUsername.text.trim();
-                      widget.loginParams?[ApiAndParams.email] =
-                          edtEmail.text.trim();
-                      widget.loginParams?[ApiAndParams.mobile] =
-                          edtMobile.text.trim();
-                      if (widget.from == "register" ||
-                          widget.from == "register_header" ||
-                          widget.from == "add_to_cart_register") {
-                        print('haiii histhi is');
-                        userProfileProvider
-                            .registerAccountApi(
-                                context: context,
-                                params: widget.loginParams ?? {})
-                            .then(
-                          (value) async {
-                            if (context
-                                .read<CartListProvider>()
-                                .cartList
-                                .isNotEmpty) {
-                              addGuestCartBulkToCartWhileLogin(
-                                context: context,
-                                params: Constant.setGuestCartParams(
-                                  cartList:
-                                      context.read<CartListProvider>().cartList,
-                                ),
-                              ).then(
-                                (value) {
-                                  if (widget.from == "add_to_cart_register") {
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                  } else {
-                                    return Navigator.of(context)
-                                        .pushNamedAndRemoveUntil(mainHomeScreen,
-                                            (Route<dynamic> route) => false);
-                                  }
-                                },
-                              );
-                            } else {
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                  mainHomeScreen,
-                                  (Route<dynamic> route) => false);
-                            }
+                widget.from == "register" ? "register" : "update",
+              ),
+              callback: () async {
+                try {
+                  _formKey.currentState!.save();
+                  if (_formKey.currentState!.validate()) {
+                    print('validated');
+                    setState(() {
+                      isBtnLoading = true;
+                    });
 
-                            if (Constant.session.isUserLoggedIn()) {
-                              await context
-                                  .read<CartProvider>()
-                                  .getCartListProvider(context: context);
-                            } else {
-                              if (context
-                                  .read<CartListProvider>()
-                                  .cartList
-                                  .isNotEmpty) {
-                                await context
-                                    .read<CartProvider>()
-                                    .getGuestCartListProvider(context: context);
-                              }
-                            }
-                          },
-                        );
-                      } else if (widget.from == "add_to_cart") {
-                        print('haiii histhi is cart');
-                        Map<String, String> params = {};
-                        params[ApiAndParams.name] = edtUsername.text.trim();
-                        params[ApiAndParams.email] = edtEmail.text.trim();
-                        params[ApiAndParams.mobile] = edtMobile.text.trim();
-                        params[ApiAndParams.countryCode] =
-                            countryCode.toString();
-                        userProfileProvider
-                            .updateUserProfile(
-                                context: context,
-                                selectedImagePath: selectedImagePath,
-                                params: params)
-                            .then(
-                          (value) {
-                            if (context
-                                .read<CartListProvider>()
-                                .cartList
-                                .isNotEmpty) {
-                              addGuestCartBulkToCartWhileLogin(
-                                  context: context,
-                                  params: Constant.setGuestCartParams(
-                                    cartList: context
-                                        .read<CartListProvider>()
-                                        .cartList,
-                                  )).then(
-                                (value) {
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                },
-                              );
-                            } else {
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                  mainHomeScreen,
-                                  (Route<dynamic> route) => false);
-                            }
-                          },
-                        );
+                    widget.loginParams?[ApiAndParams.name] = edtUsername.text.trim();
+                    widget.loginParams?[ApiAndParams.email] = edtEmail.text.trim();
+                    widget.loginParams?[ApiAndParams.mobile] = edtMobile.text.trim();
 
-                        if (Constant.session.isUserLoggedIn()) {
-                          await context
-                              .read<CartProvider>()
-                              .getCartListProvider(context: context);
-                        } else {
-                          if (context
-                              .read<CartListProvider>()
-                              .cartList
-                              .isNotEmpty) {
-                            await context
-                                .read<CartProvider>()
-                                .getGuestCartListProvider(context: context);
+                    if (widget.from == "register" ||
+                        widget.from == "register_header" ||
+                        widget.from == "add_to_cart_register") {
+                      await userProfileProvider.registerAccountApi(
+                        context: context,
+                        params: widget.loginParams ?? {},
+                      ).then((value) async {
+                        setState(() {
+                          isBtnLoading = false;
+                        });
+
+                        if (value == "1") {
+                          if (context.read<CartListProvider>().cartList.isNotEmpty) {
+                            await addGuestCartBulkToCartWhileLogin(
+                              context: context,
+                              params: Constant.setGuestCartParams(
+                                cartList: context.read<CartListProvider>().cartList,
+                              ),
+                            );
+                          }
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            mainHomeScreen,
+                            (Route<dynamic> route) => false,
+                          );
+
+                          if (Constant.session.isUserLoggedIn()) {
+                            await context.read<CartProvider>().getCartListProvider(context: context);
+                          } else if (context.read<CartListProvider>().cartList.isNotEmpty) {
+                            await context.read<CartProvider>().getGuestCartListProvider(context: context);
                           }
                         }
-                      } else {
-                        print('haiii histhi is else');
-                        Map<String, String> params = {};
-                        params[ApiAndParams.name] = edtUsername.text.trim();
-                        params[ApiAndParams.email] = edtEmail.text.trim();
-                        params[ApiAndParams.mobile] = edtMobile.text.trim();
-                        params[ApiAndParams.countryCode] =
-                            countryCode.toString();
+                      });
+                    } else if (widget.from == "add_to_cart") {
+                      Map<String, String> params = {
+                        ApiAndParams.name: edtUsername.text.trim(),
+                        ApiAndParams.email: edtEmail.text.trim(),
+                        ApiAndParams.mobile: edtMobile.text.trim(),
+                        ApiAndParams.countryCode: countryCode.toString(),
+                      };
 
-                        userProfileProvider
-                            .updateUserProfile(
-                                context: context,
-                                selectedImagePath: selectedImagePath,
-                                params: params)
-                            .then(
-                          (value) async {
-                            if (value is bool) {
-                              if (Constant.session.getData(
-                                          SessionManager.keyLatitude) ==
-                                      "0" &&
-                                  Constant.session.getData(
-                                          SessionManager.keyLongitude) ==
-                                      "0" &&
-                                  Constant.session
-                                          .getData(SessionManager.keyAddress) ==
-                                      "") {
+                      await userProfileProvider.updateUserProfile(
+                        context: context,
+                        selectedImagePath: selectedImagePath,
+                        params: params,
+                      ).then((value) async {
+                        setState(() {
+                          isBtnLoading = false;
+                        });
+
+                        if (context.read<CartListProvider>().cartList.isNotEmpty) {
+                          await addGuestCartBulkToCartWhileLogin(
+                            context: context,
+                            params: Constant.setGuestCartParams(
+                              cartList: context.read<CartListProvider>().cartList,
+                            ),
+                          );
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        } else {
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            mainHomeScreen,
+                            (Route<dynamic> route) => false,
+                          );
+                        }
+
+                        if (Constant.session.isUserLoggedIn()) {
+                          await context.read<CartProvider>().getCartListProvider(context: context);
+                        } else if (context.read<CartListProvider>().cartList.isNotEmpty) {
+                          await context.read<CartProvider>().getGuestCartListProvider(context: context);
+                        }
+                      });
+                    } else {
+                      Map<String, String> params = {
+                        ApiAndParams.name: edtUsername.text.trim(),
+                        ApiAndParams.email: edtEmail.text.trim(),
+                        ApiAndParams.mobile: edtMobile.text.trim(),
+                        ApiAndParams.countryCode: countryCode.toString(),
+                      };
+
+                      await userProfileProvider.updateUserProfile(
+                        context: context,
+                        selectedImagePath: selectedImagePath,
+                        params: params,
+                      ).then((value) async {
+                        setState(() {
+                          isBtnLoading = false;
+                        });
+
+                        if (value is bool && value) {
+                          if (Constant.session.getData(SessionManager.keyLatitude) == "0" &&
+                              Constant.session.getData(SessionManager.keyLongitude) == "0" &&
+                              Constant.session.getData(SessionManager.keyAddress) == "") {
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                              confirmLocationScreen,
+                              (Route<dynamic> route) => false,
+                              arguments: [null, null, "location"],
+                            );
+                          } else {
+                            if (widget.from == "header") {
+                              if (context.read<CartListProvider>().cartList.isNotEmpty) {
+                                await addGuestCartBulkToCartWhileLogin(
+                                  context: context,
+                                  params: Constant.setGuestCartParams(
+                                    cartList: context.read<CartListProvider>().cartList,
+                                  ),
+                                );
                                 Navigator.of(context).pushNamedAndRemoveUntil(
-                                  confirmLocationScreen,
+                                  mainHomeScreen,
                                   (Route<dynamic> route) => false,
-                                  arguments: [null, null, "location"],
                                 );
                               } else {
-                                if (widget.from == "header") {
-                                  if (context
-                                      .read<CartListProvider>()
-                                      .cartList
-                                      .isNotEmpty) {
-                                    addGuestCartBulkToCartWhileLogin(
-                                      context: context,
-                                      params: Constant.setGuestCartParams(
-                                        cartList: context
-                                            .read<CartListProvider>()
-                                            .cartList,
-                                      ),
-                                    ).then(
-                                      (value) => Navigator.of(context)
-                                          .pushNamedAndRemoveUntil(
-                                        mainHomeScreen,
-                                        (Route<dynamic> route) => false,
-                                      ),
-                                    );
-                                    print("i am right here-----------3");
-                                  } else {
-                                    print("i am right here-----------1");
-                                    showMessage(
-                                      context,
-                                      getTranslatedValue(context,
-                                          "profile_updated_successfully"),
-                                      MessageType.success,
-                                    );
-                                    Navigator.of(context).pop();
-                                  }
-                                } else if (widget.from == "add_to_cart") {
-                                  addGuestCartBulkToCartWhileLogin(
-                                      context: context,
-                                      params: Constant.setGuestCartParams(
-                                        cartList: context
-                                            .read<CartListProvider>()
-                                            .cartList,
-                                      )).then(
-                                    (value) {
-                                      Navigator.pop(context);
-                                      Navigator.pop(context);
-                                      Navigator.pop(context);
-                                    },
-                                  );
-                                } else {
-                                  print("i am right here-----------2");
-                                  showMessage(
-                                    context,
-                                    getTranslatedValue(context,
-                                        "profile_updated_successfully"),
-                                    MessageType.success,
-                                  );
-                                }
+                                showMessage(
+                                  context,
+                                  getTranslatedValue(context, "profile_updated_successfully"),
+                                  MessageType.success,
+                                );
+                                Navigator.of(context).pop();
                               }
-                              userProfileProvider.changeState();
                             } else {
-                              userProfileProvider.changeState();
                               showMessage(
                                 context,
-                                value.toString(),
-                                MessageType.warning,
+                                getTranslatedValue(context, "profile_updated_successfully"),
+                                MessageType.success,
                               );
                             }
-
-                            if (Constant.session.isUserLoggedIn()) {
-                              await context
-                                  .read<CartProvider>()
-                                  .getCartListProvider(context: context);
-                            } else {
-                              if (context
-                                  .read<CartListProvider>()
-                                  .cartList
-                                  .isNotEmpty) {
-                                await context
-                                    .read<CartProvider>()
-                                    .getGuestCartListProvider(context: context);
-                              }
-                            }
-                          },
-                        );
-                      }
-                    } else {
-                      print('not validated');
-                      if (edtEmail.text.trim().isEmpty &&
-                          edtUsername.text.trim().isEmpty) {
-                        showMessage(
-                          context,
-                          getTranslatedValue(
+                          }
+                        } else {
+                          showMessage(
                             context,
-                            "enter_username_email",
-                          ),
-                          MessageType.error,
-                        );
-                      }
+                            value.toString(),
+                            MessageType.warning,
+                          );
+                        }
+
+                        if (Constant.session.isUserLoggedIn()) {
+                          await context.read<CartProvider>().getCartListProvider(context: context);
+                        } else if (context.read<CartListProvider>().cartList.isNotEmpty) {
+                          await context.read<CartProvider>().getGuestCartListProvider(context: context);
+                        }
+                      });
                     }
-                  } catch (e) {
-                    userProfileProvider.changeState();
-                    showMessage(
-                      context,
-                      e.toString(),
-                      MessageType.error,
-                    );
+                  } else {
+                    print('not validated');
+                    if (edtEmail.text.trim().isEmpty && edtUsername.text.trim().isEmpty) {
+                      showMessage(
+                        context,
+                        getTranslatedValue(context, "enter_username_email"),
+                        MessageType.error,
+                      );
+                    }
                   }
-                },
-              );
-      },
-    );
-  }
+                } catch (e) {
+                  setState(() {
+                    isBtnLoading = false;
+                  });
+                  userProfileProvider.changeState();
+                  showMessage(
+                    context,
+                    e.toString(),
+                    MessageType.error,
+                  );
+                }
+              },
+            );
+    },
+  );
+}
+
 
   imgWidget() {
     return Center(

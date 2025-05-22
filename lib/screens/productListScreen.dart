@@ -123,85 +123,85 @@ class _ProductListScreenState extends State<ProductListScreen> {
               ),
               Row(
                 children: [
-                  Expanded(
-                    child: Container(
-                      child: GestureDetector(
-                        onTap: () async {
-                          Navigator.pushNamed(
-                            context,
-                            productListFilterScreen,
-                            arguments: [
-                              context
-                                  .read<ProductListProvider>()
-                                  .productList
-                                  .brands,
-                              double.parse(context
-                                          .read<ProductListProvider>()
-                                          .productList
-                                          .totalMaxPrice) !=
-                                      0
-                                  ? double.parse(context
-                                      .read<ProductListProvider>()
-                                      .productList
-                                      .totalMaxPrice)
-                                  : double.parse(context
-                                      .read<ProductListProvider>()
-                                      .productList
-                                      .totalMaxPrice),
-                              double.parse(context
-                                          .read<ProductListProvider>()
-                                          .productList
-                                          .totalMinPrice) !=
-                                      0
-                                  ? double.parse(context
-                                      .read<ProductListProvider>()
-                                      .productList
-                                      .totalMinPrice)
-                                  : double.parse(context
-                                      .read<ProductListProvider>()
-                                      .productList
-                                      .totalMinPrice),
-                              context
-                                  .read<ProductListProvider>()
-                                  .productList
-                                  .sizes,
-                              Constant.selectedCategories,
-                            ],
-                          ).then((value) async {
-                            if (value == true) {
-                              context.read<ProductListProvider>().offset = 0;
-                              context.read<ProductListProvider>().products = [];
+                  // Expanded(
+                  //   child: Container(
+                  //     child: GestureDetector(
+                  //       onTap: () async {
+                  //         Navigator.pushNamed(
+                  //           context,
+                  //           productListFilterScreen,
+                  //           arguments: [
+                  //             context
+                  //                 .read<ProductListProvider>()
+                  //                 .productList
+                  //                 .brands,
+                  //             double.parse(context
+                  //                         .read<ProductListProvider>()
+                  //                         .productList
+                  //                         .totalMaxPrice) !=
+                  //                     0
+                  //                 ? double.parse(context
+                  //                     .read<ProductListProvider>()
+                  //                     .productList
+                  //                     .totalMaxPrice)
+                  //                 : double.parse(context
+                  //                     .read<ProductListProvider>()
+                  //                     .productList
+                  //                     .totalMaxPrice),
+                  //             double.parse(context
+                  //                         .read<ProductListProvider>()
+                  //                         .productList
+                  //                         .totalMinPrice) !=
+                  //                     0
+                  //                 ? double.parse(context
+                  //                     .read<ProductListProvider>()
+                  //                     .productList
+                  //                     .totalMinPrice)
+                  //                 : double.parse(context
+                  //                     .read<ProductListProvider>()
+                  //                     .productList
+                  //                     .totalMinPrice),
+                  //             context
+                  //                 .read<ProductListProvider>()
+                  //                 .productList
+                  //                 .sizes,
+                  //             Constant.selectedCategories,
+                  //           ],
+                  //         ).then((value) async {
+                  //           if (value == true) {
+                  //             context.read<ProductListProvider>().offset = 0;
+                  //             context.read<ProductListProvider>().products = [];
 
-                              callApi(isReset: true);
-                            }
-                          });
-                        },
-                        child: Container(
-                            margin:
-                                EdgeInsetsDirectional.only(start: 10, end: 5),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(7),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                defaultImg(
-                                    image: "filter_icon",
-                                    height: 17,
-                                    width: 17,
-                                    padding: const EdgeInsetsDirectional.only(
-                                        top: 7, bottom: 7, end: 7),
-                                    iconColor: Theme.of(context).primaryColor),
-                                CustomTextLabel(
-                                  jsonKey: "filter",
-                                  softWrap: true,
-                                )
-                              ],
-                            )),
-                      ),
-                    ),
-                  ),
+                  //             callApi(isReset: true);
+                  //           }
+                  //         });
+                  //       },
+                  //       child: Container(
+                  //           margin:
+                  //               EdgeInsetsDirectional.only(start: 10, end: 5),
+                  //           decoration: BoxDecoration(
+                  //             color: Theme.of(context).cardColor,
+                  //             borderRadius: BorderRadius.circular(7),
+                  //           ),
+                  //           child: Row(
+                  //             mainAxisAlignment: MainAxisAlignment.center,
+                  //             children: [
+                  //               defaultImg(
+                  //                   image: "filter_icon",
+                  //                   height: 17,
+                  //                   width: 17,
+                  //                   padding: const EdgeInsetsDirectional.only(
+                  //                       top: 7, bottom: 7, end: 7),
+                  //                   iconColor: Theme.of(context).primaryColor),
+                  //               CustomTextLabel(
+                  //                 jsonKey: "filter",
+                  //                 softWrap: true,
+                  //               )
+                  //             ],
+                  //           )),
+                  //     ),
+                  //   ),
+                  // ),
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
@@ -344,7 +344,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         );
                       },
                       child: Container(
-                        margin: EdgeInsetsDirectional.only(start: 5, end: 5),
+                        margin: EdgeInsetsDirectional.only(start: 10, end: 5),
                         decoration: BoxDecoration(
                           color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(7),
@@ -419,6 +419,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     ),
                   ),
                 ],
+              ),
+              getSizedBox(
+                height: Constant.size5,
               ),
               Expanded(
                 child: setRefreshIndicator(

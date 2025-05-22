@@ -149,9 +149,9 @@ class _LoginAccountState extends State<LoginAccount> {
       child: Scaffold(
         body: Stack(
           children: [
-            ListView(
-              children: [
-                Column(
+            Center(
+              child: SingleChildScrollView(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(
@@ -179,7 +179,7 @@ class _LoginAccountState extends State<LoginAccount> {
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
             PositionedDirectional(
               top: 40,

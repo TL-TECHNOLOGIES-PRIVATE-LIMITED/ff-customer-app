@@ -3,20 +3,33 @@ import 'package:project/helper/utils/generalImports.dart';
 
 late final SharedPreferences prefs;
 
+// ✅ Must be top-level
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  await LocalAwesomeNotification.onBackgroundMessageHandler(message);
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   prefs = await SharedPreferences.getInstance();
+
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-
     await FirebaseMessaging.instance.setAutoInitEnabled(true);
   } catch (_) {}
 
   SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+    const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
+  );
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
@@ -92,9 +105,8 @@ class MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    print('================= local notification initState start==============');
-    localNotification.init(context); // ✅ Correct placement
-    print('================= local notification initState end==============');
+    print('-----------------------notif------------------------------');
+    localNotification.init(context);
   }
 
   @override
@@ -132,31 +144,6 @@ class MyAppState extends State<MyApp> {
 
           return Consumer<LanguageProvider>(
             builder: (context, languageProvider, child) {
-              if (Constant.session
-                  .getData(SessionManager.appThemeName)
-                  .toString()
-                  .isEmpty) {
-                Constant.session.setData(
-                    SessionManager.appThemeName, Constant.themeList[0], false);
-                Constant.session.setBoolData(
-                    SessionManager.isDarkTheme,
-                    PlatformDispatcher.instance.platformBrightness ==
-                        Brightness.dark,
-                    false);
-              }
-
-              // This callback is called every time the brightness changes from the device.
-              PlatformDispatcher.instance.onPlatformBrightnessChanged = () {
-                if (Constant.session.getData(SessionManager.appThemeName) ==
-                    Constant.themeList[0]) {
-                  Constant.session.setBoolData(
-                      SessionManager.isDarkTheme,
-                      PlatformDispatcher.instance.platformBrightness ==
-                          Brightness.dark,
-                      true);
-                }
-              };
-
               return GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
