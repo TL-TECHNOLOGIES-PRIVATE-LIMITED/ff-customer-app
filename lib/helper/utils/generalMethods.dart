@@ -601,7 +601,7 @@ Future<bool> exitDialog(BuildContext context) async {
                 isDestructiveAction: true,
                 onPressed: () {
                   if (Platform.isAndroid) {
-                    SystemNavigator.pop();
+                 exit(0);
                   } else if (Platform.isIOS) {
                     exit(0);
                   }

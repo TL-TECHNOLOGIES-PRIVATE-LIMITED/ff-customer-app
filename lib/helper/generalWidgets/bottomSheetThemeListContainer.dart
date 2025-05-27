@@ -1,135 +1,73 @@
 import 'package:project/helper/utils/generalImports.dart';
 
-class BottomSheetThemeListContainer extends StatefulWidget {
-  BottomSheetThemeListContainer({
-    Key? key,
-  }) : super(key: key);
+class BottomSheetThemeListContainer extends StatelessWidget {
+  BottomSheetThemeListContainer({Key? key}) : super(key: key);
 
-  @override
-  State<BottomSheetThemeListContainer> createState() =>
-      _BottomSheetThemeListContainerState();
-}
-
-class _BottomSheetThemeListContainerState
-    extends State<BottomSheetThemeListContainer> {
-  @override
-  void initState() {
-    Future.delayed(Duration.zero, () async {
-      await context.read<ThemeProvider>().setSelectedTheme(
-          currentTheme: Constant.session.getData(SessionManager.appThemeName));
-    });
-    super.initState();
-  }
+  final List<String> lblThemeDisplayNames = [
+    "theme_display_names_system_default",
+    "theme_display_names_light",
+    "theme_display_names_dark",
+  ];
 
   @override
   Widget build(BuildContext context) {
-    List lblThemeDisplayNames = [
-      "theme_display_names_system_default",
-      "theme_display_names_light",
-      "theme_display_names_dark",
-    ];
-
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, _) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            getSizedBox(
-              height: 20,
-            ),
+            getSizedBox(height: 20),
             Center(
               child: CustomTextLabel(
                 jsonKey: "change_theme",
                 softWrap: true,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium!.merge(
-                      TextStyle(
-                        letterSpacing: 0.5,
-                        color: ColorsRes.mainTextColor,
-                      ),
+                style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                      letterSpacing: 0.5,
+                      color: ColorsRes.mainTextColor,
                     ),
               ),
             ),
-            getSizedBox(
-              height: 10,
-            ),
-            ListView(
+            getSizedBox(height: 10),
+            ListView.builder(
               shrinkWrap: true,
+              itemCount: Constant.themeList.length,
               padding: EdgeInsets.zero,
-              children: List.generate(
-                3,
-                (index) {
-                  return GestureDetector(
-                    onTap: () {
-                      themeProvider.setSelectedTheme(
-                        currentTheme: Constant.themeList[index],
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsetsDirectional.only(
-                                start: Constant.size10),
-                            child: CustomTextLabel(
-                              jsonKey: lblThemeDisplayNames[index],
-                            ),
-                          ),
-                        ),
-                        CustomRadio(
-                          inactiveColor: ColorsRes.mainTextColor,
-                          activeColor: Theme.of(context).primaryColor,
-                          value: index == 0
-                              ? ThemeState.systemDefault
-                              : index == 1
-                                  ? ThemeState.light
-                                  : ThemeState.dark,
-                          groupValue: themeProvider.themeState,
-                          onChanged: (value) {
-                            themeProvider.setSelectedTheme(
-                              currentTheme: Constant.themeList[index],
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: EdgeInsetsDirectional.only(
-                start: 10,
-                end: 10,
-                bottom: 25,
-              ),
-              child: gradientBtnWidget(
-                context,
-                10,
-                callback: () {
-                  Navigator.pop(context);
-                  themeProvider.updateTheme(
-                    currentTheme:
-                        themeProvider.themeState == ThemeState.systemDefault
-                            ? Constant.themeList[0]
-                            : themeProvider.themeState == ThemeState.light
-                                ? Constant.themeList[1]
-                                : Constant.themeList[2],
-                  );
-                },
-                otherWidgets: CustomTextLabel(
-                  jsonKey: "change",
-                  softWrap: true,
-                  style: Theme.of(context).textTheme.titleMedium!.merge(
-                        TextStyle(
-                          color: Colors.white,
-                          letterSpacing: 0.5,
-                          fontWeight: FontWeight.w500,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    // Immediately update and apply the theme when tapped
+                    themeProvider.updateTheme(
+                      currentTheme: Constant.themeList[index],
+                    );
+                    Navigator.pop(context); // Close the bottom sheet
+                  },
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsetsDirectional.only(start: Constant.size10),
+                          child: CustomTextLabel(jsonKey: lblThemeDisplayNames[index]),
                         ),
                       ),
-                ),
-              ),
+                      CustomRadio(
+                        inactiveColor: ColorsRes.mainTextColor,
+                        activeColor: Theme.of(context).primaryColor,
+                        value: ThemeState.values[index],
+                        groupValue: themeProvider.themeState,
+                        onChanged: (value) {
+                          themeProvider.updateTheme(
+                            currentTheme: Constant.themeList[index],
+                          );
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
+            getSizedBox(height: 20),
           ],
         );
       },

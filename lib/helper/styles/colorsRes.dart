@@ -1,7 +1,9 @@
+import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:project/helper/utils/generalImports.dart';
 
 class ColorsRes {
-  static MaterialColor appColor = const MaterialColor(
+  static const MaterialColor appColor = MaterialColor(
     0xFF2E3593,
     <int, Color>{
       50: Color(0xFF2E3593),
@@ -17,7 +19,7 @@ class ColorsRes {
     },
   );
 
-  static MaterialColor darkAppColor = const MaterialColor(
+  static const MaterialColor darkAppColor = MaterialColor(
     0xFF4A52D0,
     <int, Color>{
       50: Color(0xFF4A52D0),
@@ -44,22 +46,16 @@ class ColorsRes {
   static Color defaultPageOuterCircle = const Color(0x0d999999);
 
   static Color mainTextColor = const Color(0xde000000);
-
-  ///[mainTextColor] do not change the main color change only [mainTextColorLight] and [mainTextColorDark] color only
   static Color mainTextColorLight = const Color(0xff121418);
   static Color mainTextColorDark = const Color(0xfffefefe);
 
   static Color subTitleMainTextColor = const Color(0x94000000);
-
-  ///[subtitleTextColorLight] do not change the main color change only [subTitleTextColorDark] and [subTitleTextColorLight] color only
   static Color subTitleTextColorLight = const Color(0xffAEAEAE);
   static Color subTitleTextColorDark = const Color(0xff7F878E);
 
   static Color mainIconColor = Colors.white;
-
   static Color bgColorLight = const Color(0xffF7F7F7);
   static Color bgColorDark = const Color(0xff141A1F);
-
   static Color cardColorLight = const Color(0xffFEFEFE);
   static Color cardColorDark = const Color(0xff202934);
 
@@ -67,38 +63,35 @@ class ColorsRes {
   static Color lightGrey = const Color(0xffb8babb);
   static Color appColorWhite = Colors.white;
   static Color appColorBlack = Colors.black;
-  static Color appColorRed = Color(0xffF52C45);
+  static Color appColorRed = const Color(0xffF52C45);
   static Color appColorGreen = Colors.green;
 
   static Color greyBox = const Color(0x0a000000);
   static Color lightGreyBox = const Color.fromARGB(9, 213, 212, 212);
 
-  //It will be same for both theme
   static Color shimmerBaseColor = Colors.white;
   static Color shimmerHighlightColor = Colors.white;
   static Color shimmerContentColor = Colors.white;
 
-  //Dark theme shimmer color
-  static Color shimmerBaseColorDark = Color(0xff1E252B);
-  static Color shimmerHighlightColorDark = Color(0xff2A323A);
+  static Color shimmerBaseColorDark = const Color(0xff1E252B);
+  static Color shimmerHighlightColorDark = const Color(0xff2A323A);
   static Color shimmerContentColorDark = Colors.black;
 
-  //Light theme shimmer color
-  static Color shimmerBaseColorLight = Color(0xffE0E0E0);
-  static Color shimmerHighlightColorLight = Color(0xffF0F0F0);
+  static Color shimmerBaseColorLight = const Color(0xffE0E0E0);
+  static Color shimmerHighlightColorLight = const Color(0xffF0F0F0);
   static Color shimmerContentColorLight = Colors.white;
 
-  static Color activeRatingColor = Color(0xffF4CD32);
-  static Color deActiveRatingColor = Color(0xffAEAEAE);
+  static Color activeRatingColor = const Color(0xffF4CD32);
+  static Color deActiveRatingColor = const Color(0xffAEAEAE);
 
-  static Color statusBgColorPendingPayment = Color(0xffFFF8EC);
-  static Color statusBgColorReceived = Color(0xffF1FFFC);
-  static Color statusBgColorProcessed = Color(0xffFBF8FF);
-  static Color statusBgColorShipped = Color(0xffF2FAFF);
-  static Color statusBgColorOutForDelivery = Color(0xffF7FAFC);
-  static Color statusBgColorDelivered = Color(0xffF7FAFC);
-  static Color statusBgColorCancelled = Color(0xffF1FFEF);
-  static Color statusBgColorReturned = Color(0xffFFF4F4);
+  static Color statusBgColorPendingPayment = const Color(0xffFFF8EC);
+  static Color statusBgColorReceived = const Color(0xffF1FFFC);
+  static Color statusBgColorProcessed = const Color(0xffFBF8FF);
+  static Color statusBgColorShipped = const Color(0xffF2FAFF);
+  static Color statusBgColorOutForDelivery = const Color(0xffF7FAFC);
+  static Color statusBgColorDelivered = const Color(0xffF7FAFC);
+  static Color statusBgColorCancelled = const Color(0xffF1FFEF);
+  static Color statusBgColorReturned = const Color(0xffFFF4F4);
 
   static List<Color> statusBgColor = [
     statusBgColorPendingPayment,
@@ -111,14 +104,14 @@ class ColorsRes {
     statusBgColorReturned,
   ];
 
-  static Color statusTextColorPendingPayment = Color(0xffDD6B20);
-  static Color statusTextColorReceived = Color(0xff319795);
-  static Color statusTextColorProcessed = Color(0xff805AD5);
-  static Color statusTextColorShipped = Color(0xff3182CE);
-  static Color statusTextColorOutForDelivery = Color(0xff2D3748);
-  static Color statusTextColorDelivered = Color(0xff38A169);
-  static Color statusTextColorCancelled = Color(0xffE53E3E);
-  static Color statusTextColorReturned = Color(0xffD69E2E);
+  static Color statusTextColorPendingPayment = const Color(0xffDD6B20);
+  static Color statusTextColorReceived = const Color(0xff319795);
+  static Color statusTextColorProcessed = const Color(0xff805AD5);
+  static Color statusTextColorShipped = const Color(0xff3182CE);
+  static Color statusTextColorOutForDelivery = const Color(0xff2D3748);
+  static Color statusTextColorDelivered = const Color(0xff38A169);
+  static Color statusTextColorCancelled = const Color(0xffE53E3E);
+  static Color statusTextColorReturned = const Color(0xffD69E2E);
 
   static List<Color> statusTextColor = [
     statusTextColorPendingPayment,
@@ -131,22 +124,17 @@ class ColorsRes {
     statusTextColorReturned,
   ];
 
-  static ThemeData lightTheme = ThemeData(
+  static final ThemeData lightTheme = ThemeData(
     primaryColor: appColor,
     brightness: Brightness.light,
     scaffoldBackgroundColor: bgColorLight,
     cardColor: cardColorLight,
-    iconTheme: IconThemeData(
-      color: grey,
-    ),
+    iconTheme: IconThemeData(color: grey),
     appBarTheme: AppBarTheme(
       backgroundColor: grey,
-      iconTheme: IconThemeData(
-        color: grey,
-      ),
+      iconTheme: IconThemeData(color: grey),
     ),
-    colorScheme:
-        ColorScheme.fromSwatch(primarySwatch: ColorsRes.appColor).copyWith(
+    colorScheme: ColorScheme.fromSwatch(primarySwatch: ColorsRes.appColor).copyWith(
       surface: bgColorLight,
       brightness: Brightness.light,
     ),
@@ -156,23 +144,18 @@ class ColorsRes {
     ),
   );
 
-  static ThemeData darkTheme = ThemeData(
+  static final ThemeData darkTheme = ThemeData(
     primaryColor: darkAppColor,
     brightness: Brightness.dark,
     scaffoldBackgroundColor: bgColorDark,
     cardColor: cardColorDark,
-    iconTheme: IconThemeData(
-      color: grey,
-    ),
+    iconTheme: IconThemeData(color: grey),
     appBarTheme: AppBarTheme(
       backgroundColor: grey,
-      iconTheme: IconThemeData(
-        color: grey,
-      ),
+      iconTheme: IconThemeData(color: grey),
     ),
-    colorScheme:
-        ColorScheme.fromSwatch(primarySwatch: ColorsRes.darkAppColor).copyWith(
-      surface: bgColorLight,
+    colorScheme: ColorScheme.fromSwatch(primarySwatch: ColorsRes.darkAppColor).copyWith(
+      surface: bgColorDark,
       brightness: Brightness.dark,
     ),
     cardTheme: CardTheme(
@@ -186,42 +169,29 @@ class ColorsRes {
     bool isDarkTheme = Constant.session.getBoolData(SessionManager.isDarkTheme);
 
     bool isDark = false;
+
     if (theme == Constant.themeList[2]) {
       isDark = true;
     } else if (theme == Constant.themeList[1]) {
       isDark = false;
-    } else if (theme == "" || theme == Constant.themeList[0]) {
+    } else if (theme.isEmpty || theme == Constant.themeList[0]) {
       var brightness = PlatformDispatcher.instance.platformBrightness;
       isDark = brightness == Brightness.dark;
 
-      if (theme == "") {
-        Constant.session
-            .setData(SessionManager.appThemeName, Constant.themeList[0], false);
+      if (theme.isEmpty) {
+        Constant.session.setData(SessionManager.appThemeName, Constant.themeList[0], false);
       }
     }
 
-    if (isDark) {
-      if (!isDarkTheme) {
-        Constant.session.setBoolData(SessionManager.isDarkTheme, false, false);
-      }
-      mainTextColor = mainTextColorDark;
-      subTitleMainTextColor = subTitleTextColorDark;
+    Constant.session.setBoolData(SessionManager.isDarkTheme, isDark, false);
 
-      shimmerBaseColor = shimmerBaseColorDark;
-      shimmerHighlightColor = shimmerHighlightColorDark;
-      shimmerContentColor = shimmerContentColorDark;
-      return darkTheme;
-    } else {
-      if (isDarkTheme) {
-        Constant.session.setBoolData(SessionManager.isDarkTheme, true, false);
-      }
-      mainTextColor = mainTextColorLight;
-      subTitleMainTextColor = subTitleTextColorLight;
+    mainTextColor = isDark ? mainTextColorDark : mainTextColorLight;
+    subTitleMainTextColor = isDark ? subTitleTextColorDark : subTitleTextColorLight;
 
-      shimmerBaseColor = shimmerBaseColorLight;
-      shimmerHighlightColor = shimmerHighlightColorLight;
-      shimmerContentColor = shimmerContentColorLight;
-      return lightTheme;
-    }
+    shimmerBaseColor = isDark ? shimmerBaseColorDark : shimmerBaseColorLight;
+    shimmerHighlightColor = isDark ? shimmerHighlightColorDark : shimmerHighlightColorLight;
+    shimmerContentColor = isDark ? shimmerContentColorDark : shimmerContentColorLight;
+
+    return isDark ? darkTheme : lightTheme;
   }
 }

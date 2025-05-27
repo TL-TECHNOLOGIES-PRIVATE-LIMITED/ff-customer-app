@@ -1,17 +1,21 @@
 import 'package:project/helper/utils/generalImports.dart';
 import 'package:badges/badges.dart' as badges;
-
-Widget gradientBtnWidget(BuildContext context, double borderRadius,
-    {required Function callback,
-    String title = "",
-    Widget? otherWidgets,
-    double? height,
-    double? width,
-    Color? color1,
-    Color? color2}) {
+Widget gradientBtnWidget(
+  BuildContext context,
+  double borderRadius, {
+  required Function? callback,
+  String title = "",
+  Widget? otherWidgets,
+  double? height,
+  double? width,
+  Color? color1,
+  Color? color2,
+}) {
   return GestureDetector(
     onTap: () {
-      callback();
+      if (callback != null) {
+        callback();
+      }
     },
     child: Container(
       height: height ?? 45,
@@ -22,13 +26,14 @@ Widget gradientBtnWidget(BuildContext context, double borderRadius,
         color1: color1,
         color2: color2,
       ),
-      child: otherWidgets ??= CustomTextLabel(
+      child: otherWidgets ?? CustomTextLabel(
         text: title,
         softWrap: true,
         style: Theme.of(context).textTheme.titleMedium!.merge(TextStyle(
-            color: ColorsRes.mainIconColor,
-            letterSpacing: 0.5,
-            fontWeight: FontWeight.w500)),
+          color: ColorsRes.mainIconColor,
+          letterSpacing: 0.5,
+          fontWeight: FontWeight.w500,
+        )),
       ),
     ),
   );

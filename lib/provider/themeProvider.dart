@@ -1,61 +1,65 @@
 import 'package:project/helper/utils/generalImports.dart';
-
 enum ThemeState { systemDefault, light, dark }
-
 class ThemeProvider extends ChangeNotifier {
-  List<String> ThemeList = [
+  List<String> themeList = [
     "theme_display_names_system_default",
     "theme_display_names_light",
     "theme_display_names_dark"
   ];
 
   String selectedTheme = "";
+  late ThemeState themeState;
 
-  ThemeState themeState = Constant.session
-              .getData(SessionManager.appThemeName)
-              .toLowerCase() ==
-          "system default"
-      ? ThemeState.systemDefault
-      : Constant.session.getData(SessionManager.appThemeName).toLowerCase() ==
-              "light"
-          ? ThemeState.light
-          : ThemeState.dark;
+  ThemeProvider() {
+    final storedTheme = Constant.session
+        .getData(SessionManager.appThemeName)
+        .toString() // Ensure it's a string
+        .toLowerCase();
 
-  Future setSelectedTheme({required String currentTheme}) async {
-    themeState = currentTheme.toLowerCase() == "system default"
-        ? ThemeState.systemDefault
-        : currentTheme.toLowerCase() == "light"
-            ? ThemeState.light
-            : ThemeState.dark;
-
-    selectedTheme = currentTheme.toLowerCase() == "system default"
-        ? Constant.themeList[0]
-        : currentTheme.toLowerCase() == "light"
-            ? Constant.themeList[1]
-            : Constant.themeList[2];
-
-    notifyListeners();
+    themeState = _mapStringToThemeState(storedTheme);
+    selectedTheme = Constant.themeList[themeState.index];
   }
 
-  Future updateTheme({required String currentTheme}) async {
+  ThemeState _mapStringToThemeState(String theme) {
+    switch (theme) {
+      case "light":
+        return ThemeState.light;
+      case "dark":
+        return ThemeState.dark;
+      case "system default":
+      default:
+        return ThemeState.systemDefault;
+    }
+  }
+
+  Future<void> updateTheme({required String currentTheme}) async {
+    // Update provider's state first
+    themeState = _mapStringToThemeState(currentTheme.toLowerCase());
+    selectedTheme = Constant.themeList[themeState.index];
+
+    // Save to SharedPreferences
     Constant.session.setData(SessionManager.appThemeName, currentTheme, true);
 
-    bool isDark = false;
-
-    if (currentTheme == Constant.themeList[2]) {
+    // Determine isDark based on selected theme
+    bool isDark;
+    if (currentTheme == Constant.themeList[2]) { // Dark theme
       isDark = true;
-    } else if (currentTheme == Constant.themeList[1]) {
+    } else if (currentTheme == Constant.themeList[1]) { // Light theme
       isDark = false;
-    } else if (currentTheme == "" || currentTheme == Constant.themeList[0]) {
-      var brightness = PlatformDispatcher.instance.platformBrightness;
+    } else { // System default
+      final brightness = PlatformDispatcher.instance.platformBrightness;
       isDark = brightness == Brightness.dark;
-
-      if (currentTheme == "") {
-        Constant.session
-            .setData(SessionManager.appThemeName, Constant.themeList[0], false);
+      
+      // Handle empty theme case (set to system default)
+      if (currentTheme.isEmpty) {
+        Constant.session.setData(SessionManager.appThemeName, Constant.themeList[0], false);
       }
     }
 
+    // Save isDark state
     Constant.session.setBoolData(SessionManager.isDarkTheme, isDark, true);
+
+    // Notify listeners to rebuild UI
+    notifyListeners();
   }
 }

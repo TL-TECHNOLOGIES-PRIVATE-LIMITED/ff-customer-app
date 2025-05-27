@@ -99,8 +99,7 @@ flutter {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    api 'com.razorpay:checkout:1.6.41'
+   implementation 'com.razorpay:checkout:1.6.40'
     
     // add the Firebase SDK for Google Analytics
     implementation platform('com.google.firebase:firebase-bom:33.8.0')
