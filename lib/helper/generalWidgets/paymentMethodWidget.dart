@@ -1,3 +1,4 @@
+import 'package:project/helper/generalWidgets/warning_msg_widget.dart';
 import 'package:project/helper/utils/generalImports.dart';
 
 class PaymentMethodsWidget extends StatelessWidget {
@@ -345,7 +346,8 @@ class PaymentMethodsWidget extends StatelessWidget {
                     },
                     child: Container(
                       padding: EdgeInsets.zero,
-                      margin: EdgeInsets.symmetric(vertical: Constant.size5),
+                      margin:
+                          EdgeInsets.symmetric(vertical: Constant.size5),
                       decoration: BoxDecoration(
                         color: context
                                     .read<PaymentMethodsProvider>()
@@ -375,7 +377,9 @@ class PaymentMethodsWidget extends StatelessWidget {
                             padding: EdgeInsetsDirectional.only(
                                 start: Constant.size10),
                             child: defaultImg(
-                                image: "ic_razorpay", width: 25, height: 25),
+                                image: "ic_razorpay",
+                                width: 25,
+                                height: 25),
                           ),
                           Padding(
                             padding: EdgeInsetsDirectional.only(
@@ -407,7 +411,18 @@ class PaymentMethodsWidget extends StatelessWidget {
                         ],
                       ),
                     ),
-                  ),
+                  ),    SizedBox(
+                        height: 5,
+                      ),
+                      context
+                                  .read<PaymentMethodsProvider>()
+                                  .selectedPaymentMethod ==
+                              "Razorpay"
+                          ? WarningMessageContainer(
+                              context: context,
+                              text: 'payment_warning_message',
+                              type: MessageType.warning)
+                          : SizedBox(),
                 if (paymentMethodsProvider
                         .paymentMethodsData?.cashfreePaymentMethod ==
                     "1")

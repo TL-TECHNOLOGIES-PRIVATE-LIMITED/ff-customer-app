@@ -38,9 +38,81 @@ class PlaceOrderButtonWidgetState extends State<PlaceOrderButtonWidget> {
   }
 
   void _handleRazorPayPaymentError(PaymentFailureResponse response) {
-    context.read<CheckoutProvider>().deleteAwaitingOrder(context);
-    context.read<CheckoutProvider>().setPaymentProcessState(false);
-    showMessage(context, response.message.toString(), MessageType.warning);
+    final checkoutProvider = context.read<CheckoutProvider>();
+
+    checkoutProvider.deleteAwaitingOrder(context);
+    checkoutProvider.setPaymentProcessState(false);
+
+       showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          title: CustomTextLabel(
+            jsonKey: "payment_failed",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+          content: CustomTextLabel(
+            jsonKey: "payment_failed_textdiscription",
+            style: TextStyle(
+              color: ColorsRes.mainTextColor,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+              },
+              child: Text(
+                'OK',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _contactAdmin(); // Call function to contact admin
+              },
+              child: const Text('Contact Us'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _contactAdmin() async {
+    const phoneNumber =
+        '+91 90612 23339'; // Replace with actual admin phone number
+    final Uri telLaunchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+
+    if (await canLaunchUrl(telLaunchUri)) {
+      await launchUrl(telLaunchUri);
+    } else {
+      showMessage(
+        context,
+        'Could not open dialer.',
+        MessageType.error,
+      );
+    }
   }
 
   void _handleRazorPayExternalWallet(ExternalWalletResponse response) {
@@ -374,8 +446,10 @@ class PlaceOrderButtonWidgetState extends State<PlaceOrderButtonWidget> {
                           padding: EdgeInsetsDirectional.all(4),
                           width: 40,
                           height: 40,
-                          child: CircularProgressIndicator(
-                            color: ColorsRes.appColorWhite,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: ColorsRes.appColorWhite,
+                            ),
                           ),
                         )
                       : Container(
