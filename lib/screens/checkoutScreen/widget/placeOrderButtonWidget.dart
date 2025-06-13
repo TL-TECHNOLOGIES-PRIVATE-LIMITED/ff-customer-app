@@ -42,58 +42,137 @@ class PlaceOrderButtonWidgetState extends State<PlaceOrderButtonWidget> {
 
     checkoutProvider.deleteAwaitingOrder(context);
     checkoutProvider.setPaymentProcessState(false);
-
-       showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          title: CustomTextLabel(
-            jsonKey: "payment_failed",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-          content: CustomTextLabel(
-            jsonKey: "payment_failed_textdiscription",
-            style: TextStyle(
-              color: ColorsRes.mainTextColor,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-              },
-              child: Text(
-                'OK',
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-                _contactAdmin(); // Call function to contact admin
-              },
-              child: const Text('Contact Us'),
+showDialog(
+  context: context,
+  barrierDismissible: false,
+  builder: (context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 28),
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
           ],
-        );
-      },
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Animated Icon with Circle Background
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Theme.of(context).primaryColor.withOpacity(0.15),
+              ),
+              child: Icon(
+                Icons.error_outline_rounded,
+                color: Theme.of(context).primaryColor,
+                size: 44,
+                semanticLabel: 'Warning icon',
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Title
+            CustomTextLabel(
+              jsonKey: "payment_failed",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).primaryColor,
+                letterSpacing: 0.5,
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            // Description
+            CustomTextLabel(
+              jsonKey: "payment_failed_textdiscription",
+              softWrap: true,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: ColorsRes.mainTextColor,
+                fontSize: 15,
+                height: 1.5,
+                letterSpacing: 0.25,
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // Buttons - Make "Contact Us" primary, "OK" secondary
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // OK Button
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Theme.of(context).primaryColor),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      textStyle: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    child: Text(
+                      'OK',
+                      style: TextStyle(color: Theme.of(context).primaryColor),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 16),
+
+                // Contact Us Button
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _contactAdmin(); // Your function here
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      textStyle: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    child: const Text('Contact Us'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
+  },
+);
+
+
+
   }
 
   void _contactAdmin() async {

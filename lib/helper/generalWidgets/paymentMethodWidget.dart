@@ -419,7 +419,7 @@ class PaymentMethodsWidget extends StatelessWidget {
                                   .selectedPaymentMethod ==
                               "Razorpay"
                           ? WarningMessageContainer(
-                              context: context,
+                              
                               text: 'payment_warning_message',
                               type: MessageType.warning)
                           : SizedBox(),
